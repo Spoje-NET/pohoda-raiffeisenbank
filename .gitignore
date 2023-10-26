@@ -1,0 +1,17 @@
+.DS_Store
+config.php
+import.csv
+output.xml
+/nbproject/private/
+/nbproject/
+.phpdoc
+/.phpunit.result.cache
+.env
+/RAIFF_MULTIFLEXI.p12
+/debian/debhelper-build-stamp
+/debian/abraflexi-raiffeisenbank.debhelper.log
+/debian/abraflexi-raiffeisenbank/
+/debian/.debhelper/
+/debian/abraflexi-raiffeisenbank.substvars
+/debian/files
+/statement.xml
