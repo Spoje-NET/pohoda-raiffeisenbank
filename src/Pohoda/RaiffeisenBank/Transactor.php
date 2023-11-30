@@ -143,7 +143,7 @@ class Transactor extends PohodaBankClient
             $this->setDataValue('text', $transactionData->entryDetails->transactionDetails->remittanceInformation->originatorMessage);
         }
 
-        $this->setDataValue('note', 'Import Job ' . \Ease\Functions::cfg('JOB_ID', 'n/a'));
+        $this->setDataValue('note', 'Import Job ' . \Ease\Shared::cfg('JOB_ID', 'n/a'));
         if (property_exists($transactionData->entryDetails->transactionDetails->relatedParties, 'counterParty')) {
             if (property_exists($transactionData->entryDetails->transactionDetails->relatedParties->counterParty, 'name')) {
 //TODO                $this->setDataValue('nazFirmy', $transactionData->entryDetails->transactionDetails->relatedParties->counterParty->name);

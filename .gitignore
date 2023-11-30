@@ -6,7 +6,7 @@ output.xml
 /nbproject/
 .phpdoc
 /.phpunit.result.cache
-.env
+/.env
 /RAIFF_MULTIFLEXI.p12
 /debian/debhelper-build-stamp
 /debian/abraflexi-raiffeisenbank.debhelper.log
@@ -15,3 +15,4 @@ output.xml
 /debian/abraflexi-raiffeisenbank.substvars
 /debian/files
 /statement.xml
+/vendor

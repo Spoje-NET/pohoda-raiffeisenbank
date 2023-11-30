@@ -17,111 +17,129 @@ namespace Pohoda\RaiffeisenBank;
 class Statementor extends PohodaBankClient
 {
     /**
-     * Obtain Transactions from RB
      *
-     * @return array
+     * @var \VitexSoftware\Raiffeisenbank\Statementor
      */
-    public function getStatements()
+    private $obtainer;
+    private $statementsDir;
+
+    /**
+     *
+     * @param string $bankAccount
+     * @param array  $options
+     */
+    public function __construct($bankAccount, $options = [])
     {
-        $apiInstance = new \VitexSoftware\Raiffeisenbank\PremiumAPI\GetStatementListApi();
-        $page = 1;
-        $statements = [];
-        $requestBody = new \VitexSoftware\Raiffeisenbank\Model\GetStatementsRequest(['accountNumber' => $this->bank->getDataValue('account'), 'currency' => $this->getCurrencyCode(), 'statementLine' => \Ease\Functions::cfg('STATEMENT_LINE', 'MAIN'), 'dateFrom' => $this->since->format(self::$dateFormat), 'dateTo' => $this->until->format(self::$dateFormat)]);
-        $this->addStatusMessage(sprintf(_('Request statements from %s to %s'), $this->since->format(self::$dateFormat), $this->until->format(self::$dateFormat)), 'debug');
-        try {
-            do {
-                $result = $apiInstance->getStatements($this->getxRequestId(), $requestBody, $page);
-                if (empty($result)) {
-                    $this->addStatusMessage(sprintf(_('No transactions from %s to %s'), $this->since->format(self::$dateFormat), $this->until->format(self::$dateFormat)));
-                    $result['lastPage'] = true;
-                }
-                if (array_key_exists('statements', $result)) {
-                    $statements = array_merge($statements, $result['statements']);
-                }
-            } while ($result['last'] === false);
-        } catch (Exception $e) {
-            echo 'Exception when calling GetTransactionListApi->getTransactionList: ', $e->getMessage(), PHP_EOL;
+        parent::__construct($bankAccount, $options);
+        $this->obtainer = new \VitexSoftware\Raiffeisenbank\Statementor($bankAccount);
+
+        $this->obtainer->setScope(\Ease\Shared::cfg('STATEMENT_IMPORT_SCOPE', 'last_month'));
+
+        $this->statementsDir = \Ease\Functions::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir() . '/rb');
+
+        if (file_exists($this->statementsDir) === false) {
+            mkdir($this->statementsDir, 0777, true);
         }
-        return $statements;
     }
 
     public function import()
     {
-        $statements = $this->getStatements();
-        if ($statements) {
-            $apiInstance = new \VitexSoftware\Raiffeisenbank\PremiumAPI\DownloadStatementApi();
-            $success = 0;
-            foreach ($statements as $statement) {
-                $requestBody = new \VitexSoftware\Raiffeisenbank\Model\DownloadStatementRequest(['accountNumber' => $this->bank->getDataValue('buc'), 'currency' => $this->getCurrencyCode(), 'statementId' => $statement->statementId, 'statementFormat' => 'xml']);
-                $xmlStatementRaw = $apiInstance->downloadStatement($this->getxRequestId(), 'cs', $requestBody);
-                $statementXML = new \SimpleXMLElement($xmlStatementRaw);
-                foreach ($statementXML->BkToCstmrStmt->Stmt->Ntry as $ntry) {
-                    $this->dataReset();
-                    $this->ntryToPohoda($ntry);
-                    $this->setDataValue('vypisCisDokl', $statementXML->BkToCstmrStmt->Stmt->Id);
-                    $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
-                    $success = $this->insertTransactionToPohoda($success);
-                }
-                $this->addStatusMessage('Import done. ' . $success . ' of ' . count($statements) . ' imported');
+        $statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
+//        $statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
+        $this->account = 'RB'; //TODO!!!
+        $success = 0;
+        foreach ($statementsXML as $pos => $statement) {
+            $statementXML = new \SimpleXMLElement(file_get_contents($statement));
+            foreach ($statementXML->BkToCstmrStmt->Stmt->Ntry as $entry) {
+                $this->dataReset();
+                list($statementNumber,$statementYear,) = explode('_', $pos);
+                $this->setDataValue('statementNumber', ['statementNumber' => $statementNumber . '/' . $statementYear]);
+                $this->setDataValue('account', current($entry->NtryRef));
+                [
+                    "MOSS",
+//                    "account",
+                    "accounting",
+                    "accountingPeriodMOSS",
+                    "activity",
+//                    "bankType",
+                    "centre",
+                    "classificationKVDPH",
+                    "classificationVAT",
+                    "contract",
+//                    "datePayment",
+//                    "dateStatement",
+                    "evidentiaryResourcesMOSS",
+                    "intNote",
+                    "myIdentity",
+                    "note",
+                    "partnerIdentity",
+                    "paymentAccount",
+                    "statementNumber",
+//                    "symConst",
+                    "symPar",
+//                    "symSpec",
+//                    "symVar",
+                    "text"
+                    ];
+
+                $this->entryToPohoda($entry);
+//                $this->setDataValue('vypisCisDokl', $statementXML->BkToCstmrStmt->Stmt->Id);
+//                $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
+                $success = $this->insertTransactionToPohoda($success);
             }
+            $this->addStatusMessage('Import done. ' . $success . ' of ' . count($statements) . ' imported');
         }
     }
 
     /**
      * Parse Ntry element into \Pohoda\Banka data
      *
-     * @param SimpleXMLElement $ntry
+     * @param SimpleXMLElement $entry
      *
      * @return array
      */
-    public function ntryToPohoda($ntry)
+    public function entryToPohoda($entry)
     {
-        $this->setDataValue('typDokl', \Pohoda\RO::code(\Ease\Functions::cfg('TYP_DOKLADU', 'STANDARD')));
-        $this->setDataValue('bezPolozek', true);
-        $this->setDataValue('stavUzivK', 'stavUziv.nactenoEl');
-        $this->setDataValue('poznam', 'Import Job ' . \Ease\Functions::cfg('JOB_ID', 'n/a'));
-        if (trim($ntry->CdtDbtInd) == 'CRDT') {
-            $this->setDataValue('rada', \Pohoda\RO::code('BANKA+'));
-        } else {
-            $this->setDataValue('rada', \Pohoda\RO::code('BANKA-'));
-        }
+        $this->setDataValue('intNote', 'Import Job ' . \Ease\Shared::cfg('JOB_ID', 'n/a'));
+        $this->setDataValue('note', 'Imported by ' . \Ease\Shared::AppName() . ' ' . \Ease\Shared::AppVersion());
+        $this->setDataValue('datePayment', current($entry->BookgDt->DtTm));
+        $this->setDataValue('dateStatement', current($entry->ValDt->DtTm));
+        $moveTrans = ['DBIT' => 'expense', 'CRDT' => 'receipt'];
+        $this->setDataValue('bankType', $moveTrans[trim($entry->CdtDbtInd)]);
+//        $this->setDataValue('cisDosle', strval($entry->NtryRef));
+//        $this->setDataValue('datVyst', new \DateTime($entry->BookgDt->DtTm));
+        $this->setDataValue('homeCurrency', ['priceNone' => abs(floatval($entry->Amt))]); // "price3", "price3Sum", "price3VAT", "priceHigh", "priceHighSum", "priceHighVAT", "priceLow", "priceLowSum", "priceLowVAT", "priceNone", "round"
 
-        $moveTrans = ['DBIT' => 'typPohybu.vydej', 'CRDT' => 'typPohybu.prijem'];
-        $this->setDataValue('typPohybuK', $moveTrans[trim($ntry->CdtDbtInd)]);
-        $this->setDataValue('cisDosle', strval($ntry->NtryRef));
-        $this->setDataValue('datVyst', \Pohoda\RO::dateToFlexiDate(new \DateTime($ntry->BookgDt->DtTm)));
-        $this->setDataValue('sumOsv', abs($ntry->Amt));
-        $this->setDataValue('banka', $this->bank);
-        $this->setDataValue('mena', \Pohoda\RO::code($ntry->Amt->attributes()->Ccy));
-        if (property_exists($ntry, 'NtryDtls')) {
-            if (property_exists($ntry->NtryDtls, 'TxDtls')) {
-                $conSym = $ntry->NtryDtls->TxDtls->Refs->InstrId;
-                if (intval($conSym)) {
-                    $conSym = sprintf('%04d', $conSym);
-                    $this->ensureKSExists($conSym);
-                    $this->setDataValue('konSym', \Pohoda\RO::code($conSym));
-                }
+        //TODO $this->setDataValue('foreignCurrency', abs(floatval($entry->Amt)));
 
-                if (property_exists($ntry->NtryDtls->TxDtls->Refs, 'EndToEndId')) {
-                    $this->setDataValue('varSym', $ntry->NtryDtls->TxDtls->Refs->EndToEndId);
+
+//        $this->setDataValue('account', $this->bank);
+//        $this->setDataValue('mena', \Pohoda\RO::code($entry->Amt->attributes()->Ccy));
+        if (property_exists($entry, 'NtryDtls')) {
+            if (property_exists($entry->NtryDtls, 'TxDtls')) {
+                $this->setDataValue('symConst', current($entry->NtryDtls->TxDtls->Refs->InstrId));
+
+                if (property_exists($entry->NtryDtls->TxDtls->Refs, 'EndToEndId')) {
+                    $this->setDataValue('symVar', current($entry->NtryDtls->TxDtls->Refs->EndToEndId));
                 }
-                $transactionData['popis'] = $ntry->NtryDtls->TxDtls->AddtlTxInf;
-                if (property_exists($ntry->NtryDtls->TxDtls, 'RltdPties')) {
-                    if (property_exists($ntry->NtryDtls->TxDtls->RltdPties, 'DbtrAcct')) {
-                        $this->setDataValue('buc', $ntry->NtryDtls->TxDtls->RltdPties->DbtrAcct->Id->Othr->Id);
+                $transactionData['text'] = $entry->NtryDtls->TxDtls->AddtlTxInf;
+                if (property_exists($entry->NtryDtls->TxDtls, 'RltdPties')) {
+                    if (property_exists($entry->NtryDtls->TxDtls->RltdPties, 'DbtrAcct')) {
+                        $this->setDataValue('paymentAccount', $entry->NtryDtls->TxDtls->RltdPties->DbtrAcct->Id->Othr->Id);
                     }
-                    $this->setDataValue('nazFirmy', $ntry->NtryDtls->TxDtls->RltdPties->DbtrAcct->Nm);
+                    if (property_exists($entry->NtryDtls->TxDtls->RltdPties, 'DbtrAcct')) {
+                        $this->setDataValue('partnerIdentity', $entry->NtryDtls->TxDtls->RltdPties->DbtrAcct->Nm);
+                    }
                 }
-
-                if (property_exists($ntry->NtryDtls->TxDtls, 'RltdAgts')) {
-                    if (property_exists($ntry->NtryDtls->TxDtls->RltdAgts->DbtrAgt, 'FinInstnId')) {
-                        $this->setDataValue('smerKod', \Pohoda\RO::code($ntry->NtryDtls->TxDtls->RltdAgts->DbtrAgt->FinInstnId->Othr->Id));
+                if (property_exists($entry->NtryDtls->TxDtls, 'RltdAgts')) {
+                    if (property_exists($entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt, 'FinInstnId')) {
+                        $this->setDataValue('bankCode', $entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt->FinInstnId->Othr->Id);
                     }
                 }
             }
         }
-
-        $this->setDataValue('source', $this->sourceString());
+//
+//        $this->setDataValue('source', $this->sourceString());
         return $transactionData;
     }
 

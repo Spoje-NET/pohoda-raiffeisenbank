@@ -17,12 +17,12 @@ require_once('../vendor/autoload.php');
 $apiInstance = new \VitexSoftware\Raiffeisenbank\PremiumAPI\GetAccountsApi();
 $x_request_id = time(); // string | Unique request id provided by consumer application for reference and auditing.
 
-Transactor::checkCertificatePresence(\Ease\Functions::cfg('CERT_FILE'));
+Transactor::checkCertificatePresence(\Ease\Shared::cfg('CERT_FILE'));
 try {
     $result = $apiInstance->getAccounts($x_request_id);
     if (array_key_exists('accounts', $result)) {
         $banker = new \Pohoda\RW(null, ['evidence' => 'bankovni-ucet']);
-        if (\Ease\Functions::cfg('APP_DEBUG')) {
+        if (\Ease\Shared::cfg('APP_DEBUG')) {
             $banker->logBanner($apiInstance->getConfig()->getUserAgent());
         }
         $currentAccounts = $banker->getColumnsFromPohoda(['id', 'kod', 'nazev', 'iban', 'bic', 'nazBanky', 'poznam'], ['limit' => 0], 'iban');

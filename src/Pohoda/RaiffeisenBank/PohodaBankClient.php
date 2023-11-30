@@ -191,7 +191,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function checkForTransactionPresence()
     {
-        return false; //!empty($this->getColumnsFromPohoda('id', ['cisDosle' => $this->getDataValue('cisDosle')]));
+        return false; //!empty($this->getColumnsFromPohoda('id', ['cisDosle' => $this->getDataValue('cisDosle')])); TODO
     }
 
     /**
@@ -222,10 +222,10 @@ abstract class PohodaBankClient extends \mServer\Bank
                 //TODO: $result = $this->sync();
                 $result = $this->addToPohoda($cache);
                 $this->commit();
+                $success++;
             } catch (\Pohoda\Exception $exc) {
             }
             $this->addStatusMessage('New entry ', $result ? 'success' : 'error');
-            $success++;
         } else {
             $this->addStatusMessage('Record with remoteNumber ' . 'TODO' . ' already present in Pohoda', 'warning');
         }

@@ -16,11 +16,11 @@ const APP_NAME = 'RaiffeisenBankBalance';
  * Get today's tramsactons list
  */
 \Ease\Shared::init(['POHODA_URL', 'POHODA_LOGIN', 'POHODA_PASSWORD', 'POHODA_COMPANY', 'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER'], isset($argv[1]) ? $argv[1] : '../.env');
-Transactor::checkCertificatePresence(\Ease\Functions::cfg('CERT_FILE'));
+Transactor::checkCertificatePresence(\Ease\Shared::cfg('CERT_FILE'));
 $apiInstance = new \VitexSoftware\Raiffeisenbank\PremiumAPI\GetAccountBalanceApi();
 $xRequestId = time();
 try {
-    $result = $apiInstance->getBalance($xRequestId, \Ease\Functions::cfg('ACCOUNT_NUMBER'));
+    $result = $apiInstance->getBalance($xRequestId, \Ease\Shared::cfg('ACCOUNT_NUMBER'));
     echo json_encode($result, JSON_PRETTY_PRINT);
 } catch (Exception $e) {
     echo 'Exception when calling GetAccountBalanceApi->getBalance: ', $e->getMessage(), PHP_EOL;
