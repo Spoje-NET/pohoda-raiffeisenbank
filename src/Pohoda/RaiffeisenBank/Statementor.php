@@ -42,11 +42,15 @@ class Statementor extends PohodaBankClient
         }
     }
 
+    /**
+     *
+     * @return array
+     */
     public function import()
     {
         $statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
 //        $statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
-        $this->account = 'RB'; //TODO!!!
+        $this->account = \Ease\Shared::cfg('POHODA_BANK_IDS', 'RB'); //TODO!!!
         $success = 0;
         foreach ($statementsXML as $pos => $statement) {
             $statementXML = new \SimpleXMLElement(file_get_contents($statement));
@@ -86,8 +90,10 @@ class Statementor extends PohodaBankClient
 //                $this->setDataValue('vypisCisDokl', $statementXML->BkToCstmrStmt->Stmt->Id);
 //                $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
                 $success = $this->insertTransactionToPohoda($success);
+                $inserted[$this->response->producedDetails['id']] = $this->response->producedDetails;
             }
-            $this->addStatusMessage('Import done. ' . $success . ' of ' . count($statements) . ' imported');
+            $this->addStatusMessage('Import done. ' . $success . ' of ' . count($statementsXML) . ' imported');
+            return $inserted;
         }
     }
 
@@ -117,24 +123,34 @@ class Statementor extends PohodaBankClient
 //        $this->setDataValue('mena', \Pohoda\RO::code($entry->Amt->attributes()->Ccy));
         if (property_exists($entry, 'NtryDtls')) {
             if (property_exists($entry->NtryDtls, 'TxDtls')) {
-                $this->setDataValue('symConst', current($entry->NtryDtls->TxDtls->Refs->InstrId));
-
+                if (current($entry->NtryDtls->TxDtls->Refs->InstrId)) {
+                    $this->setDataValue('symConst', current($entry->NtryDtls->TxDtls->Refs->InstrId));
+                }
                 if (property_exists($entry->NtryDtls->TxDtls->Refs, 'EndToEndId')) {
                     $this->setDataValue('symVar', current($entry->NtryDtls->TxDtls->Refs->EndToEndId));
                 }
                 $transactionData['text'] = $entry->NtryDtls->TxDtls->AddtlTxInf;
+
+                $paymentAccount = [];
+
                 if (property_exists($entry->NtryDtls->TxDtls, 'RltdPties')) {
                     if (property_exists($entry->NtryDtls->TxDtls->RltdPties, 'DbtrAcct')) {
-                        $this->setDataValue('paymentAccount', $entry->NtryDtls->TxDtls->RltdPties->DbtrAcct->Id->Othr->Id);
+                        $paymentAccount['accountNo'] = current($entry->NtryDtls->TxDtls->RltdPties->DbtrAcct->Id->Othr->Id);
                     }
                     if (property_exists($entry->NtryDtls->TxDtls->RltdPties, 'DbtrAcct')) {
-                        $this->setDataValue('partnerIdentity', $entry->NtryDtls->TxDtls->RltdPties->DbtrAcct->Nm);
+                        $this->setDataValue('partnerIdentity', [ //"address", "addressLinkToAddress", "extId", "id", "shipToAddress"
+                            'address' => [ // "VATPayerType", "city", "company", "country", "dic", "division", "email", "fax", "icDph", "ico", "mobilPhone", "name", "phone", "street", "zip"
+                                'name' => current($entry->NtryDtls->TxDtls->RltdPties->DbtrAcct->Nm[0])]]);
                     }
                 }
                 if (property_exists($entry->NtryDtls->TxDtls, 'RltdAgts')) {
                     if (property_exists($entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt, 'FinInstnId')) {
-                        $this->setDataValue('bankCode', $entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt->FinInstnId->Othr->Id);
+                        $paymentAccount['bankCode'] = current($entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt->FinInstnId->Othr->Id[0]);
                     }
+                }
+
+                if (count($paymentAccount)) {
+                    $this->setDataValue('paymentAccount', $paymentAccount);
                 }
             }
         }

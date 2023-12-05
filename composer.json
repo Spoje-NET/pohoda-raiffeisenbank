@@ -12,7 +12,8 @@
     "bin": ["src/pohoda-raiffeisenbank-transactions.php", "src/pohoda-raiffeisenbank-setup.php"],
     "require": {
         "vitexsoftware/pohoda-connector": "dev-main",
-        "vitexsoftware/rbczpremiumapi": "dev-main"
+        "vitexsoftware/rbczpremiumapi": "dev-main",
+        "spojenet/pohoda-sql": "dev-master"
     },
     "autoload": {
         "psr-4": {

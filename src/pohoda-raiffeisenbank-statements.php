@@ -20,4 +20,4 @@ define('APP_NAME', 'Pohoda RaiffeisenBank Statements');
 PohodaBankClient::checkCertificatePresence(\Ease\Shared::cfg('CERT_FILE'));
 $engine = new Statementor(\Ease\Shared::cfg('ACCOUNT_NUMBER'));
 $engine->setScope(\Ease\Shared::cfg('STATEMENT_IMPORT_SCOPE', 'last_month'));
-$engine->import();
+print_r($engine->import());

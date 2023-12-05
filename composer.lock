@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c27c185be0cfb97454e1496a4f5a7c61",
+    "content-hash": "651243b951839e2d545405da094ed0e6",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -232,6 +232,65 @@
             "time": "2023-07-05T07:23:35+00:00"
         },
         {
+            "name": "fpdo/fluentpdo",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/envms/fluentpdo.git",
+                "reference": "1985e0e8406a56140f387bc9bec786b419cbeccc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/envms/fluentpdo/zipball/1985e0e8406a56140f387bc9bec786b419cbeccc",
+                "reference": "1985e0e8406a56140f387bc9bec786b419cbeccc",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "envms/fluent-test": "^1.0",
+                "phpunit/phpunit": "^8.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Envms\\FluentPDO\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0",
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "envms",
+                    "homepage": "https://env.ms"
+                }
+            ],
+            "description": "FluentPDO is a quick and light PHP library for rapid query building. It features a smart join builder, which automatically creates table joins.",
+            "homepage": "https://github.com/envms/fluentpdo",
+            "keywords": [
+                "builder",
+                "database",
+                "db",
+                "dbal",
+                "fluent",
+                "mysql",
+                "oracle",
+                "pdo",
+                "query"
+            ],
+            "support": {
+                "issues": "https://github.com/envms/fluentpdo/issues",
+                "source": "https://github.com/envms/fluentpdo/tree/v2.2.4"
+            },
+            "time": "2022-01-27T21:49:44+00:00"
+        },
+        {
             "name": "goetas-webservices/xsd2php-runtime",
             "version": "dev-master",
             "source": {
@@ -298,12 +357,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "d95d9ab74822c2ca06b31477cd6775a4a299b8e8"
+                "reference": "41042bc7ab002487b876a0683fc8dce04ddce104"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/d95d9ab74822c2ca06b31477cd6775a4a299b8e8",
-                "reference": "d95d9ab74822c2ca06b31477cd6775a4a299b8e8",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/41042bc7ab002487b876a0683fc8dce04ddce104",
+                "reference": "41042bc7ab002487b876a0683fc8dce04ddce104",
                 "shasum": ""
             },
             "require": {
@@ -318,11 +377,11 @@
                 "psr/http-client-implementation": "1.0"
             },
             "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.8.1",
+                "bamarni/composer-bin-plugin": "^1.8.2",
                 "ext-curl": "*",
                 "php-http/client-integration-tests": "dev-master#2c025848417c1135031fdf9c728ee53d0a7ceaee as 3.0.999",
                 "php-http/message-factory": "^1.1",
-                "phpunit/phpunit": "^8.5.29 || ^9.5.23",
+                "phpunit/phpunit": "^8.5.36 || ^9.6.15",
                 "psr/log": "^1.1 || ^2.0 || ^3.0"
             },
             "suggest": {
@@ -400,7 +459,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.8"
+                "source": "https://github.com/guzzle/guzzle/tree/7.8.1"
             },
             "funding": [
                 {
@@ -416,7 +475,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-09-11T09:12:01+00:00"
+            "time": "2023-12-03T20:35:24+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -424,20 +483,20 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "71b12f952d8be69a239989db2fe08314a5189e3b"
+                "reference": "bbff78d96034045e58e13dedd6ad91b5d1253223"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/71b12f952d8be69a239989db2fe08314a5189e3b",
-                "reference": "71b12f952d8be69a239989db2fe08314a5189e3b",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/bbff78d96034045e58e13dedd6ad91b5d1253223",
+                "reference": "bbff78d96034045e58e13dedd6ad91b5d1253223",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2.5 || ^8.0"
             },
             "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.8.1",
-                "phpunit/phpunit": "^8.5.29 || ^9.5.23"
+                "bamarni/composer-bin-plugin": "^1.8.2",
+                "phpunit/phpunit": "^8.5.36 || ^9.6.15"
             },
             "default-branch": true,
             "type": "library",
@@ -484,7 +543,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/promises/issues",
-                "source": "https://github.com/guzzle/promises/tree/2.0"
+                "source": "https://github.com/guzzle/promises/tree/2.0.2"
             },
             "funding": [
                 {
@@ -500,7 +559,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-08-27T10:15:36+00:00"
+            "time": "2023-12-03T20:19:20+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -508,12 +567,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "38ef514a6c21335f29d9be64b097d2582ecbf8e4"
+                "reference": "45b30f99ac27b5ca93cb4831afe16285f57b8221"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/38ef514a6c21335f29d9be64b097d2582ecbf8e4",
-                "reference": "38ef514a6c21335f29d9be64b097d2582ecbf8e4",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/45b30f99ac27b5ca93cb4831afe16285f57b8221",
+                "reference": "45b30f99ac27b5ca93cb4831afe16285f57b8221",
                 "shasum": ""
             },
             "require": {
@@ -527,9 +586,9 @@
                 "psr/http-message-implementation": "1.0"
             },
             "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.8.1",
+                "bamarni/composer-bin-plugin": "^1.8.2",
                 "http-interop/http-factory-tests": "^0.9",
-                "phpunit/phpunit": "^8.5.29 || ^9.5.23"
+                "phpunit/phpunit": "^8.5.36 || ^9.6.15"
             },
             "suggest": {
                 "laminas/laminas-httphandlerrunner": "Emit PSR-7 responses"
@@ -601,7 +660,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.6"
+                "source": "https://github.com/guzzle/psr7/tree/2.6.2"
             },
             "funding": [
                 {
@@ -617,7 +676,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-09-10T16:11:14+00:00"
+            "time": "2023-12-03T20:05:35+00:00"
         },
         {
             "name": "jms/metadata",
@@ -1460,6 +1519,50 @@
             "time": "2023-11-23T19:27:42+00:00"
         },
         {
+            "name": "spojenet/pohoda-sql",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Spoje-NET/PohodaSQL.git",
+                "reference": "e46e0bc77eb8a8d9ec309ce435b5f6e70e4c274e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Spoje-NET/PohodaSQL/zipball/e46e0bc77eb8a8d9ec309ce435b5f6e70e4c274e",
+                "reference": "e46e0bc77eb8a8d9ec309ce435b5f6e70e4c274e",
+                "shasum": ""
+            },
+            "require": {
+                "vitexsoftware/ease-fluentpdo": "dev-main"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.5"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SpojeNet\\PohodaSQL\\": "src/SpojeNet/PohodaSQL/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vitex",
+                    "email": "info@vitexsoftware.cz"
+                }
+            ],
+            "description": "Management Library for PohodaSQL",
+            "support": {
+                "issues": "https://github.com/Spoje-NET/PohodaSQL/issues",
+                "source": "https://github.com/Spoje-NET/PohodaSQL/tree/master"
+            },
+            "time": "2023-12-05T13:10:10+00:00"
+        },
+        {
             "name": "symfony/deprecation-contracts",
             "version": "dev-main",
             "source": {
@@ -1810,6 +1913,63 @@
                 }
             ],
             "time": "2023-11-19T07:31:14+00:00"
+        },
+        {
+            "name": "vitexsoftware/ease-fluentpdo",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/VitexSoftware/php-ease-fluentpdo.git",
+                "reference": "5f5c98146b59b99ce3133f9206a61589458de991"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/VitexSoftware/php-ease-fluentpdo/zipball/5f5c98146b59b99ce3133f9206a61589458de991",
+                "reference": "5f5c98146b59b99ce3133f9206a61589458de991",
+                "shasum": ""
+            },
+            "require": {
+                "fpdo/fluentpdo": ">=2.1",
+                "vitexsoftware/ease-core": ">=1.40"
+            },
+            "conflict": {
+                "vitexsoftware/ease-framework": "*"
+            },
+            "require-dev": {
+                "cakephp/migrations": "3.x-dev",
+                "phpstan/phpstan": "*",
+                "phpunit/phpunit": "*"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ease\\SQL\\": "src/Ease/SQL",
+                    "Ease\\Logger\\": "src/Ease/Logger"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vitex",
+                    "email": "info@vitexsoftware.cz"
+                }
+            ],
+            "description": "SQL/PDO support for Ease Framework based on FluentPDO",
+            "support": {
+                "issues": "https://github.com/VitexSoftware/php-ease-fluentpdo/issues",
+                "source": "https://github.com/VitexSoftware/php-ease-fluentpdo/tree/main"
+            },
+            "funding": [
+                {
+                    "url": "https://www.patreon.com/VitexSoftware",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2023-11-08T17:51:14+00:00"
         },
         {
             "name": "vitexsoftware/pohoda-connector",
@@ -3093,12 +3253,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "ce38eacbf713811e349b59a3a95e15d194c2f76f"
+                "reference": "1be69e7c30c80d0030f83aa6b698085dc09a76b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/ce38eacbf713811e349b59a3a95e15d194c2f76f",
-                "reference": "ce38eacbf713811e349b59a3a95e15d194c2f76f",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/1be69e7c30c80d0030f83aa6b698085dc09a76b0",
+                "reference": "1be69e7c30c80d0030f83aa6b698085dc09a76b0",
                 "shasum": ""
             },
             "require": {
@@ -3163,7 +3323,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-11-27T14:34:10+00:00"
+            "time": "2023-12-05T06:34:36+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -3412,12 +3572,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "70004109dbe3f1ee5fc29551240d04471a3cdd09"
+                "reference": "0d69cada954ad37493362262066ba3b5687d808f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/70004109dbe3f1ee5fc29551240d04471a3cdd09",
-                "reference": "70004109dbe3f1ee5fc29551240d04471a3cdd09",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/0d69cada954ad37493362262066ba3b5687d808f",
+                "reference": "0d69cada954ad37493362262066ba3b5687d808f",
                 "shasum": ""
             },
             "require": {
@@ -3507,7 +3667,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-11-29T12:09:43+00:00"
+            "time": "2023-12-05T07:03:43+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -4528,7 +4688,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "vitexsoftware/pohoda-connector": 20,
-        "vitexsoftware/rbczpremiumapi": 20
+        "vitexsoftware/rbczpremiumapi": 20,
+        "spojenet/pohoda-sql": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
