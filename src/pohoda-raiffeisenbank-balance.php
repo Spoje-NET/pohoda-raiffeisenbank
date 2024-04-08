@@ -4,7 +4,7 @@
  * RaiffeisenBank - Balance.
  *
  * @author     Vítězslav Dvořák <info@vitexsoftware.com>
- * @copyright  (C) 2023 Spoje.Net
+ * @copyright  (C) 2023-2024 Spoje.Net
  */
 
 namespace Pohoda\RaiffeisenBank;
@@ -13,7 +13,7 @@ require_once('../vendor/autoload.php');
 
 const APP_NAME = 'RaiffeisenBankBalance';
 /**
- * Get today's tramsactons list
+ * Get today's transactons list
  */
 \Ease\Shared::init(['POHODA_URL', 'POHODA_LOGIN', 'POHODA_PASSWORD', 'POHODA_COMPANY', 'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER'], isset($argv[1]) ? $argv[1] : '../.env');
 Transactor::checkCertificatePresence(\Ease\Shared::cfg('CERT_FILE'));
