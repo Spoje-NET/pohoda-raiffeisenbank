@@ -2819,12 +2819,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/VitexSoftware/php-vitexsoftware-rbczpremiumapi.git",
-                "reference": "12c88858edf455b529e0f7ebb76f36a0f77678b2"
+                "reference": "2298db9766d2eee650d1b9203bd7c8211af209fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VitexSoftware/php-vitexsoftware-rbczpremiumapi/zipball/12c88858edf455b529e0f7ebb76f36a0f77678b2",
-                "reference": "12c88858edf455b529e0f7ebb76f36a0f77678b2",
+                "url": "https://api.github.com/repos/VitexSoftware/php-vitexsoftware-rbczpremiumapi/zipball/2298db9766d2eee650d1b9203bd7c8211af209fa",
+                "reference": "2298db9766d2eee650d1b9203bd7c8211af209fa",
                 "shasum": ""
             },
             "require": {
@@ -2867,6 +2867,7 @@
                 "openapi-generator",
                 "openapitools",
                 "php",
+                "raiffeisenbank",
                 "rest",
                 "sdk"
             ],
@@ -2874,7 +2875,7 @@
                 "issues": "https://github.com/VitexSoftware/php-vitexsoftware-rbczpremiumapi/issues",
                 "source": "https://github.com/VitexSoftware/php-vitexsoftware-rbczpremiumapi/tree/main"
             },
-            "time": "2024-01-12T17:10:01+00:00"
+            "time": "2024-04-08T22:52:11+00:00"
         }
     ],
     "packages-dev": [
