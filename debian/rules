@@ -11,3 +11,7 @@
 override_dh_clean:
 	rm -rf vendor/*
 	dh_clean
+
+override_dh_install:
+	jq '.version = "'`dpkg-parsechangelog | sed -n 's/^Version: //p'| sed 's/~.*//' `'"'  debian/conf/composer.json |sponge debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/composer.json
+	dh_install

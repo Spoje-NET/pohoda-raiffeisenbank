@@ -1,4 +1,4 @@
-debian/conf/composer.json       usr/lib/pohoda-raiffeisenbank/
+#debian/conf/composer.json       usr/lib/pohoda-raiffeisenbank/
 src/*			        usr/lib/pohoda-raiffeisenbank/
 #src/SpojeNet/*                 usr/lib/pohoda-raiffeisenbank/SpojeNet/
 bin/*                           usr/bin/

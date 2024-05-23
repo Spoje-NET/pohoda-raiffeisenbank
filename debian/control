@@ -7,9 +7,9 @@ Standards-Version: 4.5.0
 Homepage: https://github.com/Spoje-NET/pohoda-raiffeisenbank
 
 Package: pohoda-raiffeisenbank
-Architecture: any
+Architecture: all
 Multi-Arch: foreign
-Depends: ${misc:Depends}, ${shlibs:Depends}, php-vitexsoftware-rbczpremiumapi, php-spojenet-pohoda-sql
+Depends: ${misc:Depends}, ${shlibs:Depends}, php-vitexsoftware-rbczpremiumapi, php-spojenet-pohoda-sql, php-vitexsoftware-pohoda-connector
 Description: Import Raiffeisenbank statements into Pohoda
  See your Bank Account Statements in Pohoda
 
