@@ -1,0 +1,7 @@
+debian/conf/composer.json       usr/lib/pohoda-raiffeisenbank/
+src/*			        usr/lib/pohoda-raiffeisenbank/
+#src/SpojeNet/*                 usr/lib/pohoda-raiffeisenbank/SpojeNet/
+bin/*                           usr/bin/
+.env.example                    usr/share/doc/pohoda-raiffeisenbank
+#io.github.spoje_net.pohoda_raiffeisenbank.metainfo.xml /usr/share/metainfo/
+pohoda-raiffeisenbank.svg       usr/share/icons/hicolor/scalable/apps/

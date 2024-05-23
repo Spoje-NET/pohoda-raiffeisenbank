@@ -1,0 +1,12 @@
+#!/bin/sh
+# postinst script for pohoda-raiffeisenbank
+set -e
+
+. /usr/share/debconf/confmodule
+
+for file in `ls /usr/lib/pohoda-raiffeisenbank/multiflexi/*.json`
+do
+	multiflexi-json2app $file
+done
+
+#DEBHELPER#

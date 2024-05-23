@@ -16,3 +16,7 @@ output.xml
 /debian/files
 /statement.xml
 /vendor
+/debian/pohoda-raiffeisenbank.substvars
+/debian/pohoda-raiffeisenbank/
+/debian/multiflexi-pohoda-raiffeisenbank.substvars
+/debian/multiflexi-pohoda-raiffeisenbank/

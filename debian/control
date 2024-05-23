@@ -1,0 +1,20 @@
+Source: pohoda-raiffeisenbank
+Section: utils
+Priority: optional
+Maintainer: Vítězslav Dvořák <info@vitexsoftware.cz>
+Build-Depends: debhelper-compat (= 12)
+Standards-Version: 4.5.0
+Homepage: https://github.com/Spoje-NET/pohoda-raiffeisenbank
+
+Package: pohoda-raiffeisenbank
+Architecture: any
+Multi-Arch: foreign
+Depends: ${misc:Depends}, ${shlibs:Depends}, php-vitexsoftware-rbczpremiumapi, php-spojenet-pohoda-sql
+Description: Import Raiffeisenbank statements into Pohoda
+ See your Bank Account Statements in Pohoda
+
+Package: multiflexi-pohoda-raiffeisenbank
+Architecture: all
+Depends: ${misc:Depends}, pohoda-raiffeisenbank, multiflexi
+Description: Raiffeisen Bank statement tools to MultiFlexi
+ Allow use of Raiffeisen Bank statement tools in MultiFlexi environment
