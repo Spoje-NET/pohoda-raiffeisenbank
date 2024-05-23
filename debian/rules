@@ -15,3 +15,4 @@ override_dh_clean:
 override_dh_install:
 	dh_install
 	jq '.version = "'`dpkg-parsechangelog | sed -n 's/^Version: //p'| sed 's/~.*//' `'"'  debian/conf/composer.json |sponge debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/composer.json
+	jq '.version = "'`dpkg-parsechangelog | sed -n 's/^Version: //p'| sed 's/~.*//'`'"'  multiflexi/pohoda_raiffeisenbank.multiflexi.app.json |sponge debian/multiflexi-pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/multiflexi/pohoda_raiffeisenbank.multiflexi.app.json
