@@ -40,6 +40,90 @@
             "description": "ClientID",
             "defval": "",
             "required": true
+        },
+        "POHODA_ICO": {
+            "type": "text",
+            "description": "Pohoda ICO",
+            "defval": "12345678",
+            "required": true
+        },
+        "POHODA_URL": {
+            "type": "text",
+            "description": "Pohoda URL",
+            "defval": "http://127.0.0.1:10010",
+            "required": true
+        },
+        "POHODA_USERNAME": {
+            "type": "text",
+            "description": "Pohoda Username",
+            "defval": "Admin",
+            "required": true
+        },
+        "POHODA_PASSWORD": {
+            "type": "password",
+            "description": "Pohoda Password",
+            "defval": "xxxxxxxx",
+            "required": true
+        },
+        "POHODA_TIMEOUT": {
+            "type": "number",
+            "description": "Pohoda Timeout",
+            "defval": 60,
+            "required": true
+        },
+        "POHODA_COMPRESS": {
+            "type": "boolean",
+            "description": "Pohoda Compress",
+            "defval": false,
+            "required": true
+        },
+        "POHODA_DEBUG": {
+            "type": "boolean",
+            "description": "Pohoda Debug",
+            "defval": true,
+            "required": true
+        },
+        "POHODA_BANK_IDS": {
+            "type": "text",
+            "description": "Pohoda Bank IDs",
+            "defval": "KB",
+            "required": true
+        },
+        "DB_CONNECTION": {
+            "type": "text",
+            "description": "Database Connection",
+            "defval": "sqlsrv",
+            "required": true
+        },
+        "DB_HOST": {
+            "type": "text",
+            "description": "Database Host",
+            "defval": "127.0.0.1",
+            "required": true
+        },
+        "DB_PORT": {
+            "type": "number",
+            "description": "Database Port",
+            "defval": 1433,
+            "required": true
+        },
+        "DB_DATABASE": {
+            "type": "text",
+            "description": "Database Name",
+            "defval": "StwPh_12345678_2023",
+            "required": true
+        },
+        "DB_USERNAME": {
+            "type": "text",
+            "description": "Database Username",
+            "defval": "sa",
+            "required": true
+        },
+        "DB_PASSWORD": {
+            "type": "password",
+            "description": "Database Password",
+            "defval": "XXXXX",
+            "required": true
         }
     },
     "multiflexi": "1.10.2.0"
