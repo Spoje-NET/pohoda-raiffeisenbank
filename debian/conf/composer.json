@@ -1,41 +1,49 @@
 {
-  "name": "vitexsoftware/pohoda-raiffeisenbank",
-  "description": "raiffeisenbank bank statement downloader for Stormware Pohoda",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Vítězslav Dvořák",
-      "email": "info@vitexsoftware.cz"
-    }
-  ],
-  "require": {
-    "deb/ease-core": "*",
-    "deb/abraflexi": "*",
-    "deb/rbczpremiumapi": "*"
-    "deb/pohoda-sql": "*"
-    "deb/pohoda-connector": "*",
-  },
-  "autoload": {
-    "psr-4": {
-      "Pohoda\\RaiffeisenBank\\": "/usr/share/pohoda-raiffeisenbank/RaiffeisenBank/"
-    }
-  },
-  "repositories": [
-    {
-      "type": "path",
-      "url": "/usr/share/php/EaseCore"
+    "name": "vitexsoftware/pohoda-raiffeisenbank",
+    "description": "raiffeisenbank bank statement downloader for Stormware Pohoda",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vítězslav Dvořák",
+            "email": "info@vitexsoftware.cz"
+        }
+    ],
+    "require": {
+        "deb/ease-core": "*",
+        "deb/abraflexi": "*",
+        "deb/rbczpremiumapi": "*",
+        "deb/pohoda-sql": "*",
+        "deb/pohoda-connector": "*"
     },
-    {
-      "type": "path",
-      "url": "/usr/share/php/AbraFlexi"
+    "autoload": {
+        "psr-4": {
+            "Pohoda\\RaiffeisenBank\\": "/usr/share/pohoda-raiffeisenbank/RaiffeisenBank/"
+        }
     },
-    {
-      "type": "path",
-      "url": "/usr/share/php/Raiffeisenbank"
-    },
-    {
-      "type": "path",
-      "url": "/usr/share/php/GuzzleHttp"
-    }
-  ]
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/usr/share/php/EaseCore"
+        },
+        {
+            "type": "path",
+            "url": "/usr/share/php/AbraFlexi"
+        },
+        {
+            "type": "path",
+            "url": "/usr/share/php/Raiffeisenbank"
+        },
+        {
+            "type": "path",
+            "url": "/usr/share/php/GuzzleHttp"
+        },
+        {
+            "type": "path",
+            "url": "/usr/share/php/PohodaSQL"
+        },
+        {
+            "type": "path",
+            "url": "/usr/share/php/mServer"
+        }
+    ]
 }
