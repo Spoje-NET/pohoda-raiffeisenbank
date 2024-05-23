@@ -20,3 +20,5 @@ output.xml
 /debian/pohoda-raiffeisenbank/
 /debian/multiflexi-pohoda-raiffeisenbank.substvars
 /debian/multiflexi-pohoda-raiffeisenbank/
+/debian/multiflexi-pohoda-raiffeisenbank.debhelper.log
+/debian/pohoda-raiffeisenbank.debhelper.log
