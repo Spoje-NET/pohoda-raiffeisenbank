@@ -4,7 +4,7 @@
  * RaiffeisenBank - BankClient class
  *
  * @author     Vítězslav Dvořák <info@vitexsoftware.com>
- * @copyright  (C) 2023 Spoje.Net
+ * @copyright  (C) 2023-2024 Spoje.Net
  */
 
 namespace Pohoda\RaiffeisenBank;
@@ -17,7 +17,6 @@ namespace Pohoda\RaiffeisenBank;
 abstract class PohodaBankClient extends \mServer\Bank
 {
     protected $constantor;
-
     protected $constSymbols;
 
     /**
@@ -83,7 +82,7 @@ abstract class PohodaBankClient extends \mServer\Bank
     {
         if ((file_exists($certFile) === false) || (is_readable($certFile) === false)) {
             fwrite(STDERR, 'Cannot read specified certificate file: ' . $certFile . PHP_EOL);
-            exit;
+            exit(1);
         }
     }
 
@@ -221,11 +220,12 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $this->reset();
                 //TODO: $result = $this->sync();
                 $result = $this->addToPohoda($cache);
-                $this->commit();
-                $success++;
+                if ($this->commit()) {
+                    $success++;
+                }
             } catch (\Pohoda\Exception $exc) {
             }
-            $this->addStatusMessage('New entry ', $result ? 'success' : 'error');
+            $this->addStatusMessage('New entry ', $result ? 'success' : 'error'); // TODO: Parse response for docID
         } else {
             $this->addStatusMessage('Record with remoteNumber ' . 'TODO' . ' already present in Pohoda', 'warning');
         }

@@ -19,7 +19,7 @@ class Transactor extends PohodaBankClient
     /**
      * Transaction Handler
      *
-     * @param null $init
+     * @param null  $init
      * @param array $options
      */
     public function __construct($bankAccount, $options = [])

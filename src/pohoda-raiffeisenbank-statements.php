@@ -9,6 +9,8 @@
 
 namespace Pohoda\RaiffeisenBank;
 
+use SpojeNet\PohodaSQL\Agenda;
+
 require_once('../vendor/autoload.php');
 
 define('APP_NAME', 'Pohoda RaiffeisenBank Statements');
@@ -20,4 +22,30 @@ define('APP_NAME', 'Pohoda RaiffeisenBank Statements');
 PohodaBankClient::checkCertificatePresence(\Ease\Shared::cfg('CERT_FILE'));
 $engine = new Statementor(\Ease\Shared::cfg('ACCOUNT_NUMBER'));
 $engine->setScope(\Ease\Shared::cfg('STATEMENT_IMPORT_SCOPE', 'last_month'));
-print_r($engine->import());
+$inserted = $engine->import();
+
+//
+//    [243] => Array
+//        (
+//            [id] => 243
+//            [number] => KB102023
+//            [actionType] => add
+//        )
+//
+//    [244] => Array
+//        (
+//            [id] => 244
+//            [number] => KB102023
+//            [actionType] => add
+//        )
+//
+
+
+$doc = new \SpojeNet\PohodaSQL\DOC();
+$doc->setDataValue('RelAgID', Agenda::BANK); //Bank
+
+foreach ($inserted as $id => $importInfo) {
+    $url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . $id;
+    $result = $doc->urlAttachment('Sharepoint', $url, $id);
+    $doc->addStatusMessage($importInfo['number'] . ' URL', is_null($result) ? 'error' : 'success');
+}

@@ -6,7 +6,7 @@ Raiffeisenbank for Stormware Pohoda
 Configuration
 -------------
 
-
+````````````
 `EASE_LOGGER`=syslog|console
 `CERT_FILE`='RAIFF_CERT.p12'
 `CERT_PASS`=CertPass
