@@ -11,9 +11,10 @@
     "minimum-stability": "dev",
     "bin": ["src/pohoda-raiffeisenbank-transactions.php", "src/pohoda-raiffeisenbank-setup.php"],
     "require": {
+        "vgrem/php-spo": "^3",
         "vitexsoftware/pohoda-connector": "dev-main",
         "vitexsoftware/rbczpremiumapi": "dev-main",
-        "spojenet/pohoda-sql": "dev-master"
+        "spojenet/pohoda-sql": "dev-main"
     },
     "autoload": {
         "psr-4": {

@@ -45,6 +45,12 @@ abstract class PohodaBankClient extends \mServer\Bank
 
     /**
      *
+     * @var Response
+     */
+    public $response;
+
+    /**
+     *
      * @var
      */
     protected $bank;
@@ -214,6 +220,9 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function insertTransactionToPohoda($success)
     {
+        $producedId = '';
+        $producedNumber = '';
+        $producedAction = '';
         if ($this->checkForTransactionPresence() === false) {
             try {
                 $cache = $this->getData();
@@ -223,9 +232,19 @@ abstract class PohodaBankClient extends \mServer\Bank
                 if ($this->commit()) {
                     $success++;
                 }
+                if (property_exists($this->response, 'producedDetails') && is_array($this->response->producedDetails)) {
+                    $producedId = $this->response->producedDetails['id'];
+                    $producedNumber = $this->response->producedDetails['number'];
+                    $producedAction = $this->response->producedDetails['actionType'];
+                } else {
+                    echo '';
+                }
             } catch (\Pohoda\Exception $exc) {
+                $producedId = 'n/a';
+                $producedNumber = 'n/a';
+                $producedAction = 'n/a';
             }
-            $this->addStatusMessage('New entry ', $result ? 'success' : 'error'); // TODO: Parse response for docID
+            $this->addStatusMessage('#' . $producedId . ' ' . $producedAction . ' ' . $producedNumber, $result ? 'success' : 'error'); // TODO: Parse response for docID
         } else {
             $this->addStatusMessage('Record with remoteNumber ' . 'TODO' . ' already present in Pohoda', 'warning');
         }

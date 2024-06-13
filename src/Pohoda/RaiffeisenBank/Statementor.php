@@ -35,6 +35,18 @@ class Statementor extends PohodaBankClient
     public $account;
 
     /**
+     * Downloaded XML statements
+     * @var array
+     */
+    private $statementsXML = [];
+
+    /**
+     * Downloaded PDF statements
+     * @var array
+     */
+    private $statementsPDF = [];
+
+    /**
      *
      * @param string $bankAccount
      * @param array  $options
@@ -59,32 +71,41 @@ class Statementor extends PohodaBankClient
      */
     public function import()
     {
-        $statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
-//        $statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
+        $inserted = [];
+        $this->statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
+        $this->statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
         $this->account = \Ease\Shared::cfg('POHODA_BANK_IDS', 'RB'); //TODO!!!
         $success = 0;
-        foreach ($statementsXML as $pos => $statement) {
+        foreach ($this->statementsXML as $pos => $statement) {
             $statementXML = new \SimpleXMLElement(file_get_contents($statement));
+            $statementNumberLong = current((array) $statementXML->BkToCstmrStmt->Stmt->Id);
             foreach ($statementXML->BkToCstmrStmt->Stmt->Ntry as $entry) {
                 $this->dataReset();
                 $this->setData($this->entryToPohoda($entry));
                 list($statementNumber, $statementYear, ) = explode('_', $pos);
                 $this->setDataValue('statementNumber', ['statementNumber' => $statementNumber . '/' . $statementYear]);
-                $this->setDataValue('account', current((array) $entry->NtryRef));
+//                $this->setDataValue('account', current((array) $entry->NtryRef));
 //                $this->setDataValue('vypisCisDokl', $statementXML->BkToCstmrStmt->Stmt->Id);
 //                $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
                 $success = $this->insertTransactionToPohoda($success);
-                if ($success && property_exists($this->response, 'producedDetails')) {
-                    $inserted[$this->response->producedDetails['id']] = $this->response->producedDetails;
+                if (property_exists($this->response, 'producedDetails') && is_array($this->response->producedDetails)) {
+                    if (array_key_exists('id', $this->response->producedDetails)) {
+                        $inserted[$this->response->producedDetails['id']] = $this->response->producedDetails;
+                    } else {
+                        echo ''; // WTF?
+                    }
                 }
             }
-            $this->addStatusMessage('Import done. ' . $success . ' of ' . count($statementsXML) . ' imported');
+            $this->addStatusMessage($statementNumberLong . ' Import done. ' . $success . ' of ' . count($this->statementsXML) . ' imported');
             return $inserted;
         }
     }
 
     /**
-     * Parse Ntry element into \Pohoda\Banka data
+     * Parse Ntry element and convert into \Pohoda\Banka data
+     *
+     * @see https://cbaonline.cz/upload/1425-standard-xml-cba-listopad-2020.pdf
+     * @see https://www.stormware.cz/xml/schema/version_2/bank.xsd
      *
      * @param SimpleXMLElement $entry
      *
@@ -92,6 +113,7 @@ class Statementor extends PohodaBankClient
      */
     public function entryToPohoda($entry)
     {
+        $data['symPar'] = current((array) $entry->NtryRef);
         $data['intNote'] = 'Import Job ' . \Ease\Shared::cfg('JOB_ID', 'n/a');
         $data['note'] = 'Imported by ' . \Ease\Shared::AppName() . ' ' . \Ease\Shared::AppVersion();
         $data['datePayment'] = current((array) $entry->BookgDt->DtTm);
@@ -110,22 +132,39 @@ class Statementor extends PohodaBankClient
                 if (property_exists($entry->NtryDtls->TxDtls, 'AddtlTxInf')) {
                     $data['text'] = current((array) $entry->NtryDtls->TxDtls->AddtlTxInf);
                 }
+//                if ($entry->NtryDtls->TxDtls->Refs->MsgId) {
+//                    $data['numberMovement'] = current((array) $entry->NtryDtls->TxDtls->Refs->MsgId);
+//                }
                 if ($entry->NtryDtls->TxDtls->Refs->InstrId) {
+                    // ZPS: Platební titul,
+                    // SEPA: Identifikace platby Dříve i pro TPS: Konstantní symbol
                     $data['symConst'] = current((array) $entry->NtryDtls->TxDtls->Refs->InstrId);
                 }
                 if (property_exists($entry->NtryDtls->TxDtls->Refs, 'EndToEndId')) {
+                    // ZPS: Klientská reference,
+                    // SEPA: Reference, Karetní operace: Číslo dobíjeného mobilu, případně číslo faktury, Klientská reference Dříve i pro TPS: Variabilní symbol
                     $data['symVar'] = current((array) $entry->NtryDtls->TxDtls->Refs->EndToEndId);
                 }
                 $paymentAccount = [];
                 if (property_exists($entry->NtryDtls->TxDtls, 'RltdPties')) {
                     if (property_exists($entry->NtryDtls->TxDtls->RltdPties, 'DbtrAcct')) {
                         $paymentAccount['accountNo'] = current((array) $entry->NtryDtls->TxDtls->RltdPties->DbtrAcct->Id->Othr->Id);
-                    }
-                    if (property_exists($entry->NtryDtls->TxDtls->RltdPties, 'DbtrAcct')) {
+
                         $data['partnerIdentity'] = [//"address", "addressLinkToAddress", "extId", "id", "shipToAddress"
                             'address' => [// "VATPayerType", "city", "company", "country", "dic", "division", "email", "fax", "icDph", "ico", "mobilPhone", "name", "phone", "street", "zip"
                                 'name' => current((array) $entry->NtryDtls->TxDtls->RltdPties->DbtrAcct->Nm)]];
                     }
+
+                    if (property_exists($entry->NtryDtls->TxDtls->RltdPties, 'CdtrAcct')) {
+                        $paymentAccount['accountNo'] = current((array) $entry->NtryDtls->TxDtls->RltdPties->CdtrAcct->Id->Othr->Id);
+                        $data['partnerIdentity'] = [
+                            'address' => [
+                                'name' => current((array) $entry->NtryDtls->TxDtls->RltdPties->CdtrAcct->Nm)
+                            ]
+                        ];
+                    }
+                } else {
+                    echo ''; // No Related party ?
                 }
                 if (property_exists($entry->NtryDtls->TxDtls, 'RltdAgts')) {
                     if (property_exists($entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt, 'FinInstnId')) {
@@ -137,7 +176,9 @@ class Statementor extends PohodaBankClient
 //                    $data['paymentAccount'] = current((array) $paymentAccount['accountNo']);
 //                }
 //                accountNo, bankCode
-                $data['paymentAccount'] = $paymentAccount;
+                if (empty($paymentAccount) === false) {
+                    $data['paymentAccount'] = $paymentAccount;
+                }
             }
         }
 //
@@ -166,6 +207,10 @@ class Statementor extends PohodaBankClient
             case 'last_month':
                 $this->since = new \DateTime("first day of last month");
                 $this->until = new \DateTime("last day of last month");
+                break;
+            case 'last_week':
+                $this->since = new \DateTime("first day of last week");
+                $this->until = new \DateTime("last day of last week");
                 break;
             case 'last_two_months':
                 $this->since = (new \DateTime("first day of last month"))->modify('-1 month');
@@ -216,5 +261,23 @@ class Statementor extends PohodaBankClient
             $this->since = $this->since->setTime(0, 0);
             $this->until = $this->until->setTime(0, 0);
         }
+    }
+
+    /**
+     * List of downloaded PDF statements
+     * @return array
+     */
+    public function getPdfStatements()
+    {
+        return $this->statementsPDF;
+    }
+
+    /**
+     * List of downloaded XML statements
+     * @return array
+     */
+    public function getXmlStatements()
+    {
+        return $this->statementsXML;
     }
 }
