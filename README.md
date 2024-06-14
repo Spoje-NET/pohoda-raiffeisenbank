@@ -3,6 +3,29 @@ Raiffeisenbank for Stormware Pohoda
 
 ![](pohoda-raiffeisenbank.svg?raw=true)
 
+Downloads bank statements in PDF and XML formats
+The XML is parsed and imported into Pohoda via the mServer service.
+The PDF is sent to a sharepoint folder and the link to download it is 
+attached via MSSQL to all bank statements from the statement.
+
+Debian/Ubuntu installation
+--------------------------
+
+Please use the .deb packages. The repository is availble:
+
+ ```shell
+    echo "deb http://repo.vitexsoftware.com $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/vitexsoftware.list
+    sudo wget -O /etc/apt/trusted.gpg.d/vitexsoftware.gpg http://repo.vitexsoftware.com/keyring.gpg
+    sudo apt update
+    sudo apt install abraflexi-raiffeisenbank
+```
+
+Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
+
+  * **abraflexi-raiffeisenbank-setup**        - check and/or prepare Bank account setup in AbraFlexi
+  * **abraflexi-raiffeisenbank-transactions** - Import transactions. From latest imported or within the given scope
+  * **abraflexi-raiffeisenbank-statements**   - Import transactions from Account Statements.
+
 Configuration
 -------------
 
@@ -69,3 +92,12 @@ OFFICE365_PATH='Shared documents/statements'
 
 Into configuration file .env please put ClientID **OR** Login/Password values. 
 
+Powered by: https://github.com/VitexSoftware/php-vitexsoftware-rbczpremiumapi https://github.com/Spoje-NET/PohodaSQL https://github.com/Spoje-NET/PohodaSQL
+
+MultiFlexi
+----------
+
+Pohoda RaiffeisenBank is ready for run as [MultiFlexi](https://multiflexi.eu) application.
+See the full list of ready-to-run applications within the MultiFlexi platform on the [application list page](https://www.multiflexi.eu/apps.php).
+
+[![MultiFlexi App](https://github.com/VitexSoftware/MultiFlexi/blob/main/doc/multiflexi-app.svg)](https://www.multiflexi.eu/apps.php)
