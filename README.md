@@ -3,10 +3,19 @@ Raiffeisenbank for Stormware Pohoda
 
 ![](pohoda-raiffeisenbank.svg?raw=true)
 
-Downloads bank statements in PDF and XML formats
+Downloads bank statements in PDF and XML formats.
 The XML is parsed and imported into Pohoda via the mServer service.
 The PDF is sent to a sharepoint folder and the link to download it is 
-attached via MSSQL to all bank statements from the statement.
+attached via MSSQL to all bank statements from the XML.
+
+Requirements
+------------
+
+* php 8.1+
+* Pohoda (Pohoda SQL for full functionality) + [mServer](https://www.stormware.cz/pohoda/xml/mserver/)
+* Sharepoint User or Application Account
+* MSSQL login and password
+* [php-sqlsrv](https://learn.microsoft.com/en-us/sql/connect/php/microsoft-php-driver-for-sql-server?view=sql-server-ver16)
 
 Debian/Ubuntu installation
 --------------------------
@@ -17,7 +26,7 @@ Please use the .deb packages. The repository is availble:
     echo "deb http://repo.vitexsoftware.com $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/vitexsoftware.list
     sudo wget -O /etc/apt/trusted.gpg.d/vitexsoftware.gpg http://repo.vitexsoftware.com/keyring.gpg
     sudo apt update
-    sudo apt install abraflexi-raiffeisenbank
+    sudo apt install pohoda-raiffeisenbank
 ```
 
 Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
