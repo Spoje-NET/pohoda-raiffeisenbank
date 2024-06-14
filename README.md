@@ -64,6 +64,7 @@ Destination options
 ```env
 OFFICE365_TENANT=yourcomapny
 OFFICE365_SITE=YourSite
+OFFICE365_PATH='Shared documents/statements'
 ```
 
 Into configuration file .env please put ClientID **OR** Login/Password values. 

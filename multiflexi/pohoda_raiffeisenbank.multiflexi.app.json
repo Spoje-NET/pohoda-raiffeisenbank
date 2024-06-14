@@ -122,7 +122,61 @@
         "DB_PASSWORD": {
             "type": "password",
             "description": "Database Password",
-            "defval": "XXXXX",
+            "defval": "pohodaSQLpassword",
+            "required": true
+        },
+        "DB_SETTINGS": {
+            "type": "text",
+            "description": "Database Settings",
+            "defval": "encrypt=false",
+            "required": true
+        },
+        "OFFICE365_USERNAME": {
+            "type": "text",
+            "description": "Office 365 Username",
+            "defval": "",
+            "required": false
+        },
+        "OFFICE365_PASSWORD": {
+            "type": "password",
+            "description": "Office 365 Password",
+            "defval": "",
+            "required": false
+        },
+        "OFFICE365_CLIENTID": {
+            "type": "text",
+            "description": "Office 365 Client ID",
+            "defval": "",
+            "required": false
+        },
+        "OFFICE365_SECRET": {
+            "type": "text",
+            "description": "Office 365 Secret",
+            "defval": "",
+            "required": false
+        },
+        "OFFICE365_CLSECRET": {
+            "type": "text",
+            "description": "Office 365 Client Secret",
+            "defval": "",
+            "required": false
+        },
+        "OFFICE365_TENANT": {
+            "type": "text",
+            "description": "Office 365 Tenant",
+            "defval": "",
+            "required": true
+        },
+        "OFFICE365_SITE": {
+            "type": "text",
+            "description": "Office 365 Site",
+            "defval": "",
+            "required": true
+        },
+        "OFFICE365_PATH": {
+            "type": "text",
+            "description": "Office 365 Path",
+            "defval": "",
             "required": true
         }
     },
