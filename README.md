@@ -101,7 +101,12 @@ OFFICE365_PATH='Shared documents/statements'
 
 Into configuration file .env please put ClientID **OR** Login/Password values. 
 
-Powered by: https://github.com/VitexSoftware/php-vitexsoftware-rbczpremiumapi https://github.com/Spoje-NET/PohodaSQL https://github.com/Spoje-NET/PohodaSQL
+Powered by
+----------
+
+* https://github.com/VitexSoftware/php-vitexsoftware-rbczpremiumapi
+* https://github.com/Spoje-NET/PohodaSQL
+* https://github.com/VitexSoftware/PHP-Pohoda-Connector
 
 MultiFlexi
 ----------
