@@ -54,7 +54,7 @@ if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD'
 }
 
 $ctx = (new ClientContext('https://' . Shared::cfg('OFFICE365_TENANT') . '.sharepoint.com/sites/' . Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
-$targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl('Sdilene dokumenty/Banky');
+$targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl('Sdilene dokumenty/Banky/novaslozka');
 
 foreach ($pdfs as $filename) {
     $uploadFile = $targetFolder->uploadFile(basename($filename), file_get_contents($filename));
