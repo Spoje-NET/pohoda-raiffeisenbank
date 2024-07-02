@@ -1,8 +1,15 @@
-pohoda-raiffeisenbank (0.2.0) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (0.2.1) UNRELEASED; urgency=medium
 
+  * launcher fix
+
+ --  <vitezslav.dvorak@spojenet.cz>  Tue, 02 Jul 2024 22:43:47 +0200
+
+pohoda-raiffeisenbank (0.2.0) unstable; urgency=medium
+
+  [ vitezslav.dvorak@spojenet.cz ]
   * Sharepoint & Mssql support added
 
- --  <vitezslav.dvorak@spojenet.cz>  Fri, 14 Jun 2024 12:15:33 +0200
+ --  <vitezslav.dvorak@spojenet.cz>  Tue, 02 Jul 2024 22:43:33 +0200
 
 pohoda-raiffeisenbank (0.1.0) unstable; urgency=low
 

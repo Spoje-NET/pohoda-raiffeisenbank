@@ -1,4 +1,5 @@
 #!/bin/bash
-php -f /usr/lib/pohoda-raiffeisenbank/setup.php $@
+php -f /usr/lib/pohoda-raiffeisenbank/pohoda-raiffeisenbank-setup.php -- $@
+
 
 

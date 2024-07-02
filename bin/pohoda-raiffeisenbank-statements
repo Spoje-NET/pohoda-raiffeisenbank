@@ -1,2 +1,3 @@
 #!/bin/bash
-php -f /usr/lib/pohoda-raiffeisenbank/statements.php $@
+php -f /usr/lib/pohoda-raiffeisenbank/pohoda-raiffeisenbank-statements.php -- $@
+
