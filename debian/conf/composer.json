@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Pohoda\\RaiffeisenBank\\": "/usr/share/pohoda-raiffeisenbank/RaiffeisenBank/"
+            "Pohoda\\RaiffeisenBank\\": "/usr/lib/pohoda-raiffeisenbank/Pohoda/RaiffeisenBank/"
         }
     },
     "repositories": [
