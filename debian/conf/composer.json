@@ -9,6 +9,7 @@
         }
     ],
     "require": {
+        "vgrem/php-spo": "^3",
         "deb/ease-core": "*",
         "deb/abraflexi": "*",
         "deb/rbczpremiumapi": "*",

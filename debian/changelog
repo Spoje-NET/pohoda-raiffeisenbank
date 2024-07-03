@@ -1,8 +1,15 @@
-pohoda-raiffeisenbank (0.2.1) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (0.3.0) UNRELEASED; urgency=medium
 
+  * xml file importer added
+
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Wed, 03 Jul 2024 19:02:22 +0200
+
+pohoda-raiffeisenbank (0.2.1) jammy; urgency=medium
+
+  [ vitezslav.dvorak@spojenet.cz ]
   * launcher fix
 
- --  <vitezslav.dvorak@spojenet.cz>  Tue, 02 Jul 2024 22:43:47 +0200
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Wed, 03 Jul 2024 19:02:02 +0200
 
 pohoda-raiffeisenbank (0.2.0) unstable; urgency=medium
 
