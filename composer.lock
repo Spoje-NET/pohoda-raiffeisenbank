@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/instantiator.git",
-                "reference": "9955122a490d18ce723cf9014b196c126222c180"
+                "reference": "0dfb69d79d0964b8a80bfa92c07f50e3e8d73542"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/instantiator/zipball/9955122a490d18ce723cf9014b196c126222c180",
-                "reference": "9955122a490d18ce723cf9014b196c126222c180",
+                "url": "https://api.github.com/repos/doctrine/instantiator/zipball/0dfb69d79d0964b8a80bfa92c07f50e3e8d73542",
+                "reference": "0dfb69d79d0964b8a80bfa92c07f50e3e8d73542",
                 "shasum": ""
             },
             "require": {
@@ -75,7 +75,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-05-05T15:09:38+00:00"
+            "time": "2024-06-20T19:34:15+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -1693,7 +1693,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/1.x"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.30.0"
             },
             "funding": [
                 {
@@ -1717,16 +1717,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "412589da9efe781abff81770478ec88466ab3082"
+                "reference": "9175fd2fa7c06edaca319cc9fec16518bb4bffc9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/412589da9efe781abff81770478ec88466ab3082",
-                "reference": "412589da9efe781abff81770478ec88466ab3082",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/9175fd2fa7c06edaca319cc9fec16518bb4bffc9",
+                "reference": "9175fd2fa7c06edaca319cc9fec16518bb4bffc9",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.2",
+                "symfony/deprecation-contracts": "^2.5|^3.0",
                 "symfony/polyfill-ctype": "^1.8"
             },
             "conflict": {
@@ -1780,7 +1781,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-06-02T19:15:21+00:00"
+            "time": "2024-06-29T05:42:09+00:00"
         },
         {
             "name": "vgrem/php-spo",
@@ -1862,12 +1863,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/VitexSoftware/php-ease-core.git",
-                "reference": "31718e35488e83d3686d6f438b3cfad819d6b482"
+                "reference": "3f08bd966514bdc6b8b4b269e67a30033559db09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VitexSoftware/php-ease-core/zipball/31718e35488e83d3686d6f438b3cfad819d6b482",
-                "reference": "31718e35488e83d3686d6f438b3cfad819d6b482",
+                "url": "https://api.github.com/repos/VitexSoftware/php-ease-core/zipball/3f08bd966514bdc6b8b4b269e67a30033559db09",
+                "reference": "3f08bd966514bdc6b8b4b269e67a30033559db09",
                 "shasum": ""
             },
             "require": {
@@ -1916,7 +1917,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-05-29T15:51:33+00:00"
+            "time": "2024-06-20T18:44:15+00:00"
         },
         {
             "name": "vitexsoftware/ease-fluentpdo",
@@ -1981,12 +1982,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/VitexSoftware/PHP-Pohoda-Connector.git",
-                "reference": "ae618999c359831b06b1dcfc01c7532e7824bbdc"
+                "reference": "14a4d0908ba120417a111459f27f126cfcd1a917"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VitexSoftware/PHP-Pohoda-Connector/zipball/ae618999c359831b06b1dcfc01c7532e7824bbdc",
-                "reference": "ae618999c359831b06b1dcfc01c7532e7824bbdc",
+                "url": "https://api.github.com/repos/VitexSoftware/PHP-Pohoda-Connector/zipball/14a4d0908ba120417a111459f27f126cfcd1a917",
+                "reference": "14a4d0908ba120417a111459f27f126cfcd1a917",
                 "shasum": ""
             },
             "require": {
@@ -2948,7 +2949,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-06-13T20:41:29+00:00"
+            "time": "2024-06-13T22:08:13+00:00"
         },
         {
             "name": "vitexsoftware/rbczpremiumapi",
@@ -3079,16 +3080,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "dev-master",
+            "version": "v5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "3ef0811e45ba7e91fb0f066af5af7d52c3b24469"
+                "reference": "683130c2ff8c2739f4822ff7ac5c873ec529abd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/3ef0811e45ba7e91fb0f066af5af7d52c3b24469",
-                "reference": "3ef0811e45ba7e91fb0f066af5af7d52c3b24469",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/683130c2ff8c2739f4822ff7ac5c873ec529abd1",
+                "reference": "683130c2ff8c2739f4822ff7ac5c873ec529abd1",
                 "shasum": ""
             },
             "require": {
@@ -3101,7 +3102,6 @@
                 "ircmaxell/php-yacc": "^0.0.7",
                 "phpunit/phpunit": "^9.0"
             },
-            "default-branch": true,
             "bin": [
                 "bin/php-parse"
             ],
@@ -3132,9 +3132,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/master"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v5.1.0"
             },
-            "time": "2024-06-12T18:31:58+00:00"
+            "time": "2024-07-01T20:03:41+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -3261,12 +3261,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "3352293d9e91513d5508c415835014881b420218"
+                "reference": "39d628812d8d83344a6c1b07799e3700d830d355"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/3352293d9e91513d5508c415835014881b420218",
-                "reference": "3352293d9e91513d5508c415835014881b420218",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/39d628812d8d83344a6c1b07799e3700d830d355",
+                "reference": "39d628812d8d83344a6c1b07799e3700d830d355",
                 "shasum": ""
             },
             "require": {
@@ -3285,7 +3285,7 @@
                 "theseer/tokenizer": "^1.2.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.3"
+                "phpunit/phpunit": "^9.6"
             },
             "suggest": {
                 "ext-pcov": "PHP extension that provides line coverage",
@@ -3294,7 +3294,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "9.2-dev"
+                    "dev-main": "9.2-dev"
                 }
             },
             "autoload": {
@@ -3331,7 +3331,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-03-22T05:16:32+00:00"
+            "time": "2024-06-29T07:23:05+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -3580,12 +3580,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "cdeb0d99ecb1c4ad07e2e0b4e744d19965951d56"
+                "reference": "07da7f5d51ff0bc9b0ea757be084a57e174b1312"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/cdeb0d99ecb1c4ad07e2e0b4e744d19965951d56",
-                "reference": "cdeb0d99ecb1c4ad07e2e0b4e744d19965951d56",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/07da7f5d51ff0bc9b0ea757be084a57e174b1312",
+                "reference": "07da7f5d51ff0bc9b0ea757be084a57e174b1312",
                 "shasum": ""
             },
             "require": {
@@ -3675,7 +3675,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-06-11T09:46:58+00:00"
+            "time": "2024-06-17T05:30:09+00:00"
         },
         {
             "name": "sebastian/cli-parser",
