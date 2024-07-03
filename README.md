@@ -31,9 +31,10 @@ Please use the .deb packages. The repository is availble:
 
 Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
 
-  * **abraflexi-raiffeisenbank-setup**        - check and/or prepare Bank account setup in AbraFlexi
-  * **abraflexi-raiffeisenbank-transactions** - Import transactions. From latest imported or within the given scope
-  * **abraflexi-raiffeisenbank-statements**   - Import transactions from Account Statements.
+  * **abraflexi-raiffeisenbank-setup**         - check and/or prepare Bank account setup in AbraFlexi
+  * **abraflexi-raiffeisenbank-transactions**  - Import transactions. From latest imported or within the given scope
+  * **abraflexi-raiffeisenbank-statements**    - Import transactions from Account Statements.
+  * **abraflexi-raiffeisenbank-xml-statement** - Import transactions from XML Statements file.
 
 Configuration
 -------------
@@ -69,8 +70,6 @@ DB_DATABASE=StwPh_12345678_2023
 DB_USERNAME=pohodaSQLuser
 DB_PASSWORD=pohodaSQLpassword
 DB_SETTINGS=encrypt=false
-
-
 ```
 
 Sharepoint Integration

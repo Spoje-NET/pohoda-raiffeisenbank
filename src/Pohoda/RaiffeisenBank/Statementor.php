@@ -14,8 +14,8 @@ namespace Pohoda\RaiffeisenBank;
  *
  * @author vitex
  */
-class Statementor extends PohodaBankClient
-{
+class Statementor extends PohodaBankClient {
+
     /**
      *
      * @var \VitexSoftware\Raiffeisenbank\Statementor
@@ -51,8 +51,7 @@ class Statementor extends PohodaBankClient
      * @param string $bankAccount
      * @param array  $options
      */
-    public function __construct($bankAccount, $options = [])
-    {
+    public function __construct($bankAccount, $options = []) {
         parent::__construct($bankAccount, $options);
         $this->obtainer = new \VitexSoftware\Raiffeisenbank\Statementor($bankAccount);
 
@@ -66,14 +65,36 @@ class Statementor extends PohodaBankClient
     }
 
     /**
+     * 
+     * @param string $xmlFile
+     * 
+     * @return array
+     */
+    public function importXML(string $xmlFile) {
+        $this->statementsXML[basename($xmlFile)] = $xmlFile;
+        $pdfFile = str_replace('.xml', '.pdf', $xmlFile);
+        if (file_exists($pdfFile)) {
+            $this->statementsPDF[basename($pdfFile)] = $pdfFile;
+        }
+        return $this->import();
+    }
+
+    /**
+     * 
+     * @return array
+     */
+    public function importOnline() {
+        $this->statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
+        $this->statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
+        return $this->import();
+    }
+
+    /**
      *
      * @return array
      */
-    public function import()
-    {
+    public function import() {
         $inserted = [];
-        $this->statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
-        $this->statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
         $this->account = \Ease\Shared::cfg('POHODA_BANK_IDS', 'RB'); //TODO!!!
         $success = 0;
         foreach ($this->statementsXML as $pos => $statement) {
@@ -111,8 +132,7 @@ class Statementor extends PohodaBankClient
      *
      * @return array
      */
-    public function entryToPohoda($entry)
-    {
+    public function entryToPohoda($entry) {
         $data['symPar'] = current((array) $entry->NtryRef);
         $data['intNote'] = 'Import Job ' . \Ease\Shared::cfg('JOB_ID', 'n/a');
         $data['note'] = 'Imported by ' . \Ease\Shared::AppName() . ' ' . \Ease\Shared::AppVersion();
@@ -157,15 +177,21 @@ class Statementor extends PohodaBankClient
 
                     if (property_exists($entry->NtryDtls->TxDtls->RltdPties, 'CdtrAcct')) {
                         $paymentAccount['accountNo'] = current((array) $entry->NtryDtls->TxDtls->RltdPties->CdtrAcct->Id->Othr->Id);
-                        $data['partnerIdentity'] = [
-                            'address' => [
-                                'name' => current((array) $entry->NtryDtls->TxDtls->RltdPties->CdtrAcct->Nm)
-                            ]
-                        ];
+
+                        if (property_exists($entry->NtryDtls->TxDtls->RltdPties->CdtrAcct, 'Nm')) {
+                            $data['partnerIdentity'] = [
+                                'address' => [
+                                    'name' => current((array) $entry->NtryDtls->TxDtls->RltdPties->CdtrAcct->Nm)
+                                ]
+                            ];
+                        } else {
+                            $this->addStatusMessage(sprintf(_('%s payment without partnerIdentity name'), $paymentAccount['accountNo']));
+                        }
                     }
                 } else {
                     echo ''; // No Related party ?
                 }
+
                 if (property_exists($entry->NtryDtls->TxDtls, 'RltdAgts')) {
                     if (property_exists($entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt, 'FinInstnId')) {
                         $paymentAccount['bankCode'] = current((array) $entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt->FinInstnId->Othr->Id);
@@ -193,8 +219,7 @@ class Statementor extends PohodaBankClient
      *
      * @throws \Exception
      */
-    function setScope($scope)
-    {
+    function setScope($scope) {
         switch ($scope) {
             case 'yesterday':
                 $this->since = (new \DateTime('yesterday'))->setTime(0, 0);
@@ -267,8 +292,7 @@ class Statementor extends PohodaBankClient
      * List of downloaded PDF statements
      * @return array
      */
-    public function getPdfStatements()
-    {
+    public function getPdfStatements() {
         return $this->statementsPDF;
     }
 
@@ -276,8 +300,7 @@ class Statementor extends PohodaBankClient
      * List of downloaded XML statements
      * @return array
      */
-    public function getXmlStatements()
-    {
+    public function getXmlStatements() {
         return $this->statementsXML;
     }
 }
