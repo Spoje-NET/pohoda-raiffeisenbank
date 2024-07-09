@@ -9,7 +9,6 @@
 
 namespace Pohoda\RaiffeisenBank;
 
-use SpojeNet\PohodaSQL\Agenda;
 use Ease\Shared;
 use Office365\Runtime\Auth\ClientCredential;
 use Office365\Runtime\Auth\UserCredentials;
@@ -20,12 +19,14 @@ require_once('../vendor/autoload.php');
 define('APP_NAME', 'Pohoda RaiffeisenBank Statements');
 
 /**
- * Get today's tramsactons list
+ * Get today's Statements list
  */
 \Ease\Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER'], isset($argv[1]) ? $argv[1] : '../.env');
 PohodaBankClient::checkCertificatePresence(\Ease\Shared::cfg('CERT_FILE'));
 $engine = new Statementor(\Ease\Shared::cfg('ACCOUNT_NUMBER'));
 $engine->setScope(\Ease\Shared::cfg('STATEMENT_IMPORT_SCOPE', 'last_month'));
+$engine->logBanner('', 'Scope: ' . $engine->scope);
+
 $inserted = $engine->importOnline();
 
 //
@@ -49,12 +50,16 @@ $pdfs = $engine->getPdfStatements();
 
 if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
     $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
+    $engine->addStatusMessage('Using OFFICE365_USERNAME ' . Shared::cfg('OFFICE365_USERNAME') . ' and OFFICE365_PASSWORD', 'debug');
 } else {
     $credentials = new ClientCredential(Shared::cfg('OFFICE365_CLIENTID'), Shared::cfg('OFFICE365_CLSECRET'));
+    $engine->addStatusMessage('Using OFFICE365_CLIENTID ' . Shared::cfg('OFFICE365_CLIENTID') . ' and OFFICE365_CLSECRET', 'debug');
 }
 
 $ctx = (new ClientContext('https://' . Shared::cfg('OFFICE365_TENANT') . '.sharepoint.com/sites/' . Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
 $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
+
+$engine->addStatusMessage('using ' . $ctx->getServiceRootUrl(), 'debug');
 
 foreach ($pdfs as $filename) {
     $uploadFile = $targetFolder->uploadFile(basename($filename), file_get_contents($filename));

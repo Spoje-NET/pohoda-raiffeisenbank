@@ -45,6 +45,12 @@ class Statementor extends PohodaBankClient {
      * @var array
      */
     private $statementsPDF = [];
+    
+    /**
+     * 
+     * @var string
+     */
+    public $scope = '';
 
     /**
      *
@@ -286,6 +292,7 @@ class Statementor extends PohodaBankClient {
             $this->since = $this->since->setTime(0, 0);
             $this->until = $this->until->setTime(0, 0);
         }
+        $this->scope = $scope;
     }
 
     /**

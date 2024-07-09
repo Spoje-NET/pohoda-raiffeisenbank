@@ -1717,12 +1717,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "9175fd2fa7c06edaca319cc9fec16518bb4bffc9"
+                "reference": "aaf847b839ab2cbe99186af15b04fed391c12c1b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/9175fd2fa7c06edaca319cc9fec16518bb4bffc9",
-                "reference": "9175fd2fa7c06edaca319cc9fec16518bb4bffc9",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/aaf847b839ab2cbe99186af15b04fed391c12c1b",
+                "reference": "aaf847b839ab2cbe99186af15b04fed391c12c1b",
                 "shasum": ""
             },
             "require": {
@@ -1781,7 +1781,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-06-29T05:42:09+00:00"
+            "time": "2024-07-06T07:57:47+00:00"
         },
         {
             "name": "vgrem/php-spo",
@@ -3580,12 +3580,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "07da7f5d51ff0bc9b0ea757be084a57e174b1312"
+                "reference": "d229f5800280c68f1c5fc28b132bc64ff5ed3dd4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/07da7f5d51ff0bc9b0ea757be084a57e174b1312",
-                "reference": "07da7f5d51ff0bc9b0ea757be084a57e174b1312",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/d229f5800280c68f1c5fc28b132bc64ff5ed3dd4",
+                "reference": "d229f5800280c68f1c5fc28b132bc64ff5ed3dd4",
                 "shasum": ""
             },
             "require": {
@@ -3675,7 +3675,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-06-17T05:30:09+00:00"
+            "time": "2024-07-03T05:19:53+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -4703,5 +4703,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
