@@ -29,6 +29,8 @@ $engine->logBanner('', 'Scope: ' . $engine->scope);
 
 $inserted = $engine->importOnline();
 
+if ($inserted) {
+
 //
 //    [243] => Array
 //        (
@@ -46,40 +48,39 @@ $inserted = $engine->importOnline();
 //
 
 
-$pdfs = $engine->getPdfStatements();
+    $pdfs = $engine->getPdfStatements();
 
-if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
-    $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
-    $engine->addStatusMessage('Using OFFICE365_USERNAME ' . Shared::cfg('OFFICE365_USERNAME') . ' and OFFICE365_PASSWORD', 'debug');
-} else {
-    $credentials = new ClientCredential(Shared::cfg('OFFICE365_CLIENTID'), Shared::cfg('OFFICE365_CLSECRET'));
-    $engine->addStatusMessage('Using OFFICE365_CLIENTID ' . Shared::cfg('OFFICE365_CLIENTID') . ' and OFFICE365_CLSECRET', 'debug');
-}
-
-$ctx = (new ClientContext('https://' . Shared::cfg('OFFICE365_TENANT') . '.sharepoint.com/sites/' . Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
-$targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
-
-$engine->addStatusMessage('using ' . $ctx->getServiceRootUrl(), 'debug');
-
-foreach ($pdfs as $filename) {
-    $uploadFile = $targetFolder->uploadFile(basename($filename), file_get_contents($filename));
-    try {
-        $ctx->executeQuery();
-    } catch (Exception $exc) {
-        fwrite(fopen('php://stderr', 'wb'), $exc->getMessage() . PHP_EOL);
-        exit(1);
+    if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
+        $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
+        $engine->addStatusMessage('Using OFFICE365_USERNAME ' . Shared::cfg('OFFICE365_USERNAME') . ' and OFFICE365_PASSWORD', 'debug');
+    } else {
+        $credentials = new ClientCredential(Shared::cfg('OFFICE365_CLIENTID'), Shared::cfg('OFFICE365_CLSECRET'));
+        $engine->addStatusMessage('Using OFFICE365_CLIENTID ' . Shared::cfg('OFFICE365_CLIENTID') . ' and OFFICE365_CLSECRET', 'debug');
     }
-    $fileUrl = $ctx->getBaseUrl() . '/_layouts/15/download.aspx?SourceUrl=' . urlencode($uploadFile->getServerRelativeUrl());
-}
 
+    $ctx = (new ClientContext('https://' . Shared::cfg('OFFICE365_TENANT') . '.sharepoint.com/sites/' . Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
+    $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
 
+    $engine->addStatusMessage('using ' . $ctx->getServiceRootUrl(), 'debug');
 
-$doc = new \SpojeNet\PohodaSQL\DOC();
-$doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); //Bank
+    foreach ($pdfs as $filename) {
+        $uploadFile = $targetFolder->uploadFile(basename($filename), file_get_contents($filename));
+        try {
+            $ctx->executeQuery();
+        } catch (Exception $exc) {
+            fwrite(fopen('php://stderr', 'wb'), $exc->getMessage() . PHP_EOL);
+            exit(1);
+        }
+        $fileUrl = $ctx->getBaseUrl() . '/_layouts/15/download.aspx?SourceUrl=' . urlencode($uploadFile->getServerRelativeUrl());
+    }
 
-foreach ($inserted as $id => $importInfo) {
-    $statement = current($pdfs);
-    //$url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . urlencode(basename($statement));
-    $result = $doc->urlAttachment($id, $fileUrl, basename($statement));
-    $doc->addStatusMessage($importInfo['number'] . ' ' . $fileUrl, is_null($result) ? 'error' : 'success');
+    $doc = new \SpojeNet\PohodaSQL\DOC();
+    $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); //Bank
+
+    foreach ($inserted as $id => $importInfo) {
+        $statement = current($pdfs);
+        //$url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . urlencode(basename($statement));
+        $result = $doc->urlAttachment($id, $fileUrl, basename($statement));
+        $doc->addStatusMessage($importInfo['number'] . ' ' . $fileUrl, is_null($result) ? 'error' : 'success');
+    }
 }
