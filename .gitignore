@@ -22,3 +22,4 @@ output.xml
 /debian/multiflexi-pohoda-raiffeisenbank/
 /debian/multiflexi-pohoda-raiffeisenbank.debhelper.log
 /debian/pohoda-raiffeisenbank.debhelper.log
+/.build/

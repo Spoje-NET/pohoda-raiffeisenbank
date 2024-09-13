@@ -31,10 +31,24 @@ Please use the .deb packages. The repository is availble:
 
 Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
 
-  * **abraflexi-raiffeisenbank-setup**         - check and/or prepare Bank account setup in AbraFlexi
-  * **abraflexi-raiffeisenbank-transactions**  - Import transactions. From latest imported or within the given scope
-  * **abraflexi-raiffeisenbank-statements**    - Import transactions from Account Statements.
-  * **abraflexi-raiffeisenbank-xml-statement** - Import transactions from XML Statements file.
+  * **pohoda-raiffeisenbank-setup**         - check and/or prepare Bank account setup in Pohoda
+  * **pohoda-raiffeisenbank-transactions**  - Import transactions. From latest imported or within the given scope
+  * **pohoda-raiffeisenbank-statements**    - Import transactions from Account Statements.
+  * **pohoda-raiffeisenbank-xml-statement** - Import transactions from XML Statements file.
+
+
+Setup command
+-------------
+
+Check certificate presence yet.
+
+Transactions tool
+-----------------
+
+Import Bank movements from RaiffeisenBank (using [getTransactionList](https://developers.rb.cz/premium/documentation/01rbczpremiumapi#/Get%20Transaction%20List/getTransactionList) as source)
+to Pohoda using mServer 
+
+![Transactions](transactions.png?raw=true)
 
 Configuration
 -------------
@@ -106,6 +120,12 @@ Powered by
 * https://github.com/VitexSoftware/php-vitexsoftware-rbczpremiumapi
 * https://github.com/Spoje-NET/PohodaSQL
 * https://github.com/VitexSoftware/PHP-Pohoda-Connector
+
+See also
+--------
+
+* https://github.com/Spoje-NET/pohoda-client-checker
+* https://github.com/Spoje-NET/raiffeisenbank-statement-tools
 
 MultiFlexi
 ----------

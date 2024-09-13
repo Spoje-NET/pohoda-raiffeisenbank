@@ -1,29 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * RaiffeisenBank - XML Statement importer.
+ * This file is part of the PohodaRaiffeisenbank package
  *
- * @author     Vítězslav Dvořák <info@vitexsoftware.com>
- * @copyright  (C) 2023-2024 Spoje.Net
+ * https://github.com/Spoje-NET/pohoda-raiffeisenbank
+ *
+ * (c) Spoje.Net IT s.r.o. <https://spojenet.cz>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Pohoda\RaiffeisenBank;
 
-use SpojeNet\PohodaSQL\Agenda;
 use Ease\Shared;
 use Office365\Runtime\Auth\ClientCredential;
 use Office365\Runtime\Auth\UserCredentials;
 use Office365\SharePoint\ClientContext;
 
-require_once('../vendor/autoload.php');
+require_once '../vendor/autoload.php';
 
-define('APP_NAME', 'Pohoda RaiffeisenBank Statements');
+\define('APP_NAME', 'Pohoda RaiffeisenBank Statements');
 
 /**
- * Get today's tramsactons list
+ * Get today's tramsactons list.
  */
-\Ease\Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'ACCOUNT_NUMBER'], isset($argv[2]) ? $argv[2] : '../.env');
-$xmlFile = \Ease\Shared::cfg('STATEMENT_FILE', isset($argv[1]) ? $argv[1] : '');
+\Ease\Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'ACCOUNT_NUMBER'], $argv[2] ?? '../.env');
+$xmlFile = \Ease\Shared::cfg('STATEMENT_FILE', $argv[1] ?? '');
 
 $engine = new Statementor(\Ease\Shared::cfg('ACCOUNT_NUMBER'));
 $inserted = $engine->importXML($xmlFile);
@@ -44,7 +49,6 @@ $inserted = $engine->importXML($xmlFile);
 //        )
 //
 
-
 $pdfs = $engine->getPdfStatements();
 
 if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
@@ -58,23 +62,24 @@ $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE
 
 foreach ($pdfs as $filename) {
     $uploadFile = $targetFolder->uploadFile(basename($filename), file_get_contents($filename));
+
     try {
         $ctx->executeQuery();
     } catch (Exception $exc) {
-        fwrite(fopen('php://stderr', 'wb'), $exc->getMessage() . PHP_EOL);
+        fwrite(fopen('php://stderr', 'wb'), $exc->getMessage() . \PHP_EOL);
+
         exit(1);
     }
+
     $fileUrl = $ctx->getBaseUrl() . '/_layouts/15/download.aspx?SourceUrl=' . urlencode($uploadFile->getServerRelativeUrl());
 }
 
-
-
 $doc = new \SpojeNet\PohodaSQL\DOC();
-$doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); //Bank
+$doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
 
 foreach ($inserted as $id => $importInfo) {
     $statement = current($pdfs);
-    //$url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . urlencode(basename($statement));
+    // $url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . urlencode(basename($statement));
     $result = $doc->urlAttachment($id, $fileUrl, basename($statement));
-    $doc->addStatusMessage($importInfo['number'] . ' ' . $fileUrl, is_null($result) ? 'error' : 'success');
+    $doc->addStatusMessage($importInfo['number'] . ' ' . $fileUrl, null === $result ? 'error' : 'success');
 }
