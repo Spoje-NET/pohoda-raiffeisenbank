@@ -1,8 +1,15 @@
-pohoda-raiffeisenbank (0.3.0) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (0.3.1) UNRELEASED; urgency=medium
 
+  * SVG Icons update
+
+ -- vitex <info@vitexsoftware.cz>  Mon, 21 Oct 2024 17:01:19 +0200
+
+pohoda-raiffeisenbank (0.3.0) jammy; urgency=medium
+
+  [ Vítězslav Dvořák ]
   * xml file importer added
 
- -- Vítězslav Dvořák <info@vitexsoftware.cz>  Wed, 03 Jul 2024 19:02:22 +0200
+ -- vitex <info@vitexsoftware.cz>  Mon, 21 Oct 2024 17:01:01 +0200
 
 pohoda-raiffeisenbank (0.2.1) jammy; urgency=medium
 
