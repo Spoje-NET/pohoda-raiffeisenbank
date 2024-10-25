@@ -70,14 +70,21 @@ class Statementor extends PohodaBankClient
         return $this->import();
     }
 
+    function downloadXML() {
+        $this->statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
+    }
+
+    function downloadPDF() {
+        $this->statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
+    }
+    
     /**
      * @return array
      */
     public function importOnline()
     {
-        $this->statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
-        $this->statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
-
+        $this->downloadXML();
+        $this->downloadPDF();
         return $this->import();
     }
 
@@ -197,8 +204,15 @@ class Statementor extends PohodaBankClient
                 }
 
                 if (property_exists($entry->NtryDtls->TxDtls, 'RltdAgts')) {
-                    if (property_exists($entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt, 'FinInstnId')) {
-                        $paymentAccount['bankCode'] = current((array) $entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt->FinInstnId->Othr->Id);
+                    if(property_exists($entry->NtryDtls->TxDtls->RltdAgts, 'DbtrAgt')){
+                        if (property_exists($entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt, 'FinInstnId')) {
+                            $paymentAccount['bankCode'] = current((array) $entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt->FinInstnId->Othr->Id);
+                        }
+                    }
+                    if(property_exists($entry->NtryDtls->TxDtls->RltdAgts, 'CdtrAgt')){
+                        if (property_exists($entry->NtryDtls->TxDtls->RltdAgts->CdtrAgt, 'FinInstnId')) {
+                            $paymentAccount['bankCode'] = current((array) $entry->NtryDtls->TxDtls->RltdAgts->CdtrAgt->FinInstnId->Othr->Id);
+                        }
                     }
                 }
 

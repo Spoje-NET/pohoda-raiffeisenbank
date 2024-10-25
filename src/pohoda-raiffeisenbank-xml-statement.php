@@ -25,7 +25,7 @@ require_once '../vendor/autoload.php';
 \define('APP_NAME', 'Pohoda RaiffeisenBank Statements');
 
 /**
- * Get today's tramsactons list.
+ * Get today's transactions list.
  */
 \Ease\Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'ACCOUNT_NUMBER'], $argv[2] ?? '../.env');
 $xmlFile = \Ease\Shared::cfg('STATEMENT_FILE', $argv[1] ?? '');
