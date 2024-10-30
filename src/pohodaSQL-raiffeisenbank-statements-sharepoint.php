@@ -51,7 +51,8 @@ if ($inserted) {
     //            [actionType] => add
     //        )
     //
-
+    sleep(5);
+    
     $pdfs = $engine->getPdfStatements();
 
     if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
