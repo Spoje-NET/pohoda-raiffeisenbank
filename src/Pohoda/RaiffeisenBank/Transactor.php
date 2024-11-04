@@ -59,8 +59,9 @@ class Transactor extends PohodaBankClient
                     $transactions = array_merge($transactions, $result['transactions']);
                 }
             } while ($result['lastPage'] === false);
-        } catch (Exception $e) {
+        } catch (\VitexSoftware\Raiffeisenbank\ApiException $e) {
             echo 'Exception when calling GetTransactionListApi->getTransactionList: ', $e->getMessage(), \PHP_EOL;
+            exit($e->getCode());
         }
 
         return $transactions;

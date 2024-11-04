@@ -165,7 +165,7 @@ abstract class PohodaBankClient extends \mServer\Bank
 
         if ($scope !== 'auto' && $scope !== 'today' && $scope !== 'yesterday') {
             $this->since = $this->since->setTime(0, 0);
-            $this->until = $this->until->setTime(0, 0);
+            $this->until = $this->until->setTime(23, 59);
         }
     }
 
@@ -233,14 +233,14 @@ abstract class PohodaBankClient extends \mServer\Bank
                     ++$success;
                 }
 
-                if (property_exists($this->response, 'producedDetails') && \is_array($this->response->producedDetails)) {
+                if (isset($this->response->producedDetails) && \is_array($this->response->producedDetails)) {
                     $producedId = $this->response->producedDetails['id'];
                     $producedNumber = $this->response->producedDetails['number'];
                     $producedAction = $this->response->producedDetails['actionType'];
                 } else {
                     echo '';
                 }
-            } catch (\Pohoda\Exception $exc) {
+            } catch (\Exception $exc) {
                 $producedId = 'n/a';
                 $producedNumber = 'n/a';
                 $producedAction = 'n/a';
