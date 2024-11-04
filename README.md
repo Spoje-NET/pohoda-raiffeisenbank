@@ -17,26 +17,6 @@ Requirements
 * MSSQL login and password
 * [php-sqlsrv](https://learn.microsoft.com/en-us/sql/connect/php/microsoft-php-driver-for-sql-server?view=sql-server-ver16)
 
-Debian/Ubuntu installation
---------------------------
-
-Please use the .deb packages. The repository is availble:
-
- ```shell
-    echo "deb http://repo.vitexsoftware.com $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/vitexsoftware.list
-    sudo wget -O /etc/apt/trusted.gpg.d/vitexsoftware.gpg http://repo.vitexsoftware.com/keyring.gpg
-    sudo apt update
-    sudo apt install pohoda-raiffeisenbank
-```
-
-Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
-
-  * **pohoda-raiffeisenbank-setup**         - check and/or prepare Bank account setup in Pohoda
-  * **pohoda-raiffeisenbank-transactions**  - Import transactions. From latest imported or within the given scope
-  * **pohoda-raiffeisenbank-statements**    - Import transactions from Account Statements.
-  * **pohoda-raiffeisenbank-xml-statement** - Import transactions from XML Statements file.
-
-
 Setup command
 -------------
 
@@ -67,6 +47,7 @@ TRANSACTION_IMPORT_SCOPE=yesterday
 API_DEBUG=True
 APP_DEBUG=True
 STATEMENT_LINE=ADDITIONAL
+STATEMENT_SAVE_DIR=/tmp/rb
 
 POHODA_ICO=12345678
 POHODA_URL=http://10.11.25.25:10010
@@ -134,3 +115,23 @@ Pohoda RaiffeisenBank is ready for run as [MultiFlexi](https://multiflexi.eu) ap
 See the full list of ready-to-run applications within the MultiFlexi platform on the [application list page](https://www.multiflexi.eu/apps.php).
 
 [![MultiFlexi App](https://github.com/VitexSoftware/MultiFlexi/blob/main/doc/multiflexi-app.svg)](https://www.multiflexi.eu/apps.php)
+
+Debian/Ubuntu installation
+--------------------------
+
+Please use the .deb packages. The repository is availble:
+
+ ```shell
+    echo "deb http://repo.vitexsoftware.com $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/vitexsoftware.list
+    sudo wget -O /etc/apt/trusted.gpg.d/vitexsoftware.gpg http://repo.vitexsoftware.com/keyring.gpg
+    sudo apt update
+    sudo apt install pohoda-raiffeisenbank
+```
+
+Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
+
+  * **pohoda-raiffeisenbank-setup**         - check and/or prepare Bank account setup in Pohoda
+  * **pohoda-raiffeisenbank-transactions**  - Import transactions. From latest imported or within the given scope
+  * **pohoda-raiffeisenbank-statements**    - Import transactions from Account Statements.
+  * **pohoda-raiffeisenbank-xml-statement** - Import transactions from XML Statements file.
+  * **pohodasql-raiffeisenbank-statements-sharepoint** - Import transactions from Account Statements with link to Sharepoint

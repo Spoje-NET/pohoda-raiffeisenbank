@@ -60,8 +60,20 @@ class Transactor extends PohodaBankClient
                 }
             } while ($result['lastPage'] === false);
         } catch (\VitexSoftware\Raiffeisenbank\ApiException $e) {
-            echo 'Exception when calling GetTransactionListApi->getTransactionList: ', $e->getMessage(), \PHP_EOL;
-            exit($e->getCode());
+            $errorMessage = $e->getMessage();
+            preg_match('/cURL error ([0-9]+)/', $errorMessage, $matches);
+
+            if (\array_key_exists(1, $matches)) {
+                $errorCode = $matches[1];
+            } elseif (preg_match('/\[([0-9]+)\]/', $errorMessage, $matches)) {
+                $errorCode = $matches[1];
+            } else {
+                $errorCode = 2;
+            }
+
+            $this->addStatusMessage('Exception when calling GetTransactionListApi->getTransactionList: '.$errorMessage, 'error', $apiInstance);
+
+            exit(intval($errorCode));
         }
 
         return $transactions;

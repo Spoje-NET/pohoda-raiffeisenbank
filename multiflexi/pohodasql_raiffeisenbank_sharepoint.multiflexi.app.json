@@ -128,9 +128,9 @@
         },
         "DB_SETTINGS": {
             "type": "text",
-            "description": "Database Settings",
-            "defval": "encrypt=false",
-            "required": true
+            "description": "Database Settings like encrypt=false",
+            "defval": "",
+            "required": false
         },
         "OFFICE365_USERNAME": {
             "type": "text",
@@ -179,6 +179,12 @@
             "description": "Office 365 Path",
             "defval": "",
             "required": true
+        },
+        "STATEMENT_SAVE_DIR": {
+            "type": "text",
+            "description": "Place for PDF files",
+            "defval": "",
+            "required": false
         }
     },
     "multiflexi": "1.10.2.0"

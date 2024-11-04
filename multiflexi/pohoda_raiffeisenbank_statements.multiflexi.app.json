@@ -95,6 +95,12 @@
             "description": "Pohoda Bank IDs",
             "defval": "KB",
             "required": true
+        },
+        "STATEMENT_SAVE_DIR": {
+            "type": "text",
+            "description": "Place for PDF files",
+            "defval": "",
+            "required": false
         }
     },
     "multiflexi": "1.10.2.0"
