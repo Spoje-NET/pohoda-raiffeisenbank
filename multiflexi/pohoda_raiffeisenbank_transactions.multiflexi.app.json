@@ -1,8 +1,8 @@
 {
     "image": "",
-    "name": "Raiffeisenbank statements for Pohoda",
+    "name": "Raiffeisenbank transactions for Pohoda",
     "description": "Import Raiffeisenbank statements into Pohoda",
-    "executable": "pohoda-raiffeisenbank-statements",
+    "executable": "pohoda-raiffeisenbank-transactions",
     "setup": "pohoda-raiffeisenbank-setup",
     "cmdparams": "",
     "deploy": "apt install pohoda-raiffeisenbank",
@@ -10,14 +10,8 @@
     "requirements": "Pohoda,SQLServer,RaiffeisenBank",
     "ociimage": "",
     "topics": "Raiffeisen,Bank,Statements,Pohoda",
-    "uuid": "d660baec-aa96-4810-ad9f-b4180f27b9f1",
+    "uuid": "10f24522-66af-460c-8dc1-e6454cfc9a55",
     "environment": {
-        "IMPORT_SCOPE": {
-            "type": "text",
-            "description": "Time scope of statements downloaded",
-            "defval": "yesterday",
-            "required": true
-        },
         "ACCOUNT_NUMBER": {
             "type": "text",
             "description": "Bank Account Number",
@@ -36,10 +30,10 @@
             "defval": "",
             "required": true
         },
-        "STATEMENT_IMPORT_SCOPE": {
+        "IMPORT_SCOPE": {
             "type": "text",
             "description": "Time scope of transactions downloaded",
-            "defval": "auto",
+            "defval": "today",
             "required": true
         },
         "XIBMCLIENTID": {

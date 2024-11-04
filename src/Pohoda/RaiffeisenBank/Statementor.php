@@ -111,7 +111,7 @@ class Statementor extends PohodaBankClient
                 //                $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
                 $success = $this->insertTransactionToPohoda($success);
 
-                if (property_exists($this->response, 'producedDetails') && \is_array($this->response->producedDetails)) {
+                if (isset($this->response->producedDetails) && \is_array($this->response->producedDetails)) {
                     if (\array_key_exists('id', $this->response->producedDetails)) {
                         $inserted[$this->response->producedDetails['id']] = $this->response->producedDetails;
                     } else {
