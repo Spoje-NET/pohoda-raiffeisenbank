@@ -57,7 +57,7 @@ if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD'
     $credentials = new ClientCredential(Shared::cfg('OFFICE365_CLIENTID'), Shared::cfg('OFFICE365_CLSECRET'));
 }
 
-$ctx = (new ClientContext('https://' . Shared::cfg('OFFICE365_TENANT') . '.sharepoint.com/sites/' . Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
+$ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
 $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
 
 foreach ($pdfs as $filename) {
@@ -66,12 +66,12 @@ foreach ($pdfs as $filename) {
     try {
         $ctx->executeQuery();
     } catch (Exception $exc) {
-        fwrite(fopen('php://stderr', 'wb'), $exc->getMessage() . \PHP_EOL);
+        fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
 
         exit(1);
     }
 
-    $fileUrl = $ctx->getBaseUrl() . '/_layouts/15/download.aspx?SourceUrl=' . urlencode($uploadFile->getServerRelativeUrl());
+    $fileUrl = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
 }
 
 $doc = new \SpojeNet\PohodaSQL\DOC();
@@ -81,5 +81,5 @@ foreach ($inserted as $id => $importInfo) {
     $statement = current($pdfs);
     // $url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . urlencode(basename($statement));
     $result = $doc->urlAttachment($id, $fileUrl, basename($statement));
-    $doc->addStatusMessage($importInfo['number'] . ' ' . $fileUrl, null === $result ? 'error' : 'success');
+    $doc->addStatusMessage($importInfo['number'].' '.$fileUrl, null === $result ? 'error' : 'success');
 }

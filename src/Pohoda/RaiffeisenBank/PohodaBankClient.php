@@ -60,7 +60,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function sourceString()
     {
-        return substr(__FILE__ . '@' . gethostname(), -50);
+        return substr(__FILE__.'@'.gethostname(), -50);
     }
 
     /**
@@ -71,7 +71,7 @@ abstract class PohodaBankClient extends \mServer\Bank
     public static function checkCertificatePresence($certFile): void
     {
         if ((file_exists($certFile) === false) || (is_readable($certFile) === false)) {
-            fwrite(\STDERR, 'Cannot read specified certificate file: ' . $certFile . \PHP_EOL);
+            fwrite(\STDERR, 'Cannot read specified certificate file: '.$certFile.\PHP_EOL);
 
             exit(1);
         }
@@ -123,8 +123,8 @@ abstract class PohodaBankClient extends \mServer\Bank
 
                 break;
             case 'this_year':
-                $this->since = new \DateTime('first day of January ' . date('Y'));
-                $this->until = new \DateTime('last day of December' . date('Y'));
+                $this->since = new \DateTime('first day of January '.date('Y'));
+                $this->until = new \DateTime('last day of December'.date('Y'));
 
                 break;
             case 'January':  // 1
@@ -139,8 +139,8 @@ abstract class PohodaBankClient extends \mServer\Bank
             case 'October':  // 10
             case 'November': // 11
             case 'December': // 12
-                $this->since = new \DateTime('first day of ' . $scope . ' ' . date('Y'));
-                $this->until = new \DateTime('last day of ' . $scope . ' ' . date('Y'));
+                $this->since = new \DateTime('first day of '.$scope.' '.date('Y'));
+                $this->until = new \DateTime('last day of '.$scope.' '.date('Y'));
 
                 break;
             case 'auto':
@@ -158,7 +158,7 @@ abstract class PohodaBankClient extends \mServer\Bank
                 break;
 
             default:
-                throw new \Exception('Unknown scope ' . $scope);
+                throw new \Exception('Unknown scope '.$scope);
 
                 break;
         }
@@ -176,7 +176,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function getxRequestId()
     {
-        return $this->getDataValue('account') . time();
+        return $this->getDataValue('account').time();
     }
 
     /**
@@ -205,8 +205,8 @@ abstract class PohodaBankClient extends \mServer\Bank
     public function ensureKSExists($conSym): void
     {
         if (!\array_key_exists($conSym, $this->constSymbols)) {
-            $this->constantor->insertToPohoda(['kod' => $conSym, 'poznam' => 'Created by Raiffeisen Bank importer', 'nazev' => '?!?!? ' . $conSym]);
-            $this->constantor->addStatusMessage('New constant ' . $conSym . ' created in flexibee', 'warning');
+            $this->constantor->insertToPohoda(['kod' => $conSym, 'poznam' => 'Created by Raiffeisen Bank importer', 'nazev' => '?!?!? '.$conSym]);
+            $this->constantor->addStatusMessage('New constant '.$conSym.' created in flexibee', 'warning');
             $this->constSymbols[$conSym] = $conSym;
         }
     }
@@ -246,7 +246,7 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $producedAction = 'n/a';
             }
 
-            $this->addStatusMessage('#' . $producedId . ' ' . $producedAction . ' ' . $producedNumber, $result ? 'success' : 'error'); // TODO: Parse response for docID
+            $this->addStatusMessage('#'.$producedId.' '.$producedAction.' '.$producedNumber, $result ? 'success' : 'error'); // TODO: Parse response for docID
         } else {
             $this->addStatusMessage('Record with remoteNumber TODO already present in Pohoda', 'warning');
         }

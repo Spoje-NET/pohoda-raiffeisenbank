@@ -48,7 +48,7 @@ class Statementor extends PohodaBankClient
 
         $this->obtainer->setScope(\Ease\Shared::cfg('STATEMENT_IMPORT_SCOPE', 'last_month'));
 
-        $this->statementsDir = \Ease\Functions::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir() . '/rb');
+        $this->statementsDir = \Ease\Functions::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir().'/rb');
 
         if (file_exists($this->statementsDir) === false) {
             mkdir($this->statementsDir, 0777, true);
@@ -70,14 +70,16 @@ class Statementor extends PohodaBankClient
         return $this->import();
     }
 
-    function downloadXML() {
+    public function downloadXML(): void
+    {
         $this->statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
     }
 
-    function downloadPDF() {
+    public function downloadPDF(): void
+    {
         $this->statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
     }
-    
+
     /**
      * @return array
      */
@@ -85,6 +87,7 @@ class Statementor extends PohodaBankClient
     {
         $this->downloadXML();
         $this->downloadPDF();
+
         return $this->import();
     }
 
@@ -105,7 +108,7 @@ class Statementor extends PohodaBankClient
                 $this->dataReset();
                 $this->setData($this->entryToPohoda($entry));
                 [$statementNumber, $statementYear] = explode('_', $pos);
-                $this->setDataValue('statementNumber', ['statementNumber' => $statementNumber . '/' . $statementYear]);
+                $this->setDataValue('statementNumber', ['statementNumber' => $statementNumber.'/'.$statementYear]);
                 //                $this->setDataValue('account', current((array) $entry->NtryRef));
                 //                $this->setDataValue('vypisCisDokl', $statementXML->BkToCstmrStmt->Stmt->Id);
                 //                $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
@@ -120,7 +123,7 @@ class Statementor extends PohodaBankClient
                 }
             }
 
-            $this->addStatusMessage($statementNumberLong . ' Import done. ' . $success . ' of ' . \count($this->statementsXML) . ' imported');
+            $this->addStatusMessage($statementNumberLong.' Import done. '.$success.' of '.\count($this->statementsXML).' imported');
 
             return $inserted;
         }
@@ -139,12 +142,12 @@ class Statementor extends PohodaBankClient
     public function entryToPohoda($entry)
     {
         $data['symPar'] = current((array) $entry->NtryRef);
-        $data['intNote'] = 'Import Job ' . \Ease\Shared::cfg('JOB_ID', 'n/a');
-        $data['note'] = 'Imported by ' . \Ease\Shared::AppName() . ' ' . \Ease\Shared::AppVersion();
-        $data['datePayment'] = current((array) $entry->BookgDt->DtTm);
-        $data['dateStatement'] = current((array) $entry->ValDt->DtTm);
+        $data['intNote'] = 'Import Job '.\Ease\Shared::cfg('JOB_ID', 'n/a');
+        $data['note'] = 'Imported by '.\Ease\Shared::AppName().' '.\Ease\Shared::AppVersion();
+        $data['datePayment'] = current((array) $entry->BookgDt->DtTm); // current((array) $entry->ValDt->DtTm);
+        $data['dateStatement'] = current((array) $entry->BookgDt->DtTm) ;
         $moveTrans = ['DBIT' => 'expense', 'CRDT' => 'receipt'];
-        $data['bankType'] = $moveTrans[trim((string)$entry->CdtDbtInd)];
+        $data['bankType'] = $moveTrans[trim((string) $entry->CdtDbtInd)];
         //        $data['cisDosle', strval($entry->NtryRef));
         //        $data['datVyst', new \DateTime($entry->BookgDt->DtTm));
         $data['homeCurrency'] = ['priceNone' => abs((float) $entry->Amt)]; // "price3", "price3Sum", "price3VAT", "priceHigh", "priceHighSum", "priceHighVAT", "priceLow", "priceLowSum", "priceLowVAT", "priceNone", "round"
@@ -204,12 +207,13 @@ class Statementor extends PohodaBankClient
                 }
 
                 if (property_exists($entry->NtryDtls->TxDtls, 'RltdAgts')) {
-                    if(property_exists($entry->NtryDtls->TxDtls->RltdAgts, 'DbtrAgt')){
+                    if (property_exists($entry->NtryDtls->TxDtls->RltdAgts, 'DbtrAgt')) {
                         if (property_exists($entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt, 'FinInstnId')) {
                             $paymentAccount['bankCode'] = current((array) $entry->NtryDtls->TxDtls->RltdAgts->DbtrAgt->FinInstnId->Othr->Id);
                         }
                     }
-                    if(property_exists($entry->NtryDtls->TxDtls->RltdAgts, 'CdtrAgt')){
+
+                    if (property_exists($entry->NtryDtls->TxDtls->RltdAgts, 'CdtrAgt')) {
                         if (property_exists($entry->NtryDtls->TxDtls->RltdAgts->CdtrAgt, 'FinInstnId')) {
                             $paymentAccount['bankCode'] = current((array) $entry->NtryDtls->TxDtls->RltdAgts->CdtrAgt->FinInstnId->Othr->Id);
                         }
@@ -277,8 +281,8 @@ class Statementor extends PohodaBankClient
 
                 break;
             case 'this_year':
-                $this->since = new \DateTime('first day of January ' . date('Y'));
-                $this->until = new \DateTime('last day of December' . date('Y'));
+                $this->since = new \DateTime('first day of January '.date('Y'));
+                $this->until = new \DateTime('last day of December'.date('Y'));
 
                 break;
             case 'January':  // 1
@@ -293,8 +297,8 @@ class Statementor extends PohodaBankClient
             case 'October':  // 10
             case 'November': // 11
             case 'December': // 12
-                $this->since = new \DateTime('first day of ' . $scope . ' ' . date('Y'));
-                $this->until = new \DateTime('last day of ' . $scope . ' ' . date('Y'));
+                $this->since = new \DateTime('first day of '.$scope.' '.date('Y'));
+                $this->until = new \DateTime('last day of '.$scope.' '.date('Y'));
 
                 break;
             case 'auto':
@@ -312,7 +316,7 @@ class Statementor extends PohodaBankClient
                 break;
 
             default:
-                throw new \Exception('Unknown scope ' . $scope);
+                throw new \Exception('Unknown scope '.$scope);
 
                 break;
         }

@@ -22,7 +22,6 @@ namespace Pohoda\RaiffeisenBank;
  */
 class Transactor extends PohodaBankClient
 {
-
     /**
      * Transaction Handler.
      *
@@ -73,7 +72,7 @@ class Transactor extends PohodaBankClient
 
             $this->addStatusMessage('Exception when calling GetTransactionListApi->getTransactionList: '.$errorMessage, 'error', $apiInstance);
 
-            exit(intval($errorCode));
+            exit((int) $errorCode);
         }
 
         return $transactions;
@@ -86,7 +85,7 @@ class Transactor extends PohodaBankClient
     {
         //        $allMoves = $this->getColumnsFromPohoda('id', ['limit' => 0, 'banka' => $this->bank]);
         $allTransactions = $this->getTransactions();
-        $this->addStatusMessage(\count($allTransactions) . ' transactions obtained via API', 'debug');
+        $this->addStatusMessage(\count($allTransactions).' transactions obtained via API', 'debug');
         $success = 0;
 
         foreach ($allTransactions as $transaction) {
@@ -96,7 +95,7 @@ class Transactor extends PohodaBankClient
             $this->reset();
         }
 
-        $this->addStatusMessage('Import done. ' . $success . ' of ' . \count($allTransactions) . ' imported');
+        $this->addStatusMessage('Import done. '.$success.' of '.\count($allTransactions).' imported');
     }
 
     /**
@@ -114,7 +113,7 @@ class Transactor extends PohodaBankClient
         $this->setDataValue('bankType', $moveTrans[$transactionData->creditDebitIndication]);
         $this->setDataValue('account', \Ease\Shared::cfg('POHODA_BANK_IDS')); // RB
         $this->setDataValue('datePayment', (new \DateTime($transactionData->valueDate))->format('Y-m-d'));
-        $this->setDataValue('intNote', _('Automatic Import') . ': ' . \Ease\Shared::appName() . ' ' . \Ease\Shared::appVersion() . ' ' . $transactionData->entryReference);
+        $this->setDataValue('intNote', _('Automatic Import').': '.\Ease\Shared::appName().' '.\Ease\Shared::appVersion().' '.$transactionData->entryReference);
         $this->setDataValue('statementNumber', ['statementNumber' => $transactionData->bankTransactionCode->code]);
         $this->setDataValue('symPar', (string) $transactionData->entryReference);
 
@@ -169,7 +168,7 @@ class Transactor extends PohodaBankClient
             $this->setDataValue('text', $transactionData->entryDetails->transactionDetails->remittanceInformation->originatorMessage);
         }
 
-        $this->setDataValue('note', 'Import Job ' . \Ease\Shared::cfg('JOB_ID', 'n/a'));
+        $this->setDataValue('note', 'Import Job '.\Ease\Shared::cfg('JOB_ID', 'n/a'));
 
         if (property_exists($transactionData->entryDetails->transactionDetails->relatedParties, 'counterParty')) {
             $counterAccount = $transactionData->entryDetails->transactionDetails->relatedParties->counterParty;
@@ -181,7 +180,7 @@ class Transactor extends PohodaBankClient
             $counterAccountNumber = $counterAccount->account->accountNumber;
 
             if (property_exists($counterAccount->account, 'accountNumberPrefix')) {
-                $accountNumber = $counterAccount->account->accountNumberPrefix . '-' . $counterAccountNumber;
+                $accountNumber = $counterAccount->account->accountNumberPrefix.'-'.$counterAccountNumber;
             } else {
                 $accountNumber = $counterAccountNumber;
             }
@@ -220,6 +219,7 @@ class Transactor extends PohodaBankClient
                 $this->since = (new \DateTime('yesterday'))->setTime(0, 0);
                 $this->until = (new \DateTime('yesterday'))->setTime(23, 59, 59, 999);
 
+                // no break
             case 'last_week':
                 $this->since = new \DateTime('first day of last week');
                 $this->until = new \DateTime('last day of last week');
@@ -240,7 +240,7 @@ class Transactor extends PohodaBankClient
                 break;
 
             default:
-                throw new \Exception('Unknown scope ' . $scope);
+                throw new \Exception('Unknown scope '.$scope);
 
                 break;
         }

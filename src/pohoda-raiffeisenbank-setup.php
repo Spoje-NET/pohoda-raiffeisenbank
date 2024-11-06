@@ -44,7 +44,7 @@ try {
                 $banker->addStatusMessage(sprintf('Account %s already exists in pohoda as %s', $account->friendlyName, $currentAccounts[$account->iban]['kod']));
             } else {
                 $banker->dataReset();
-                $banker->setDataValue('kod', 'RB' . $account->accountId);
+                $banker->setDataValue('kod', 'RB'.$account->accountId);
                 $banker->setDataValue('nazev', $account->accountName);
                 $banker->setDataValue('buc', $account->accountNumber);
                 $banker->setDataValue('nazBanky', 'Raiffeisenbank');
