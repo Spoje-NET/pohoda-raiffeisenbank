@@ -24,11 +24,8 @@ class Transactor extends PohodaBankClient
 {
     /**
      * Transaction Handler.
-     *
-     * @param mixed $bankAccount
-     * @param array $options
      */
-    public function __construct($bankAccount, $options = [])
+    public function __construct(string $bankAccount, array $options = [])
     {
         parent::__construct($bankAccount, $options);
     }

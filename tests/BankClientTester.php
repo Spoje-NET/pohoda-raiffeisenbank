@@ -15,9 +15,12 @@ declare(strict_types=1);
 
 namespace Pohoda\RaiffeisenBank;
 
-require_once '../vendor/autoload.php';
-
-\Ease\Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID'], '../tests/test.env');
-Transactor::checkCertificatePresence(\Ease\Shared::cfg('CERT_FILE'));
-
-include_once __DIR__.'/BankClientTester.php';
+/**
+ * Description of BankClientTester.
+ *
+ * @author Vitex <info@vitexsoftware.cz>
+ */
+class BankClientTester extends \Pohoda\RaiffeisenBank\PohodaBankClient
+{
+    // put your code here
+}

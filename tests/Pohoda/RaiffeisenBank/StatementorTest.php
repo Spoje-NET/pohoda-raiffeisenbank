@@ -30,7 +30,7 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->object = new Statementor();
+        $this->object = new Statementor(\Ease\Shared::cfg('ACCOUNT_NUMBER'), ['mock' => true]);
     }
 
     /**
@@ -43,26 +43,19 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @covers \Pohoda\RaiffeisenBank\Statementor::importXML
-     *
-     * @todo   Implement testimportXML().
      */
     public function testimportXML(): void
     {
-        $this->assertEquals('', $this->object->importXML());
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $this->assertIsArray($this->object->importXML('../tests/194_2024_630804003_3780381_CZK_2024-11-06.xml'));
     }
 
     /**
      * @covers \Pohoda\RaiffeisenBank\Statementor::downloadXML
-     *
-     * @todo   Implement testdownloadXML().
      */
     public function testdownloadXML(): void
     {
-        $this->assertEquals('', $this->object->downloadXML());
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $this->object->setScope('yesterday');
+        $this->assertIsArray($this->object->downloadXML());
     }
 
     /**

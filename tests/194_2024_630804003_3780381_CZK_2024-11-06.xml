@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?><Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
+    <BkToCstmrStmt>
+        <GrpHdr>
+            <MsgId>camt.053-2024-11-07-001</MsgId>
+            <CreDtTm>2024-11-07T01:14:44</CreDtTm>
+            <MsgRcpt>
+                <Nm>SPOJENET IT s.r.o.</Nm>
+                <PstlAdr>
+                    <AdrLine>SPOJENET IT s.r.o.</AdrLine>
+                    <AdrLine>Krakovská 583/9</AdrLine>
+                    <AdrLine>Praha</AdrLine>
+                    <AdrLine>11000</AdrLine>
+                </PstlAdr>
+                <Id>
+                    <OrgId>
+                        <Othr>
+                            <Id>SPOJENET IT s.r.o.</Id>
+                        </Othr>
+                    </OrgId>
+                </Id>
+            </MsgRcpt>
+            <AddtlInf>Denní</AddtlInf>
+        </GrpHdr>
+        <Stmt>
+            <Id>CZ8755000000000630804003-2024-11-06</Id>
+            <ElctrncSeqNb>194</ElctrncSeqNb>
+            <LglSeqNb>194</LglSeqNb>
+            <CreDtTm>2024-11-07T01:14:44</CreDtTm>
+            <FrToDt>
+                <FrDtTm>2024-11-06T00:00:00</FrDtTm>
+                <ToDtTm>2024-11-06T23:59:59</ToDtTm>
+            </FrToDt>
+            <Acct>
+                <Id>
+                    <IBAN>CZ8755000000000630804003</IBAN>
+                </Id>
+                <Tp>
+                    <Cd>CACC</Cd>
+                </Tp>
+                <Ccy>CZK</Ccy>
+                <Nm>SPOJENET IT s.r.o.</Nm>
+                <Ownr>
+                    <Nm>SPOJENET IT s.r.o.</Nm>
+                    <PstlAdr>
+                        <AdrLine>SPOJENET IT s.r.o.</AdrLine>
+                        <AdrLine>Krakovská 583/9</AdrLine>
+                        <AdrLine>Praha</AdrLine>
+                        <AdrLine>11000</AdrLine>
+                    </PstlAdr>
+                    <Id>
+                        <OrgId>
+                            <Othr>
+                                <Id>SPOJENET IT s.r.o.</Id>
+                            </Othr>
+                        </OrgId>
+                    </Id>
+                </Ownr>
+                <Svcr>
+                    <FinInstnId>
+                        <BIC>RZBCCZPP</BIC>
+                        <Othr>
+                            <Id>5500</Id>
+                        </Othr>
+                    </FinInstnId>
+                </Svcr>
+            </Acct>
+            <Intrst>
+                <Tp>
+                    <Prtry>Interest Zone</Prtry>
+                </Tp>
+                <Rate>
+                    <Tp>
+                        <Pctg>6</Pctg>
+                    </Tp>
+                    <VldtyRg>
+                        <Amt>
+                            <FrToAmt>
+                                <FrAmt>
+                                    <BdryAmt>0</BdryAmt>
+                                    <Incl>true</Incl>
+                                </FrAmt>
+                                <ToAmt>
+                                    <BdryAmt>300000</BdryAmt>
+                                    <Incl>true</Incl>
+                                </ToAmt>
+                            </FrToAmt>
+                        </Amt>
+                        <CdtDbtInd>DBIT</CdtDbtInd>
+                        <Ccy>CZK</Ccy>
+                    </VldtyRg>
+                </Rate>
+                <FrToDt>
+                    <FrDtTm>2024-11-06T00:00:00</FrDtTm>
+                    <ToDtTm>2024-11-06T23:59:59</ToDtTm>
+                </FrToDt>
+            </Intrst>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>PRCD</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="CZK">9999999</Amt>
+                <CdtDbtInd>DBIT</CdtDbtInd>
+                <Dt>
+                    <Dt>2024-11-06</Dt>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>OPAV</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <CdtLine>
+                    <Incl>true</Incl>
+                    <Amt Ccy="CZK">300000</Amt>
+                </CdtLine>
+                <Amt Ccy="CZK">9999999</Amt>
+                <CdtDbtInd>DBIT</CdtDbtInd>
+                <Dt>
+                    <Dt>2024-11-06</Dt>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>CLAV</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="CZK">9999999</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Dt>
+                    <Dt>2024-11-06</Dt>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>CLBD</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="CZK">9999999</Amt>
+                <CdtDbtInd>DBIT</CdtDbtInd>
+                <Dt>
+                    <Dt>2024-11-06</Dt>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>XPCD</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <CdtLine>
+                    <Incl>true</Incl>
+                    <Amt Ccy="CZK">300000</Amt>
+                </CdtLine>
+                <Amt Ccy="CZK">9999999</Amt>
+                <CdtDbtInd>DBIT</CdtDbtInd>
+                <Dt>
+                    <Dt>2024-11-06</Dt>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>CLAV</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="CZK">9999999</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Dt>
+                    <Dt>2024-11-06</Dt>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>ITAV</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="CZK">9999999</Amt>
+                <CdtDbtInd>DBIT</CdtDbtInd>
+                <Dt>
+                    <Dt>2024-11-06</Dt>
+                </Dt>
+            </Bal>
+            <TxsSummry>
+                <TtlNtries>
+                    <NbOfNtries>0</NbOfNtries>
+                    <Sum>0</Sum>
+                    <TtlNetNtryAmt>0</TtlNetNtryAmt>
+                    <CdtDbtInd>CRDT</CdtDbtInd>
+                </TtlNtries>
+                <TtlCdtNtries>
+                    <NbOfNtries>0</NbOfNtries>
+                    <Sum>0</Sum>
+                </TtlCdtNtries>
+                <TtlDbtNtries>
+                    <NbOfNtries>0</NbOfNtries>
+                    <Sum>0</Sum>
+                </TtlDbtNtries>
+            </TxsSummry>
+        </Stmt>
+    </BkToCstmrStmt>
+</Document>

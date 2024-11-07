@@ -30,7 +30,7 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->object = new PohodaBankClient();
+        $this->object = new \Pohoda\RaiffeisenBank\BankClientTester(\Ease\Shared::cfg('ACCOUNT_NUMBER'));
     }
 
     /**

@@ -30,7 +30,7 @@ class TransactorTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->object = new Transactor();
+        $this->object = new Transactor(\Ease\Shared::cfg('ACCOUNT_NUMBER'), ['mock' => true]);
     }
 
     /**

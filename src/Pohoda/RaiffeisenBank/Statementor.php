@@ -37,16 +37,10 @@ class Statementor extends PohodaBankClient
      */
     private array $statementsPDF = [];
 
-    /**
-     * @param string $bankAccount
-     * @param array  $options
-     */
-    public function __construct($bankAccount, $options = [])
+    public function __construct(string $bankAccount, array $options = [])
     {
         parent::__construct($bankAccount, $options);
         $this->obtainer = new \VitexSoftware\Raiffeisenbank\Statementor($bankAccount);
-
-        $this->obtainer->setScope(\Ease\Shared::cfg('STATEMENT_IMPORT_SCOPE', 'last_month'));
 
         $this->statementsDir = \Ease\Functions::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir().'/rb');
 
@@ -92,9 +86,9 @@ class Statementor extends PohodaBankClient
     }
 
     /**
-     * @return array
+     * Import Raiffeisen bank XML statement into Pohoda
      */
-    public function import()
+    public function import(): array
     {
         $inserted = [];
         $this->account = \Ease\Shared::cfg('POHODA_BANK_IDS', 'RB'); // TODO!!!
@@ -136,10 +130,8 @@ class Statementor extends PohodaBankClient
      * @see https://www.stormware.cz/xml/schema/version_2/bank.xsd
      *
      * @param SimpleXMLElement $entry
-     *
-     * @return array
      */
-    public function entryToPohoda($entry)
+    public function entryToPohoda($entry): array
     {
         $data['symPar'] = current((array) $entry->NtryRef);
         $data['intNote'] = 'Import Job '.\Ease\Shared::cfg('JOB_ID', 'n/a');
@@ -302,7 +294,9 @@ class Statementor extends PohodaBankClient
 
                 break;
             case 'auto':
-                $latestRecord = $this->getColumnsFromPohoda(['id', 'lastUpdate'], ['limit' => 1, 'order' => 'lastUpdate@A', 'source' => $this->sourceString(), 'banka' => $this->bank]);
+                
+                //  "EAN", "code", "company", "dateFrom", "dateTill", "dic", "ico", "id", "internet", "lastChanges", "name", "storage", "store".
+                $latestRecord = $this->getColumnsFromPohoda();
 
                 if (\array_key_exists(0, $latestRecord) && \array_key_exists('lastUpdate', $latestRecord[0])) {
                     $this->since = $latestRecord[0]['lastUpdate'];
@@ -339,15 +333,16 @@ class Statementor extends PohodaBankClient
             $this->until = $this->until->setTime(23, 59, 59, 999);
         }
 
-        $this->scope = $scope;
+        $this->obtainer->since = $this->since;
+        $this->obtainer->until = $this->until;
+
+        //        $this->obtainer->setScope(\Ease\Shared::cfg('STATEMENT_IMPORT_SCOPE', 'last_month'));
     }
 
     /**
      * List of downloaded PDF statements.
-     *
-     * @return array
      */
-    public function getPdfStatements()
+    public function getPdfStatements(): array
     {
         return $this->statementsPDF;
     }
