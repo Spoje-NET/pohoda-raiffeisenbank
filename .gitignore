@@ -25,3 +25,4 @@ output.xml
 /.build/
 /composer.lock
 /.vscode/
+/tests/.phpunit.result.cache

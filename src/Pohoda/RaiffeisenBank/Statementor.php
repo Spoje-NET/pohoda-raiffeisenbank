@@ -145,7 +145,7 @@ class Statementor extends PohodaBankClient
         $data['intNote'] = 'Import Job '.\Ease\Shared::cfg('JOB_ID', 'n/a');
         $data['note'] = 'Imported by '.\Ease\Shared::AppName().' '.\Ease\Shared::AppVersion();
         $data['datePayment'] = current((array) $entry->BookgDt->DtTm); // current((array) $entry->ValDt->DtTm);
-        $data['dateStatement'] = current((array) $entry->BookgDt->DtTm) ;
+        $data['dateStatement'] = current((array) $entry->BookgDt->DtTm);
         $moveTrans = ['DBIT' => 'expense', 'CRDT' => 'receipt'];
         $data['bankType'] = $moveTrans[trim((string) $entry->CdtDbtInd)];
         //        $data['cisDosle', strval($entry->NtryRef));
@@ -316,14 +316,27 @@ class Statementor extends PohodaBankClient
                 break;
 
             default:
-                throw new \Exception('Unknown scope '.$scope);
+                if (strstr($scope, '>')) {
+                    [$begin, $end] = explode('>', $scope);
+                    $this->since = new \DateTime($begin);
+                    $this->until = new \DateTime($end);
+                } else {
+                    if (preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $scope)) {
+                        $this->since = new \DateTime($scope);
+                        $this->until = (new \DateTime($scope))->setTime(23, 59, 59, 999);
+
+                        break;
+                    }
+
+                    throw new \Exception('Unknown scope '.$scope);
+                }
 
                 break;
         }
 
         if ($scope !== 'auto' && $scope !== 'today' && $scope !== 'yesterday') {
             $this->since = $this->since->setTime(0, 0);
-            $this->until = $this->until->setTime(0, 0);
+            $this->until = $this->until->setTime(23, 59, 59, 999);
         }
 
         $this->scope = $scope;

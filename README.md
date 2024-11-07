@@ -41,8 +41,8 @@ XIBMCLIENTID=PwX4bOQLWGiuoErv6I
 ACCOUNT_NUMBER=666666666
 ACCOUNT_CURRENCY=CZK
 
-STATEMENT_IMPORT_SCOPE=last_two_months
-TRANSACTION_IMPORT_SCOPE=yesterday
+IMPORT_SCOPE=last_two_months
+IMPORT_SCOPE=yesterday
 
 API_DEBUG=True
 APP_DEBUG=True
@@ -66,6 +66,33 @@ DB_USERNAME=pohodaSQLuser
 DB_PASSWORD=pohodaSQLpassword
 DB_SETTINGS=encrypt=false
 ```
+
+Import Scopes
+-------------
+
+  * `today` 
+  * `yesterday`
+  * `last_week`
+  * `last_month`
+  * `last_two_months`
+  * `previous_month` 
+  * `two_months_ago`
+  * `this_year` (statements only)
+  * `January`  (statements only)
+  * `February` (statements only)
+  * `March` (statements only)
+  * `April` (statements only)
+  * `May` (statements only)
+  * `June` (statements only)
+  * `July` (statements only)
+  * `August` (statements only)
+  * `September` (statements only)
+  * `October` (statements only)
+  * `November` (statements only)
+  * `December` (statements only)
+  * `auto`
+  * `2024-08-05>2024-08-11` - custom scope 
+  * `2024-10-11` - only specific day
 
 Sharepoint Integration
 ----------------------

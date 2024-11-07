@@ -212,7 +212,7 @@ class Transactor extends PohodaBankClient
         switch ($scope) {
             case 'today':
                 $this->since = (new \DateTime())->setTime(0, 0);
-                $this->until = (new \DateTime())->setTime(23, 59);
+                $this->until = (new \DateTime())->setTime(23, 59, 59, 999);
 
                 break;
             case 'yesterday':
@@ -226,28 +226,42 @@ class Transactor extends PohodaBankClient
 
                 break;
             case 'auto':
-                $latestRecord = $this->getColumnsFromPohoda(['id', 'lastUpdate'], ['limit' => 1, 'order' => 'lastUpdate@A', 'source' => $this->sourceString(), 'banka' => $this->bank]);
+                //                $latestRecord = $this->getColumnsFromPohoda(['id', 'lastUpdate'], ['limit' => 1, 'order' => 'lastUpdate@A', 'source' => $this->sourceString(), 'banka' => $this->bank]);
+                //
+                //                if (\array_key_exists(0, $latestRecord) && \array_key_exists('lastUpdate', $latestRecord[0])) {
+                //                    $this->since = $latestRecord[0]['lastUpdate'];
+                //                } else {
+                //                    $this->addStatusMessage('Previous record for "auto since" not found. Defaulting to today\'s 00:00', 'warning');
+                //                    $this->since = (new \DateTime('yesterday'))->setTime(0, 0);
+                //                }
 
-                if (\array_key_exists(0, $latestRecord) && \array_key_exists('lastUpdate', $latestRecord[0])) {
-                    $this->since = $latestRecord[0]['lastUpdate'];
-                } else {
-                    $this->addStatusMessage('Previous record for "auto since" not found. Defaulting to today\'s 00:00', 'warning');
-                    $this->since = (new \DateTime('yesterday'))->setTime(0, 0);
-                }
-
-                $this->until = (new \DateTime('two days ago'))->setTime(0, 0); // Now
+                $this->since = (new \DateTime('89 days ago'))->setTime(0, 0);
+                $this->until = new \DateTime();
 
                 break;
 
             default:
-                throw new \Exception('Unknown scope '.$scope);
+                if (strstr($scope, '>')) {
+                    [$begin, $end] = explode('>', $scope);
+                    $this->since = new \DateTime($begin);
+                    $this->until = new \DateTime($end);
+                } else {
+                    if (preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $scope)) {
+                        $this->since = (new \DateTime($scope))->setTime(0, 0);
+                        $this->until = (new \DateTime($scope))->setTime(23, 59, 59, 999);
+
+                        break;
+                    }
+
+                    throw new \Exception('Unknown scope '.$scope);
+                }
 
                 break;
         }
 
         if ($scope !== 'auto' && $scope !== 'today' && $scope !== 'yesterday') {
             $this->since = $this->since->setTime(0, 0);
-            $this->until = $this->until->setTime(0, 0);
+            $this->until = $this->until->setTime(23, 59, 59, 999);
         }
     }
 }

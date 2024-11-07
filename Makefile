@@ -23,7 +23,10 @@ vendor: composer.json composer.lock ## Installs composer dependencies
 cs: ## Update Coding Standards
 	vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --diff --verbose
 
-# Use phpcs to reformat code to PSR12
-codingstandards:
-	phpcbf --colors --standard=PSR12 --extensions=php --ignore=vendor/ src/ 
+.PHONY: phpunit
+phpunit: ## Run Tests
+	vendor/bin/phpunit tests
+
+
+
 
