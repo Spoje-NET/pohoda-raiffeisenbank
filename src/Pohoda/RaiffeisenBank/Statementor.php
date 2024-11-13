@@ -97,8 +97,9 @@ class Statementor extends PohodaBankClient
         foreach ($this->statementsXML as $pos => $statement) {
             $statementXML = new \SimpleXMLElement(file_get_contents($statement));
             $statementNumberLong = current((array) $statementXML->BkToCstmrStmt->Stmt->Id);
-
+            $entries = 0;
             foreach ($statementXML->BkToCstmrStmt->Stmt->Ntry as $entry) {
+                $entries++;
                 $this->dataReset();
                 $this->setData($this->entryToPohoda($entry));
                 [$statementNumber, $statementYear] = explode('_', $pos);
@@ -117,10 +118,10 @@ class Statementor extends PohodaBankClient
                 }
             }
 
-            $this->addStatusMessage($statementNumberLong.' Import done. '.$success.' of '.\count($this->statementsXML).' imported');
+            $this->addStatusMessage($statementNumberLong.' Import done. '.$success.' of '.$entries.' imported');
 
-            return $inserted;
         }
+        return $inserted;
     }
 
     /**
