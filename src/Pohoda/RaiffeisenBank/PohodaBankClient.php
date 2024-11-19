@@ -32,6 +32,11 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public static string $dateFormat = 'Y-m-d';
 
+    /**
+     * @var \Riesenia\Pohoda\Banka
+     */
+    public ?\Riesenia\Pohoda\Agenda $requestXml;
+
     // public Response $response; TODO: Update
     protected $constantor;
     protected $constSymbols;
@@ -240,7 +245,9 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $cache = $this->getData();
                 $this->reset();
                 // TODO: $result = $this->sync();
-                $result = $this->addToPohoda($cache);
+                $this->takeData($cache);
+                $this->automaticLiquidation();
+                $result = $this->addToPohoda();
 
                 if ($this->commit()) {
                     ++$success;
@@ -265,5 +272,38 @@ abstract class PohodaBankClient extends \mServer\Bank
         }
 
         return $success;
+    }
+
+    public function automaticLiquidation()
+    {
+        /*
+
+          <lqd:automaticLiquidation version="2.0">
+          <!-- výběr agendy -->
+          <lqd:record>
+          <!-- Výběr záznamu z agendy agenda -->
+          <!-- budou vybrány pouze záznamy/pohyby v agendě, které mají částku k likvidaci > 0kč a dále splňují podmínku filtru -->
+          <ftr:filter>
+          <!-- výběr záznamů dle čísla účtu --><!-- <ftr:bankAccount> <typ:id>2</typ:id> <typ:ids>CS</typ:ids> </ftr:bankAccount> -->
+          <!-- výběr záznamů dle datum pohybu --><!-- <ftr:dateFrom>2022-12-27</ftr:dateFrom> --><!-- datum od --><!-- <ftr:dateTill>2022-12-31</ftr:dateTill> -->
+          <!-- datum do --><!-- výběr záznamů dle nové a změně záznamy/pohybu -->
+          <!-- <ftr:lastChanges>2023-01-09T08:30:00</ftr:lastChanges> -->
+          <!-- záznamy změněné od zadaného data a času -->
+          <!-- <ftr:selectedNumbers> <ftr:number> <typ:numberRequested>KB0010003</typ:numberRequested> </ftr:number> </ftr:selectedNumbers> -->
+          <!-- <ftr:bankAccount> <typ:id>3</typ:id> </ftr:bankAccount> -->
+          </ftr:filter>
+          </lqd:record>
+          <!-- Výber pravidla párování dokladů -->
+          <lqd:ruleOfPairing>
+          <typ:id>1</typ:id>
+          <!-- <typ:ids>Výpisy</typ:ids> -->
+          </lqd:ruleOfPairing>
+          </lqd:automaticLiquidation>
+
+         */
+
+        $this->requestXml;
+
+        return 1;
     }
 }

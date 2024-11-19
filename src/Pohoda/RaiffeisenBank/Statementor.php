@@ -86,7 +86,7 @@ class Statementor extends PohodaBankClient
     }
 
     /**
-     * Import Raiffeisen bank XML statement into Pohoda
+     * Import Raiffeisen bank XML statement into Pohoda.
      */
     public function import(): array
     {
@@ -98,8 +98,9 @@ class Statementor extends PohodaBankClient
             $statementXML = new \SimpleXMLElement(file_get_contents($statement));
             $statementNumberLong = current((array) $statementXML->BkToCstmrStmt->Stmt->Id);
             $entries = 0;
+
             foreach ($statementXML->BkToCstmrStmt->Stmt->Ntry as $entry) {
-                $entries++;
+                ++$entries;
                 $this->dataReset();
                 $this->setData($this->entryToPohoda($entry));
                 [$statementNumber, $statementYear] = explode('_', $pos);
@@ -119,8 +120,8 @@ class Statementor extends PohodaBankClient
             }
 
             $this->addStatusMessage($statementNumberLong.' Import done. '.$success.' of '.$entries.' imported');
-
         }
+
         return $inserted;
     }
 
@@ -295,7 +296,6 @@ class Statementor extends PohodaBankClient
 
                 break;
             case 'auto':
-                
                 //  "EAN", "code", "company", "dateFrom", "dateTill", "dic", "ico", "id", "internet", "lastChanges", "name", "storage", "store".
                 $latestRecord = $this->getColumnsFromPohoda();
 
