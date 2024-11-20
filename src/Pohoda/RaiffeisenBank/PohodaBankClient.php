@@ -65,7 +65,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function sourceString()
     {
-        return substr(__FILE__.'@'.gethostname(), -50);
+        return substr(__FILE__ . '@' . gethostname(), -50);
     }
 
     /**
@@ -76,7 +76,7 @@ abstract class PohodaBankClient extends \mServer\Bank
     public static function checkCertificatePresence($certFile): void
     {
         if ((file_exists($certFile) === false) || (is_readable($certFile) === false)) {
-            fwrite(\STDERR, 'Cannot read specified certificate file: '.$certFile.\PHP_EOL);
+            fwrite(\STDERR, 'Cannot read specified certificate file: ' . $certFile . \PHP_EOL);
 
             exit(1);
         }
@@ -128,8 +128,8 @@ abstract class PohodaBankClient extends \mServer\Bank
 
                 break;
             case 'this_year':
-                $this->since = new \DateTime('first day of January '.date('Y'));
-                $this->until = new \DateTime('last day of December'.date('Y'));
+                $this->since = new \DateTime('first day of January ' . date('Y'));
+                $this->until = new \DateTime('last day of December' . date('Y'));
 
                 break;
             case 'January':  // 1
@@ -140,12 +140,12 @@ abstract class PohodaBankClient extends \mServer\Bank
             case 'June':     // 6
             case 'July':     // 7
             case 'August':   // 8
-            case 'September':// 9
+            case 'September': // 9
             case 'October':  // 10
             case 'November': // 11
             case 'December': // 12
-                $this->since = new \DateTime('first day of '.$scope.' '.date('Y'));
-                $this->until = new \DateTime('last day of '.$scope.' '.date('Y'));
+                $this->since = new \DateTime('first day of ' . $scope . ' ' . date('Y'));
+                $this->until = new \DateTime('last day of ' . $scope . ' ' . date('Y'));
 
                 break;
             case 'auto':
@@ -175,7 +175,7 @@ abstract class PohodaBankClient extends \mServer\Bank
                         break;
                     }
 
-                    throw new \Exception('Unknown scope '.$scope);
+                    throw new \Exception('Unknown scope ' . $scope);
                 }
 
                 break;
@@ -194,7 +194,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function getxRequestId()
     {
-        return $this->getDataValue('account').time();
+        return $this->getDataValue('account') . time();
     }
 
     /**
@@ -223,8 +223,8 @@ abstract class PohodaBankClient extends \mServer\Bank
     public function ensureKSExists($conSym): void
     {
         if (!\array_key_exists($conSym, $this->constSymbols)) {
-            $this->constantor->insertToPohoda(['kod' => $conSym, 'poznam' => 'Created by Raiffeisen Bank importer', 'nazev' => '?!?!? '.$conSym]);
-            $this->constantor->addStatusMessage('New constant '.$conSym.' created in flexibee', 'warning');
+            $this->constantor->insertToPohoda(['kod' => $conSym, 'poznam' => 'Created by Raiffeisen Bank importer', 'nazev' => '?!?!? ' . $conSym]);
+            $this->constantor->addStatusMessage('New constant ' . $conSym . ' created in flexibee', 'warning');
             $this->constSymbols[$conSym] = $conSym;
         }
     }
@@ -246,7 +246,6 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $this->reset();
                 // TODO: $result = $this->sync();
                 $this->takeData($cache);
-                $this->automaticLiquidation();
                 $result = $this->addToPohoda();
 
                 if ($this->commit()) {
@@ -257,6 +256,9 @@ abstract class PohodaBankClient extends \mServer\Bank
                     $producedId = $this->response->producedDetails['id'];
                     $producedNumber = $this->response->producedDetails['number'];
                     $producedAction = $this->response->producedDetails['actionType'];
+                    
+                    $this->automaticLiquidation($producedNumber);
+                    
                 } else {
                     echo '';
                 }
@@ -266,7 +268,9 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $producedAction = 'n/a';
             }
 
-            $this->addStatusMessage('#'.$producedId.' '.$producedAction.' '.$producedNumber, $result ? 'success' : 'error'); // TODO: Parse response for docID
+            $this->addStatusMessage('#' . $producedId . ' ' . $producedAction . ' ' . $producedNumber, $result ? 'success' : 'error'); // TODO: Parse response for docID
+
+            
         } else {
             $this->addStatusMessage('Record with remoteNumber TODO already present in Pohoda', 'warning');
         }
@@ -274,7 +278,15 @@ abstract class PohodaBankClient extends \mServer\Bank
         return $success;
     }
 
-    public function automaticLiquidation()
+    /**
+     * Enable automatic liquidation.
+     *
+     * @see https://www.stormware.cz/schema/version_2/liquidation.xsd for details
+     * @see https://www.stormware.cz/xml/samples/version_2/import/Banka/Bank_03_v2.0.xml
+     *
+     * @return bool
+     */
+    public function automaticLiquidation($producedNumber)
     {
         /*
 
@@ -300,10 +312,74 @@ abstract class PohodaBankClient extends \mServer\Bank
           </lqd:ruleOfPairing>
           </lqd:automaticLiquidation>
 
+               <ftr:selectedNumbers>
+                    <ftr:number>
+                      <typ:numberRequested>KB0010003</typ:numberRequested> 
+                    </ftr:number>
+                </ftr:selectedNumbers>
+
+
          */
 
-        $this->requestXml;
+        file_put_contents($this->xmlCache, $this->generateAutomaticLiquidationXML($producedNumber));
 
-        return 1;
+        if ($this->debug) {
+            fpassthru(fopen($this->xmlCache, 'r'));
+        }
+
+        $this->addStatusMessage('Automatic liquidation', 'success');
+
+
+        $this->setPostFields(file_get_contents($this->xmlCache));
+
+        if ($this->debug) {
+            $this->addStatusMessage('validate request by: xmllint --schema ' . \dirname(__DIR__, 3) . '/vendor/vitexsoftware/pohoda-connector/doc/xsd/data.xsd ' . $this->xmlCache . ' --noout', 'debug');
+        }
+
+        return $this->performRequest('/xml');
+    }
+
+    /**
+     * Generate XML for automatic liquidation.
+     *
+     * @return string
+     */
+    public function generateAutomaticLiquidationXML($producedNumber)
+    {
+        $xmlString = '<?xml version="1.0" encoding="Windows-1250"?>
+<dat:dataPack xmlns:dat="http://www.stormware.cz/schema/version_2/data.xsd"
+              xmlns:lqd="http://www.stormware.cz/schema/version_2/automaticLiquidation.xsd"
+              xmlns:ftr="http://www.stormware.cz/schema/version_2/filter.xsd"
+              xmlns:typ="http://www.stormware.cz/schema/version_2/type.xsd"
+              version="2.0" id="01" ico="'.$this->getCompanyId().'" application="Tisk" note="aut. livkidace dokladů tisk z programu Pohoda">
+</dat:dataPack>';
+
+        $xml = new \SimpleXMLElement($xmlString);
+
+        $dataPackItem = $xml->addChild('dat:dataPackItem');
+        $dataPackItem->addAttribute('version', '2.0');
+        $dataPackItem->addAttribute('id', '001');
+
+        $automaticLiquidation = $dataPackItem->addChild('automaticLiquidation',null,'http://www.stormware.cz/schema/version_2/automaticLiquidation.xsd');
+        $automaticLiquidation->addAttribute('version', '2.0');
+
+        $record = $automaticLiquidation->addChild('record',null,'http://www.stormware.cz/schema/version_2/automaticLiquidation.xsd');
+
+        $filter = $record->addChild('filter',null,'http://www.stormware.cz/schema/version_2/filter.xsd');
+
+        $selectedNumbers = $filter->addChild('selectedNumbers');
+        
+        $ftrNumber = $selectedNumbers->addChild('number');
+
+        $numberRequested =  $ftrNumber->addChild('numberRequested', $producedNumber, 'http://www.stormware.cz/schema/version_2/type.xsd');
+        
+        $ruleOfPairing = $automaticLiquidation->addChild('lqd:ruleOfPairing',null,'http://www.stormware.cz/schema/version_2/automaticLiquidation.xsd');
+        $ruleOfPairing->addChild('id', '1','http://www.stormware.cz/schema/version_2/type.xsd');
+
+        return $xml->asXML();
+    }
+
+    public function getCompanyId() {
+        return \Ease\Shared::cfg('POHODA_ICO');
     }
 }

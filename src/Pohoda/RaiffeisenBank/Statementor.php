@@ -29,20 +29,28 @@ class Statementor extends PohodaBankClient
 
     /**
      * Downloaded XML statements.
+     * @var array<string>
      */
     private array $statementsXML = [];
 
     /**
      * Downloaded PDF statements.
+     * @var array<string>
      */
     private array $statementsPDF = [];
+
+    /**
+     * Bank Statement Helper
+     * @param string $bankAccount
+     * @param array<string,string>  $options
+     */
 
     public function __construct(string $bankAccount, array $options = [])
     {
         parent::__construct($bankAccount, $options);
         $this->obtainer = new \VitexSoftware\Raiffeisenbank\Statementor($bankAccount);
 
-        $this->statementsDir = \Ease\Functions::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir().'/rb');
+        $this->statementsDir = \Ease\Shared::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir().'/rb');
 
         if (file_exists($this->statementsDir) === false) {
             mkdir($this->statementsDir, 0777, true);
@@ -87,6 +95,8 @@ class Statementor extends PohodaBankClient
 
     /**
      * Import Raiffeisen bank XML statement into Pohoda.
+     * 
+     * @return array<string,array>
      */
     public function import(): array
     {
@@ -117,6 +127,7 @@ class Statementor extends PohodaBankClient
                         echo ''; // WTF?
                     }
                 }
+                
             }
 
             $this->addStatusMessage($statementNumberLong.' Import done. '.$success.' of '.$entries.' imported');
@@ -131,7 +142,7 @@ class Statementor extends PohodaBankClient
      * @see https://cbaonline.cz/upload/1425-standard-xml-cba-listopad-2020.pdf
      * @see https://www.stormware.cz/xml/schema/version_2/bank.xsd
      *
-     * @param SimpleXMLElement $entry
+     * @param \SimpleXMLElement $entry
      */
     public function entryToPohoda($entry): array
     {
