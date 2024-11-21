@@ -27,35 +27,18 @@ require_once '../vendor/autoload.php';
 /**
  * Get today's Statements list.
  */
-\Ease\Shared::init([
-    'POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 
+Shared::init([
+    'POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO',
     'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
-    'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD'
+    'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
 ], $argv[1] ?? '../.env');
 
-PohodaBankClient::checkCertificatePresence(\Ease\Shared::cfg('CERT_FILE'));
-$engine = new Statementor(\Ease\Shared::cfg('ACCOUNT_NUMBER'));
-$engine->setScope(\Ease\Shared::cfg('IMPORT_SCOPE', 'last_month'));
+PohodaBankClient::checkCertificatePresence(Shared::cfg('CERT_FILE'));
+$engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
+$engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 $engine->logBanner('', 'Scope: '.$engine->scope);
 
-$inserted = $engine->importOnline();
-
-if ($inserted) {
-    //
-    //    [243] => Array
-    //        (
-    //            [id] => 243
-    //            [number] => KB102023
-    //            [actionType] => add
-    //        )
-    //
-    //    [244] => Array
-    //        (
-    //            [id] => 244
-    //            [number] => KB102023
-    //            [actionType] => add
-    //        )
-    //
+if ($engine->downloadPDF()) {
     sleep(5);
 
     $pdfs = $engine->getPdfStatements();
@@ -78,22 +61,59 @@ if ($inserted) {
 
         try {
             $ctx->executeQuery();
-        } catch (Exception $exc) {
+            $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+            $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
+        } catch (\Exception $exc) {
             fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
 
             exit(1);
         }
 
-        $fileUrl = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+        $fileUrls[basename($filename)] = $uploaded;
     }
+} else {
+    $engine->addStatusMessage(_('Error obtaining PDF'), 'error');
+}
 
-    $doc = new \SpojeNet\PohodaSQL\DOC();
-    $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
+sleep(5);
 
-    foreach ($inserted as $id => $importInfo) {
-        $statement = current($pdfs);
-        // $url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . urlencode(basename($statement));
-        $result = $doc->urlAttachment($id, $fileUrl, basename($statement));
-        $doc->addStatusMessage($importInfo['number'].' '.$fileUrl, null === $result ? 'error' : 'success');
+if ($engine->downloadXML()) {
+    $inserted = $engine->import();
+
+    if ($inserted) {
+        //
+        //    [243] => Array
+        //        (
+        //            [id] => 243
+        //            [number] => KB102023
+        //            [actionType] => add
+        //        )
+        //
+        //    [244] => Array
+        //        (
+        //            [id] => 244
+        //            [number] => KB102023
+        //            [actionType] => add
+        //        )
+        //
+
+        $doc = new \SpojeNet\PohodaSQL\DOC();
+        $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
+
+        foreach ($inserted as $id => $importInfo) {
+            $filename = key($fileUrls);
+            $statement = next($fileUrls);
+            // $url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . urlencode(basename($statement));
+            $result = $doc->urlAttachment((int) $id, $filename, basename($statement));
+            $doc->addStatusMessage($importInfo['number'].' '.$fileUrl, null === $result ? 'error' : 'success');
+        }
+    } else {
+        $engine->addStatusMessage(_('Error Importing XML statements to Pohoda'), 'error');
+
+        exit(2);
     }
+} else {
+    $engine->addStatusMessage(_('Error Obtaining XML statements'), 'error');
+
+    exit(3);
 }

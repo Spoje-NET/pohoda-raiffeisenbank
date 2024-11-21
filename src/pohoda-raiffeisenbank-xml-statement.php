@@ -65,7 +65,7 @@ foreach ($pdfs as $filename) {
 
     try {
         $ctx->executeQuery();
-    } catch (Exception $exc) {
+    } catch (\Exception $exc) {
         fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
 
         exit(1);

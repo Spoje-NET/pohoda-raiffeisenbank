@@ -29,22 +29,23 @@ class Statementor extends PohodaBankClient
 
     /**
      * Downloaded XML statements.
+     *
      * @var array<string>
      */
     private array $statementsXML = [];
 
     /**
      * Downloaded PDF statements.
+     *
      * @var array<string>
      */
     private array $statementsPDF = [];
 
     /**
-     * Bank Statement Helper
-     * @param string $bankAccount
-     * @param array<string,string>  $options
+     * Bank Statement Helper.
+     *
+     * @param array<string, string> $options
      */
-
     public function __construct(string $bankAccount, array $options = [])
     {
         parent::__construct($bankAccount, $options);
@@ -72,14 +73,18 @@ class Statementor extends PohodaBankClient
         return $this->import();
     }
 
-    public function downloadXML(): void
+    public function downloadXML(): bool
     {
         $this->statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
+
+        return empty($this->statementsXML) === false;
     }
 
-    public function downloadPDF(): void
+    public function downloadPDF(): bool
     {
         $this->statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
+
+        return empty($this->statementsPDF) === false;
     }
 
     /**
@@ -95,8 +100,8 @@ class Statementor extends PohodaBankClient
 
     /**
      * Import Raiffeisen bank XML statement into Pohoda.
-     * 
-     * @return array<string,array>
+     *
+     * @return array<string, array>
      */
     public function import(): array
     {
@@ -127,7 +132,6 @@ class Statementor extends PohodaBankClient
                         echo ''; // WTF?
                     }
                 }
-                
             }
 
             $this->addStatusMessage($statementNumberLong.' Import done. '.$success.' of '.$entries.' imported');
