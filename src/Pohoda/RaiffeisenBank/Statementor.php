@@ -123,15 +123,8 @@ class Statementor extends PohodaBankClient
                 //                $this->setDataValue('account', current((array) $entry->NtryRef));
                 //                $this->setDataValue('vypisCisDokl', $statementXML->BkToCstmrStmt->Stmt->Id);
                 //                $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
-                $success = $this->insertTransactionToPohoda($success);
 
-                if (isset($this->response->producedDetails) && \is_array($this->response->producedDetails)) {
-                    if (\array_key_exists('id', $this->response->producedDetails)) {
-                        $inserted[$this->response->producedDetails['id']] = $this->response->producedDetails;
-                    } else {
-                        echo ''; // WTF?
-                    }
-                }
+                $inserted = array_merge($inserted, $this->insertTransactionToPohoda());
             }
 
             $this->addStatusMessage($statementNumberLong.' Import done. '.$success.' of '.$entries.' imported');

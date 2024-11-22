@@ -229,16 +229,12 @@ abstract class PohodaBankClient extends \mServer\Bank
         }
     }
 
-    /**
-     * @param int $success
-     *
-     * @return int
-     */
-    public function insertTransactionToPohoda($success)
+    public function insertTransactionToPohoda(): array
     {
         $producedId = '';
         $producedNumber = '';
         $producedAction = '';
+        $result = [];
 
         if ($this->checkForTransactionPresence() === false) {
             try {
@@ -246,20 +242,14 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $this->reset();
                 // TODO: $result = $this->sync();
                 $this->takeData($cache);
-                $result = $this->addToPohoda();
 
-                if ($this->commit()) {
-                    ++$success;
-                }
-
-                if (isset($this->response->producedDetails) && \is_array($this->response->producedDetails)) {
+                if ($this->addToPohoda() && $this->commit() && isset($this->response->producedDetails) && \is_array($this->response->producedDetails)) {
                     $producedId = $this->response->producedDetails['id'];
                     $producedNumber = $this->response->producedDetails['number'];
                     $producedAction = $this->response->producedDetails['actionType'];
+                    $result[$producedId] = $this->response->producedDetails;
 
                     $this->automaticLiquidation($producedNumber);
-                } else {
-                    echo '';
                 }
             } catch (\Exception $exc) {
                 $producedId = 'n/a';
@@ -267,12 +257,12 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $producedAction = 'n/a';
             }
 
-            $this->addStatusMessage('#'.$producedId.' '.$producedAction.' '.$producedNumber, $result ? 'success' : 'error'); // TODO: Parse response for docID
+            $this->addStatusMessage('Bank #'.$producedId.' '.$producedAction.' '.$producedNumber, $result ? 'success' : 'error'); // TODO: Parse response for docID
         } else {
             $this->addStatusMessage('Record with remoteNumber TODO already present in Pohoda', 'warning');
         }
 
-        return $success;
+        return $result;
     }
 
     /**
@@ -280,6 +270,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      *
      * @see https://www.stormware.cz/schema/version_2/liquidation.xsd for details
      * @see https://www.stormware.cz/xml/samples/version_2/import/Banka/Bank_03_v2.0.xml
+     * @see https://github.com/riesenia/pohoda/issues/49
      *
      * @param mixed $producedNumber
      *
@@ -288,7 +279,6 @@ abstract class PohodaBankClient extends \mServer\Bank
     public function automaticLiquidation($producedNumber)
     {
         /*
-
           <lqd:automaticLiquidation version="2.0">
           <!-- výběr agendy -->
           <lqd:record>

@@ -54,7 +54,7 @@ if ($engine->downloadPDF()) {
     $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
     $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
 
-    $engine->addStatusMessage('using '.$ctx->getServiceRootUrl(), 'debug');
+    $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
 
     foreach ($pdfs as $filename) {
         $uploadFile = $targetFolder->uploadFile(basename($filename), file_get_contents($filename));
@@ -100,9 +100,10 @@ if ($engine->downloadXML()) {
         $doc = new \SpojeNet\PohodaSQL\DOC();
         $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
 
-        foreach ($inserted as $id => $importInfo) {
-            $filename = key($fileUrls);
-            $statement = next($fileUrls);
+        $filename = key($fileUrls);
+        $statement = current($fileUrls);
+        foreach ($inserted as $importInfo) {
+            $id = $importInfo['id'];
             // $url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . urlencode(basename($statement));
             $result = $doc->urlAttachment((int) $id, $filename, basename($statement));
             $doc->addStatusMessage($importInfo['number'].' '.$fileUrl, null === $result ? 'error' : 'success');
