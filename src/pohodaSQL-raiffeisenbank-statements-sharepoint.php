@@ -38,6 +38,8 @@ $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 $engine->logBanner('', 'Scope: '.$engine->scope);
 
+$fileUrls = [];
+
 if ($engine->downloadPDF()) {
     sleep(5);
 
@@ -97,16 +99,30 @@ if ($engine->downloadXML()) {
         //        )
         //
 
-        $doc = new \SpojeNet\PohodaSQL\DOC();
-        $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
+        if ($fileUrls) {
+            $engine->addStatusMessage(_('Updating PohodaSQL to attach statements in sharepoint links to invoice'), 'success');
 
-        $filename = key($fileUrls);
-        $statement = current($fileUrls);
-        foreach ($inserted as $importInfo) {
-            $id = $importInfo['id'];
-            // $url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . urlencode(basename($statement));
-            $result = $doc->urlAttachment((int) $id, $filename, basename($statement));
-            $doc->addStatusMessage($importInfo['number'].' '.$fileUrl, null === $result ? 'error' : 'success');
+            $doc = new \SpojeNet\PohodaSQL\DOC();
+            $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
+
+            $filename = key($fileUrls);
+            $sharepointUri = current($fileUrls);
+
+            foreach ($inserted as $importInfo) {
+                $id = $importInfo['id'];
+
+                // $url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . urlencode(basename($statement));
+                try {
+                    $result = $doc->urlAttachment((int) $id, $sharepointUri, basename($filename));
+                    $doc->addStatusMessage($importInfo['number'].' '.$sharepointUri, $result ? 'success' : 'error');
+                } catch (Exception $ex) {
+                    $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
+
+                    exit(4);
+                }
+            }
+        } else {
+            $engine->addStatusMessage(_('No statements uploaded to Sharepoint; Skipping PohodaSQL update'), 'warning');
         }
     } else {
         $engine->addStatusMessage(_('Error Importing XML statements to Pohoda'), 'error');
