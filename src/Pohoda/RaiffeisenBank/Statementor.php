@@ -30,14 +30,14 @@ class Statementor extends PohodaBankClient
     /**
      * Downloaded XML statements.
      *
-     * @var array<string>
+     * @var array<string,string>
      */
     private array $statementsXML = [];
 
     /**
      * Downloaded PDF statements.
      *
-     * @var array<string>
+     * @var array<string,string>
      */
     private array $statementsPDF = [];
 
@@ -101,7 +101,7 @@ class Statementor extends PohodaBankClient
     /**
      * Import Raiffeisen bank XML statement into Pohoda.
      *
-     * @return array<string, array>
+     * @return list<array<string, string>>
      */
     public function import(): array
     {
@@ -144,8 +144,8 @@ class Statementor extends PohodaBankClient
     public function entryToPohoda($entry): array
     {
         $data['symPar'] = current((array) $entry->NtryRef);
-        $data['intNote'] = 'Import Job '.\Ease\Shared::cfg('JOB_ID', 'n/a');
-        $data['note'] = 'Imported by '.\Ease\Shared::AppName().' '.\Ease\Shared::AppVersion();
+        $data['intNote'] = 'Imported by '.\Ease\Shared::AppName().' '.\Ease\Shared::AppVersion(). ' Import Job '.\Ease\Shared::cfg('MULTIFLEXI_JOB_ID', \Ease\Shared::cfg('JOB_ID', 'n/a'));
+        $data['note'] = '';
         $data['datePayment'] = current((array) $entry->BookgDt->DtTm); // current((array) $entry->ValDt->DtTm);
         $data['dateStatement'] = current((array) $entry->BookgDt->DtTm);
         $moveTrans = ['DBIT' => 'expense', 'CRDT' => 'receipt'];

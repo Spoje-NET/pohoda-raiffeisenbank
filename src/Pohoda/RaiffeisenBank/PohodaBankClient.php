@@ -210,17 +210,20 @@ abstract class PohodaBankClient extends \mServer\Bank
     /**
      * Is Record with current remoteNumber already present in Pohoda ?
      *
+     * @todo Implement using Pohoda API UserList
+     *
      * @return bool
      */
     public function checkForTransactionPresence()
     {
+        $this->addStatusMessage('Checking for transaction presence - Not yet implemented', 'debug');
         return false; // !empty($this->getColumnsFromPohoda('id', ['cisDosle' => $this->getDataValue('cisDosle')])); TODO
     }
 
     /**
      * @param string $conSym
      */
-    public function ensureKSExists($conSym): void
+    public function ensureKSExists(string $conSym): void
     {
         if (!\array_key_exists($conSym, $this->constSymbols)) {
             $this->constantor->insertToPohoda(['kod' => $conSym, 'poznam' => 'Created by Raiffeisen Bank importer', 'nazev' => '?!?!? '.$conSym]);
@@ -229,6 +232,11 @@ abstract class PohodaBankClient extends \mServer\Bank
         }
     }
 
+    /**
+     * Insert Transaction to Pohoda.
+     *
+     * @return array<int, array<string,string>> Imported Transactions
+     */
     public function insertTransactionToPohoda(): array
     {
         $producedId = '';

@@ -107,7 +107,7 @@ if ($xmlStatements) {
                 try {
                     $result = $doc->urlAttachment((int) $id, $sharepointUri, basename($filename));
                     $doc->addStatusMessage($importInfo['number'].' '.$sharepointUri, $result ? 'success' : 'error');
-                } catch (Exception $ex) {
+                } catch (\Exception $ex) {
                     $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
 
                     $exitcode = 4;
