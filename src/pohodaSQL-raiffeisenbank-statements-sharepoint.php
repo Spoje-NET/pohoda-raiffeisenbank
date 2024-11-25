@@ -83,22 +83,6 @@ if ($engine->downloadXML()) {
     $inserted = $engine->import();
 
     if ($inserted) {
-        //
-        //    [243] => Array
-        //        (
-        //            [id] => 243
-        //            [number] => KB102023
-        //            [actionType] => add
-        //        )
-        //
-        //    [244] => Array
-        //        (
-        //            [id] => 244
-        //            [number] => KB102023
-        //            [actionType] => add
-        //        )
-        //
-
         if ($fileUrls) {
             $engine->addStatusMessage(_('Updating PohodaSQL to attach statements in sharepoint links to invoice'), 'success');
 
@@ -111,7 +95,6 @@ if ($engine->downloadXML()) {
             foreach ($inserted as $importInfo) {
                 $id = $importInfo['id'];
 
-                // $url = \Ease\Shared::cfg('DOWNLOAD_LINK_PREFIX') . urlencode(basename($statement));
                 try {
                     $result = $doc->urlAttachment((int) $id, $sharepointUri, basename($filename));
                     $doc->addStatusMessage($importInfo['number'].' '.$sharepointUri, $result ? 'success' : 'error');
@@ -125,9 +108,7 @@ if ($engine->downloadXML()) {
             $engine->addStatusMessage(_('No statements uploaded to Sharepoint; Skipping PohodaSQL update'), 'warning');
         }
     } else {
-        $engine->addStatusMessage(_('Error Importing XML statements to Pohoda'), 'error');
-
-        exit(2);
+        $engine->addStatusMessage(_('Empty statement'), 'warning');
     }
 } else {
     $engine->addStatusMessage(_('Error Obtaining XML statements'), 'error');
