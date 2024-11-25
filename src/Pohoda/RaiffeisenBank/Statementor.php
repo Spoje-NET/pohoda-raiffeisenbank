@@ -73,18 +73,18 @@ class Statementor extends PohodaBankClient
         return $this->import();
     }
 
-    public function downloadXML(): bool
+    public function downloadXML(): array
     {
         $this->statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
 
-        return empty($this->statementsXML) === false;
+        return $this->statementsXML;
     }
 
-    public function downloadPDF(): bool
+    public function downloadPDF(): array
     {
         $this->statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
 
-        return empty($this->statementsPDF) === false;
+        return $this->statementsPDF;
     }
 
     /**

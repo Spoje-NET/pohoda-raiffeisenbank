@@ -37,10 +37,12 @@ PohodaBankClient::checkCertificatePresence(Shared::cfg('CERT_FILE'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 $engine->logBanner('', 'Scope: '.$engine->scope);
-
+$exitcode = 0;
 $fileUrls = [];
 
-if ($engine->downloadPDF()) {
+$pdfStatements = $engine->downloadPDF();
+
+if ($pdfStatements) {
     sleep(5);
 
     $pdfs = $engine->getPdfStatements();
@@ -74,12 +76,19 @@ if ($engine->downloadPDF()) {
         $fileUrls[basename($filename)] = $uploaded;
     }
 } else {
-    $engine->addStatusMessage(_('Error obtaining PDF'), 'error');
+    if (\is_array($pdfStatements)) {
+        $engine->addStatusMessage(_('No PDF statements obtained'), 'info');
+    } else {
+        $engine->addStatusMessage(_('Error obtaining PDF statements'), 'error');
+        $exitcode = 2;
+    }
 }
 
 sleep(5);
 
-if ($engine->downloadXML()) {
+$xmlStatements = $engine->downloadXML();
+
+if ($xmlStatements) {
     $inserted = $engine->import();
 
     if ($inserted) {
@@ -101,7 +110,7 @@ if ($engine->downloadXML()) {
                 } catch (Exception $ex) {
                     $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
 
-                    exit(4);
+                    $exitcode = 4;
                 }
             }
         } else {
@@ -111,7 +120,12 @@ if ($engine->downloadXML()) {
         $engine->addStatusMessage(_('Empty statement'), 'warning');
     }
 } else {
-    $engine->addStatusMessage(_('Error Obtaining XML statements'), 'error');
-
-    exit(3);
+    if (\is_array($xmlStatements)) {
+        $engine->addStatusMessage(_('No XML statements obtained'), 'info');
+    } else {
+        $engine->addStatusMessage(_('Error Obtaining XML statements'), 'error');
+        $exitcode = 3;
+    }
 }
+
+exit($exitcode);
