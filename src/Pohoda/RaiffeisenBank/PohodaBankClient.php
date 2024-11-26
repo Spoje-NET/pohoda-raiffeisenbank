@@ -216,13 +216,11 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function checkForTransactionPresence()
     {
-        $this->addStatusMessage('Checking for transaction presence - Not yet implemented', 'debug');
+        $this->addStatusMessage('Checking for transaction presence - Not yet implemented', 'warning');
+
         return false; // !empty($this->getColumnsFromPohoda('id', ['cisDosle' => $this->getDataValue('cisDosle')])); TODO
     }
 
-    /**
-     * @param string $conSym
-     */
     public function ensureKSExists(string $conSym): void
     {
         if (!\array_key_exists($conSym, $this->constSymbols)) {
@@ -235,7 +233,7 @@ abstract class PohodaBankClient extends \mServer\Bank
     /**
      * Insert Transaction to Pohoda.
      *
-     * @return array<int, array<string,string>> Imported Transactions
+     * @return array<int, array<string, string>> Imported Transactions
      */
     public function insertTransactionToPohoda(): array
     {

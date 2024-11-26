@@ -30,14 +30,14 @@ class Statementor extends PohodaBankClient
     /**
      * Downloaded XML statements.
      *
-     * @var array<string,string>
+     * @var array<string, string>
      */
     private array $statementsXML = [];
 
     /**
      * Downloaded PDF statements.
      *
-     * @var array<string,string>
+     * @var array<string, string>
      */
     private array $statementsPDF = [];
 
@@ -124,7 +124,16 @@ class Statementor extends PohodaBankClient
                 //                $this->setDataValue('vypisCisDokl', $statementXML->BkToCstmrStmt->Stmt->Id);
                 //                $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
 
-                $inserted = array_merge($inserted, $this->insertTransactionToPohoda());
+                try {
+                    $lastInsert = $this->insertTransactionToPohoda();
+
+                    if ($lastInsert) {
+                        $inserted = array_merge($inserted);
+                        ++$success;
+                    }
+                } catch (\Exception $exc) {
+                    $this->addStatusMessage('Error Inserting Record', 'error');
+                }
             }
 
             $this->addStatusMessage($statementNumberLong.' Import done. '.$success.' of '.$entries.' imported');
@@ -144,7 +153,7 @@ class Statementor extends PohodaBankClient
     public function entryToPohoda($entry): array
     {
         $data['symPar'] = current((array) $entry->NtryRef);
-        $data['intNote'] = 'Imported by '.\Ease\Shared::AppName().' '.\Ease\Shared::AppVersion(). ' Import Job '.\Ease\Shared::cfg('MULTIFLEXI_JOB_ID', \Ease\Shared::cfg('JOB_ID', 'n/a'));
+        $data['intNote'] = 'Imported by '.\Ease\Shared::AppName().' '.\Ease\Shared::AppVersion().' Import Job '.\Ease\Shared::cfg('MULTIFLEXI_JOB_ID', \Ease\Shared::cfg('JOB_ID', 'n/a'));
         $data['note'] = '';
         $data['datePayment'] = current((array) $entry->BookgDt->DtTm); // current((array) $entry->ValDt->DtTm);
         $data['dateStatement'] = current((array) $entry->BookgDt->DtTm);
