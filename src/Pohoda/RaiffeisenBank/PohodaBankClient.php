@@ -254,7 +254,7 @@ abstract class PohodaBankClient extends \mServer\Bank
                     $producedNumber = $this->response->producedDetails['number'];
                     $producedAction = $this->response->producedDetails['actionType'];
                     $result[$producedId] = $this->response->producedDetails;
-
+                    $result[$producedId]['messages'] = $this->response->messages;
                     $this->automaticLiquidation($producedNumber);
                 }
             } catch (\Exception $exc) {

@@ -128,7 +128,7 @@ class Statementor extends PohodaBankClient
                     $lastInsert = $this->insertTransactionToPohoda();
 
                     if ($lastInsert) {
-                        $inserted = array_merge($inserted);
+                        $inserted = array_merge($lastInsert);
                         ++$success;
                     }
                 } catch (\Exception $exc) {

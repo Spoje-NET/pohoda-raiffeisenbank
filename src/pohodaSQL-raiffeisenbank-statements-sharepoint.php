@@ -27,11 +27,16 @@ require_once '../vendor/autoload.php';
 /**
  * Get today's Statements list.
  */
-Shared::init([
-    'POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO',
-    'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
-    'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
-], $argv[1] ?? '../.env');
+$options = getopt('o::e::', ['output::environment::']);
+Shared::init(
+    [
+        'POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO',
+        'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
+        'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
+    ],
+    \array_key_exists('environment', $options) ? $options['environment'] : '../.env',
+);
+$destination = \array_key_exists('output', $options) ? $options['output'] : \Ease\Shared::cfg('RESULT_FILE', 'php://stdout');
 
 PohodaBankClient::checkCertificatePresence(Shared::cfg('CERT_FILE'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
@@ -39,13 +44,18 @@ $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 $engine->logBanner('', 'Scope: '.$engine->scope);
 $exitcode = 0;
 $fileUrls = [];
+$report = [
+    'sharepoint' => [],
+    'pohoda' => [],
+    'pohodaSQL' => []
+];
 
 $pdfStatements = $engine->downloadPDF();
 
 if ($pdfStatements) {
     sleep(5);
 
-    $pdfs = $engine->getPdfStatements();
+    $pdfStatements = $engine->getPdfStatements();
 
     if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
         $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
@@ -60,17 +70,18 @@ if ($pdfStatements) {
 
     $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
 
-    foreach ($pdfs as $filename) {
+    foreach ($pdfStatements as $filename) {
         $uploadFile = $targetFolder->uploadFile(basename($filename), file_get_contents($filename));
 
         try {
             $ctx->executeQuery();
             $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
             $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
+            $report['sharepoint'][basename($filename)] = $uploaded;
         } catch (\Exception $exc) {
             fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
 
-            exit(1);
+            $exitcode =1;
         }
 
         $fileUrls[basename($filename)] = $uploaded;
@@ -96,10 +107,10 @@ try {
 
 if ($xmlStatements) {
     $inserted = $engine->import();
-
+    $report['pohoda'] = $inserted;
     if ($inserted) {
         if ($fileUrls) {
-            $engine->addStatusMessage(_('Updating PohodaSQL to attach statements in sharepoint links to invoice'), 'success');
+            $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'),count($inserted)), 'debug');
 
             $doc = new \SpojeNet\PohodaSQL\DOC();
             $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
@@ -112,10 +123,11 @@ if ($xmlStatements) {
 
                 try {
                     $result = $doc->urlAttachment((int) $id, $sharepointUri, basename($filename));
-                    $doc->addStatusMessage($importInfo['number'].' '.$sharepointUri, $result ? 'success' : 'error');
+                    $doc->addStatusMessage(sprintf( '#%d: %s %s', $id,$importInfo['number'],$sharepointUri ), $result ? 'success' : 'error');
+                    $report['pohodaSQL'][$id] = $importInfo['number'];
                 } catch (\Exception $ex) {
                     $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
-
+                    $report['pohodaSQL'][$id] = $ex->getMessage();
                     $exitcode = 4;
                 }
             }
@@ -133,5 +145,8 @@ if ($xmlStatements) {
         $exitcode = 3;
     }
 }
+
+$written = file_put_contents($destination, json_encode($report, \Ease\Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
+$engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');
 
 exit($exitcode);

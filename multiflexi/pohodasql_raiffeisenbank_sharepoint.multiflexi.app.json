@@ -81,7 +81,7 @@
         "POHODA_DEBUG": {
             "type": "boolean",
             "description": "Pohoda Debug",
-            "defval": true,
+            "defval": false,
             "required": true
         },
         "POHODA_BANK_IDS": {
@@ -184,6 +184,18 @@
             "type": "text",
             "description": "Place for PDF files",
             "defval": "",
+            "required": false
+        },
+        "RESULT_FILE": {
+            "type": "string",
+            "description": "write output json data to",
+            "defval": "bank_import_report_{ACCOUNT_NUMBER}.json",
+            "required": false
+        },
+        "ZABBIX_KEY": {
+            "type": "string",
+            "description": "Default name for Zabbix Item key name",
+            "defval": "Raiff-Import-{ACCOUNT_NUMBER}",
             "required": false
         }
     },
