@@ -3,10 +3,14 @@ Raiffeisenbank for Stormware Pohoda
 
 ![](pohoda-raiffeisenbank.svg?raw=true)
 
-Downloads bank statements in PDF and XML formats.
-The XML is parsed and imported into Pohoda via the mServer service.
-The PDF is sent to a sharepoint folder and the link to download it is 
-attached via MSSQL to all bank statements from the XML.
+It downloads PDF statements from Raiffeisen Premium API for a specified period and uploads them to Sharepoint.
+
+It downloads the corresponding XML statements and parses them. It imports the bank movements obtained in this way via mServer into Stormware Pohoda.
+
+After importing all items, document liquidation is initiated and they are automatically matched.
+
+When using PohodaSQL, links to PDF statements are attached to all movements.
+
 
 Requirements
 ------------
