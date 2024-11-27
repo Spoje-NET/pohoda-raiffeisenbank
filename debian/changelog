@@ -1,8 +1,14 @@
-pohoda-raiffeisenbank (0.4.0) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.0.0) UNRELEASED; urgency=medium
+
+  * v1.0.0 release
+
+ -- vitex <info@vitexsoftware.cz>  Wed, 27 Nov 2024 09:43:27 +0100
+
+pohoda-raiffeisenbank (0.4.0) jammy; urgency=medium
 
   * now produce json report
 
- -- vitex <info@vitexsoftware.cz>  Tue, 26 Nov 2024 11:07:58 +0100
+ -- vitex <info@vitexsoftware.cz>  Wed, 27 Nov 2024 09:43:12 +0100
 
 pohoda-raiffeisenbank (0.3.1) jammy; urgency=medium
 

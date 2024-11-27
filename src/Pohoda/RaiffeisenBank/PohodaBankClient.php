@@ -47,12 +47,12 @@ abstract class PohodaBankClient extends \mServer\Bank
     /**
      * Transaction Handler.
      *
-     * @param string $bankAccount Account Number
-     * @param array  $options
+     * @param string                $bankAccount Account Number
+     * @param array<string,string>  $options
      */
-    public function __construct($bankAccount, $options = [])
+    public function __construct(string $bankAccount, $options = [])
     {
-        parent::__construct();
+        parent::__construct(null, $options);
         $this->setDataValue('account', $bankAccount);
         //        $this->constantor = new \Pohoda\RW(null, ['evidence' => 'konst-symbol']);
         //        $this->constSymbols = $this->constantor->getColumnsFromPohoda(['kod'], ['limit' => 0], 'kod');
@@ -379,7 +379,7 @@ EOD;
         return $xml->asXML();
     }
 
-    public function getCompanyId()
+    public function getCompanyId(): string
     {
         return \Ease\Shared::cfg('POHODA_ICO');
     }

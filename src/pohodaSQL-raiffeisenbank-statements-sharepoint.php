@@ -78,20 +78,20 @@ if ($pdfStatements) {
             $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
             $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
             $report['sharepoint'][basename($filename)] = $uploaded;
+            $fileUrls[basename($filename)] = $uploaded;
         } catch (\Exception $exc) {
             fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
 
             $exitcode =1;
         }
 
-        $fileUrls[basename($filename)] = $uploaded;
     }
 } else {
-    if (\is_array($pdfStatements)) {
-        $engine->addStatusMessage(_('No PDF statements obtained'), 'info');
-    } else {
+    if (is_null($pdfStatements)) {
         $engine->addStatusMessage(_('Error obtaining PDF statements'), 'error');
         $exitcode = 2;
+    } else {
+        $engine->addStatusMessage(_('No PDF statements obtained'), 'info');
     }
 }
 
