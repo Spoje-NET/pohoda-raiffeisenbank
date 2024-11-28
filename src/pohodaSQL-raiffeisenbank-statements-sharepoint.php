@@ -47,7 +47,7 @@ $fileUrls = [];
 $report = [
     'sharepoint' => [],
     'pohoda' => [],
-    'pohodaSQL' => []
+    'pohodaSQL' => [],
 ];
 
 $pdfStatements = $engine->downloadPDF();
@@ -82,12 +82,11 @@ if ($pdfStatements) {
         } catch (\Exception $exc) {
             fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
 
-            $exitcode =1;
+            $exitcode = 1;
         }
-
     }
 } else {
-    if (is_null($pdfStatements)) {
+    if (null === $pdfStatements) {
         $engine->addStatusMessage(_('Error obtaining PDF statements'), 'error');
         $exitcode = 2;
     } else {
@@ -108,9 +107,10 @@ try {
 if ($xmlStatements) {
     $inserted = $engine->import();
     $report['pohoda'] = $inserted;
+
     if ($inserted) {
         if ($fileUrls) {
-            $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'),count($inserted)), 'debug');
+            $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'), \count($inserted)), 'debug');
 
             $doc = new \SpojeNet\PohodaSQL\DOC();
             $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
@@ -123,7 +123,7 @@ if ($xmlStatements) {
 
                 try {
                     $result = $doc->urlAttachment((int) $id, $sharepointUri, basename($filename));
-                    $doc->addStatusMessage(sprintf( '#%d: %s %s', $id,$importInfo['number'],$sharepointUri ), $result ? 'success' : 'error');
+                    $doc->addStatusMessage(sprintf('#%d: %s %s', $id, $importInfo['number'], $sharepointUri), $result ? 'success' : 'error');
                     $report['pohodaSQL'][$id] = $importInfo['number'];
                 } catch (\Exception $ex) {
                     $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');

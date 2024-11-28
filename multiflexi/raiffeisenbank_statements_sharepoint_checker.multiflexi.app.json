@@ -1,0 +1,113 @@
+{
+    "image": "",
+    "name": "Raiffeisenbank statements Sharepoint check",
+    "description": "Check Raiffeisenbank statements presence in Sharepoint",
+    "executable": "raiffeisenbank-statements-sharepoint-checker",
+    "setup": "pohoda-raiffeisenbank-setup",
+    "cmdparams": "",
+    "deploy": "apt install pohoda-raiffeisenbank",
+    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
+    "requirements": "Office365,RaiffeisenBank",
+    "ociimage": "",
+    "topics": "Raiffeisen,Bank,Statements,Check",
+    "uuid": "2461feac-a694-4171-a37e-069fe3f56cef",
+    "environment": {
+        "ACCOUNT_NUMBER": {
+            "type": "text",
+            "description": "Bank Account Number",
+            "defval": "",
+            "required": true
+        },
+        "CERT_PASS": {
+            "type": "password",
+            "description": "Certificate password",
+            "defval": "",
+            "required": true
+        },
+        "CERT_FILE": {
+            "type": "string",
+            "description": "Path to RB Certificate file",
+            "defval": "",
+            "required": true
+        },
+        "IMPORT_SCOPE": {
+            "type": "text",
+            "description": "Time scope of transactions downloaded",
+            "defval": "auto",
+            "required": true
+        },
+        "XIBMCLIENTID": {
+            "type": "text",
+            "description": "ClientID",
+            "defval": "",
+            "required": true
+        },
+        "OFFICE365_USERNAME": {
+            "type": "text",
+            "description": "Office 365 Username",
+            "defval": "",
+            "required": false
+        },
+        "OFFICE365_PASSWORD": {
+            "type": "password",
+            "description": "Office 365 Password",
+            "defval": "",
+            "required": false
+        },
+        "OFFICE365_CLIENTID": {
+            "type": "text",
+            "description": "Office 365 Client ID",
+            "defval": "",
+            "required": false
+        },
+        "OFFICE365_SECRET": {
+            "type": "text",
+            "description": "Office 365 Secret",
+            "defval": "",
+            "required": false
+        },
+        "OFFICE365_CLSECRET": {
+            "type": "text",
+            "description": "Office 365 Client Secret",
+            "defval": "",
+            "required": false
+        },
+        "OFFICE365_TENANT": {
+            "type": "text",
+            "description": "Office 365 Tenant",
+            "defval": "",
+            "required": true
+        },
+        "OFFICE365_SITE": {
+            "type": "text",
+            "description": "Office 365 Site",
+            "defval": "",
+            "required": true
+        },
+        "OFFICE365_PATH": {
+            "type": "text",
+            "description": "Office 365 Path",
+            "defval": "",
+            "required": true
+        },
+        "STATEMENT_SAVE_DIR": {
+            "type": "text",
+            "description": "Place for PDF files",
+            "defval": "",
+            "required": false
+        },
+        "RESULT_FILE": {
+            "type": "string",
+            "description": "write output json data to",
+            "defval": "bank_statement_check_{ACCOUNT_NUMBER}.json",
+            "required": false
+        },
+        "ZABBIX_KEY": {
+            "type": "string",
+            "description": "Default name for Zabbix Item key name",
+            "defval": "Raiff-Statement-{ACCOUNT_NUMBER}-inSharepoint",
+            "required": false
+        }
+    },
+    "multiflexi": "1.20"
+}

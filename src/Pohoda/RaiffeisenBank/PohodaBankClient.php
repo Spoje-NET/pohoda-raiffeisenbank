@@ -48,7 +48,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      * Transaction Handler.
      *
      * @param string                $bankAccount Account Number
-     * @param array<string,string>  $options
+     * @param array<string, string> $options
      */
     public function __construct(string $bankAccount, $options = [])
     {

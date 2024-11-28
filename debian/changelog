@@ -1,8 +1,14 @@
-pohoda-raiffeisenbank (1.0.0) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.1.0) UNRELEASED; urgency=medium
+
+  * raiffeisenbank-statements-sharepoint-checker added
+
+ -- vitex <info@vitexsoftware.cz>  Thu, 28 Nov 2024 17:58:36 +0100
+
+pohoda-raiffeisenbank (1.0.0) jammy; urgency=medium
 
   * v1.0.0 release
 
- -- vitex <info@vitexsoftware.cz>  Wed, 27 Nov 2024 09:43:27 +0100
+ -- vitex <info@vitexsoftware.cz>  Thu, 28 Nov 2024 17:58:09 +0100
 
 pohoda-raiffeisenbank (0.4.0) jammy; urgency=medium
 

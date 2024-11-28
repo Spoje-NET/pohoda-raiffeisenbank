@@ -73,16 +73,46 @@ class Statementor extends PohodaBankClient
         return $this->import();
     }
 
+    
+    
+    /**
+     * Get List of Statement files
+     * 
+     * @param string $format xml|pdf
+     * @return array<string>
+     */
+    public function getStatementFilenames(string $format): array {
+        foreach ($this->getStatements() as $statement) {
+            $statementFilenames[] = str_replace('/', '_', $statement->statementNumber) . '_' .
+                    $statement->accountNumber . '_' .
+                    $statement->accountId . '_' .
+                    $statement->currency . '_' . $statement->dateFrom . '.' . $format;
+        }
+
+        return $statementFilenames;
+    }
+
+
+    public function getStatements()
+    {
+        return $this->obtainer->getStatements();
+    }
+
+    public function download($format)
+    {
+        return $this->obtainer->download($this->statementsDir, $this->getStatements(), $format);
+    }
+
     public function downloadXML(): array
     {
-        $this->statementsXML = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'xml');
+        $this->statementsXML = $this->download('xml');
 
         return $this->statementsXML;
     }
 
     public function downloadPDF(): array
     {
-        $this->statementsPDF = $this->obtainer->download($this->statementsDir, $this->obtainer->getStatements(), 'pdf');
+        $this->statementsPDF = $this->download('pdf');
 
         return $this->statementsPDF;
     }
@@ -373,5 +403,13 @@ class Statementor extends PohodaBankClient
     public function getXmlStatements()
     {
         return $this->statementsXML;
+    }
+    
+    public function getSince(): \DateTime {
+        return $this->since;
+    }
+    
+    public function getUntil(): \DateTime {
+        return $this->until;
     }
 }
