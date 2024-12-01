@@ -11,6 +11,7 @@ After importing all items, document liquidation is initiated and they are automa
 
 When using PohodaSQL, links to PDF statements are attached to all movements.
 
+[![wakatime](https://wakatime.com/badge/user/5abba9ca-813e-43ac-9b5f-b1cfdf3dc1c7/project/018b7d35-a10b-4f4b-ba78-241d1c79b4e6.svg)](https://wakatime.com/badge/user/5abba9ca-813e-43ac-9b5f-b1cfdf3dc1c7/project/018b7d35-a10b-4f4b-ba78-241d1c79b4e6)
 
 Requirements
 ------------
