@@ -15,6 +15,8 @@ declare(strict_types=1);
 
 namespace Pohoda\RaiffeisenBank;
 
+use Ease\Shared;
+
 /**
  * Description of ApiClient.
  *
@@ -31,18 +33,9 @@ abstract class PohodaBankClient extends \mServer\Bank
      * DateTime Formating eg. 2021-08-01T10:00:00.0Z.
      */
     public static string $dateFormat = 'Y-m-d';
-
-    /**
-     * @var \Riesenia\Pohoda\Banka
-     */
-    public ?\Riesenia\Pohoda\Agenda $requestXml;
-
-    // public Response $response; TODO: Update
-    protected $constantor;
-    protected $constSymbols;
     protected \DateTime $since;
     protected \DateTime $until;
-    protected $bank;
+    protected string $bank;
 
     /**
      * Transaction Handler.
@@ -69,7 +62,7 @@ abstract class PohodaBankClient extends \mServer\Bank
     }
 
     /**
-     * Try to check certificate readibilty.
+     * Try to check certificate readability.
      *
      * @param string $certFile path to certificate
      */
@@ -149,7 +142,7 @@ abstract class PohodaBankClient extends \mServer\Bank
 
                 break;
             case 'auto':
-                $latestRecord = $this->getColumnsFromPohoda(['id', 'lastUpdate'], ['limit' => 1, 'order' => 'lastUpdate@A', 'source' => $this->sourceString(), 'banka' => $this->bank]);
+                $latestRecord = $this->getColumnsFromPohoda(['id', 'lastUpdate'], ['limit' => 1, 'order' => 'lastUpdate@A', 'source' => $this->sourceString(), 'bank' => $this->bank]);
 
                 if (\array_key_exists(0, $latestRecord) && \array_key_exists('lastUpdate', $latestRecord[0])) {
                     $this->since = $latestRecord[0]['lastUpdate'];
@@ -204,7 +197,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function getCurrencyCode()
     {
-        return \Ease\Shared::cfg('ACCOUNT_CURRENCY', 'CZK');
+        return Shared::cfg('ACCOUNT_CURRENCY', 'CZK');
     }
 
     /**
@@ -219,15 +212,6 @@ abstract class PohodaBankClient extends \mServer\Bank
         $this->addStatusMessage('Checking for transaction presence - Not yet implemented', 'warning');
 
         return false; // !empty($this->getColumnsFromPohoda('id', ['cisDosle' => $this->getDataValue('cisDosle')])); TODO
-    }
-
-    public function ensureKSExists(string $conSym): void
-    {
-        if (!\array_key_exists($conSym, $this->constSymbols)) {
-            $this->constantor->insertToPohoda(['kod' => $conSym, 'poznam' => 'Created by Raiffeisen Bank importer', 'nazev' => '?!?!? '.$conSym]);
-            $this->constantor->addStatusMessage('New constant '.$conSym.' created in flexibee', 'warning');
-            $this->constSymbols[$conSym] = $conSym;
-        }
     }
 
     /**
@@ -381,6 +365,6 @@ EOD;
 
     public function getCompanyId(): string
     {
-        return \Ease\Shared::cfg('POHODA_ICO');
+        return Shared::cfg('POHODA_ICO');
     }
 }

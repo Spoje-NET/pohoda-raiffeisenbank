@@ -73,25 +73,24 @@ class Statementor extends PohodaBankClient
         return $this->import();
     }
 
-    
-    
     /**
-     * Get List of Statement files
-     * 
+     * Get List of Statement files.
+     *
      * @param string $format xml|pdf
+     *
      * @return array<string>
      */
-    public function getStatementFilenames(string $format): array {
+    public function getStatementFilenames(string $format): array
+    {
         foreach ($this->getStatements() as $statement) {
-            $statementFilenames[] = str_replace('/', '_', $statement->statementNumber) . '_' .
-                    $statement->accountNumber . '_' .
-                    $statement->accountId . '_' .
-                    $statement->currency . '_' . $statement->dateFrom . '.' . $format;
+            $statementFilenames[] = str_replace('/', '_', $statement->statementNumber).'_'.
+                    $statement->accountNumber.'_'.
+                    $statement->accountId.'_'.
+                    $statement->currency.'_'.$statement->dateFrom.'.'.$format;
         }
 
         return $statementFilenames;
     }
-
 
     public function getStatements()
     {
@@ -103,6 +102,11 @@ class Statementor extends PohodaBankClient
         return $this->obtainer->download($this->statementsDir, $this->getStatements(), $format);
     }
 
+    /**
+     * Download Raiffeisen bank XML statement.
+     *
+     * @return array<string, string> List of downloaded XML files
+     */
     public function downloadXML(): array
     {
         $this->statementsXML = $this->download('xml');
@@ -110,6 +114,11 @@ class Statementor extends PohodaBankClient
         return $this->statementsXML;
     }
 
+    /**
+     * Download Raiffeisen bank PDF statement.
+     *
+     * @return array<string, string> List of downloaded PDF files
+     */
     public function downloadPDF(): array
     {
         $this->statementsPDF = $this->download('pdf');
@@ -118,7 +127,7 @@ class Statementor extends PohodaBankClient
     }
 
     /**
-     * @return array
+     * @return array<array<string, string>> List of inserted records
      */
     public function importOnline()
     {
@@ -158,7 +167,7 @@ class Statementor extends PohodaBankClient
                     $lastInsert = $this->insertTransactionToPohoda();
 
                     if ($lastInsert) {
-                        $inserted = array_merge($lastInsert);
+                        $inserted[key($lastInsert)] = current($lastInsert);
                         ++$success;
                     }
                 } catch (\Exception $exc) {
@@ -178,9 +187,9 @@ class Statementor extends PohodaBankClient
      * @see https://cbaonline.cz/upload/1425-standard-xml-cba-listopad-2020.pdf
      * @see https://www.stormware.cz/xml/schema/version_2/bank.xsd
      *
-     * @param \SimpleXMLElement $entry
+     * @return array<string, array<string, string>|string>
      */
-    public function entryToPohoda($entry): array
+    public function entryToPohoda(\SimpleXMLElement $entry): array
     {
         $data['symPar'] = current((array) $entry->NtryRef);
         $data['intNote'] = 'Imported by '.\Ease\Shared::AppName().' '.\Ease\Shared::AppVersion().' Import Job '.\Ease\Shared::cfg('MULTIFLEXI_JOB_ID', \Ease\Shared::cfg('JOB_ID', 'n/a'));
@@ -404,12 +413,14 @@ class Statementor extends PohodaBankClient
     {
         return $this->statementsXML;
     }
-    
-    public function getSince(): \DateTime {
+
+    public function getSince(): \DateTime
+    {
         return $this->since;
     }
-    
-    public function getUntil(): \DateTime {
+
+    public function getUntil(): \DateTime
+    {
         return $this->until;
     }
 }

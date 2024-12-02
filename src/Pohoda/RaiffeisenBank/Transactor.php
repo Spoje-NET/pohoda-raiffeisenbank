@@ -88,7 +88,11 @@ class Transactor extends PohodaBankClient
         foreach ($allTransactions as $transaction) {
             // $this->dataReset();
             $this->takeTransactionData($transaction);
-            $success = $this->insertTransactionToPohoda($success);
+
+            if ($this->insertTransactionToPohoda()) {
+                ++$success;
+            }
+
             $this->reset();
         }
 
