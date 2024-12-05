@@ -38,7 +38,7 @@ Shared::init(
 $destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
 PohodaBankClient::checkCertificatePresence(Shared::cfg('CERT_FILE'));
-$engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
+$engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'),['user'=>'','password'=>'']);
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 $engine->logBanner('', 'Scope: '.$engine->scope);
 $exitcode = 0;
