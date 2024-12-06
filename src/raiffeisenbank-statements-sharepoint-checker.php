@@ -51,37 +51,48 @@ $report = [
     'existing' => [],
 ];
 
-$pdfStatements = $engine->getStatementFilenames('pdf');
+try {
+    $pdfStatements = $engine->getStatementFilenames('pdf');
 
-if ($pdfStatements) {
-    if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
-        $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
-        $engine->addStatusMessage('Using OFFICE365_USERNAME '.Shared::cfg('OFFICE365_USERNAME').' and OFFICE365_PASSWORD', 'debug');
-    } else {
-        $credentials = new ClientCredential(Shared::cfg('OFFICE365_CLIENTID'), Shared::cfg('OFFICE365_CLSECRET'));
-        $engine->addStatusMessage('Using OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID').' and OFFICE365_CLSECRET', 'debug');
-    }
-
-    $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
-    $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
-
-    $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
-
-    $sharepointFilesRaw = $targetFolder->getFiles()->get()->executeQuery();
-    $sharepointFiles = [];
-
-    // @phpstan-ignore foreach.nonIterable
-    foreach ($sharepointFilesRaw as $fileInSharepint) {
-        $sharepointFiles[$fileInSharepint->getName()] = $fileInSharepint->getServerRelativeUrl();
-    }
-
-    foreach ($pdfStatements as $pdfStatement) {
-        if (\array_key_exists($pdfStatement, $sharepointFiles)) {
-            $engine->addStatusMessage(sprintf('File %s exists in SharePoint', $pdfStatement), 'success');
-            $report['existing'][] = $pdfStatement;
+    if ($pdfStatements) {
+        if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
+            $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
+            $engine->addStatusMessage('Using OFFICE365_USERNAME '.Shared::cfg('OFFICE365_USERNAME').' and OFFICE365_PASSWORD', 'debug');
         } else {
-            $engine->addStatusMessage(sprintf('File %s does not exist in SharePoint', $pdfStatement), 'warning');
-            $report['missing'][] = $pdfStatement;
+            $credentials = new ClientCredential(Shared::cfg('OFFICE365_CLIENTID'), Shared::cfg('OFFICE365_CLSECRET'));
+            $engine->addStatusMessage('Using OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID').' and OFFICE365_CLSECRET', 'debug');
+        }
+
+        $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
+        $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
+
+        $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
+
+        $sharepointFilesRaw = $targetFolder->getFiles()->get()->executeQuery();
+        $sharepointFiles = [];
+
+        // @phpstan-ignore foreach.nonIterable
+        foreach ($sharepointFilesRaw as $fileInSharepint) {
+            $sharepointFiles[$fileInSharepint->getName()] = $fileInSharepint->getServerRelativeUrl();
+        }
+
+        foreach ($pdfStatements as $pdfStatement) {
+            if (\array_key_exists($pdfStatement, $sharepointFiles)) {
+                $engine->addStatusMessage(sprintf('File %s exists in SharePoint', $pdfStatement), 'success');
+                $report['existing'][] = $pdfStatement;
+            } else {
+                $engine->addStatusMessage(sprintf('File %s does not exist in SharePoint', $pdfStatement), 'warning');
+                $report['missing'][] = $pdfStatement;
+            }
+        }
+    }
+} catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
+    $report['mesage'] = $exc->getMessage();
+    
+    $exitcode = $exc->getCode();
+    if(!$exitcode){
+        if(preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)){
+            $exitcode = (int)$codeRaw[1];
         }
     }
 }
