@@ -23,7 +23,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Test\\Pohoda\\": "vendor/spojenet/abraflexi/testing/src/Pohoda/",
+            "Test\\Pohoda\\": "vendor/vitexsoftware/pohoda-connector/tests/src/Pohoda/",
             "Test\\Pohoda\\RaiffeisenBank\\": "tests/Pohoda/RaiffeisenBank/"
         }
     },
