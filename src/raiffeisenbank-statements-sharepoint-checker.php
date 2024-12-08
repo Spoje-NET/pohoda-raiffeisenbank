@@ -88,7 +88,7 @@ try {
     }
 } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
     $report['mesage'] = $exc->getMessage();
-    
+    $engine->addStatusMessage($report['mesage'],'error');
     $exitcode = $exc->getCode();
     if(!$exitcode){
         if(preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)){
