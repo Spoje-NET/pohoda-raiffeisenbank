@@ -50,7 +50,19 @@ $report = [
     'pohodaSQL' => [],
 ];
 
-$pdfStatements = $engine->downloadPDF();
+try {
+    $pdfStatements = $engine->downloadPDF();
+} catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
+    $report['mesage'] = $exc->getMessage();
+
+    $exitcode = $exc->getCode();
+
+    if (!$exitcode) {
+        if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {
+            $exitcode = (int) $codeRaw[1];
+        }
+    }
+}
 
 if ($pdfStatements) {
     sleep(5);
