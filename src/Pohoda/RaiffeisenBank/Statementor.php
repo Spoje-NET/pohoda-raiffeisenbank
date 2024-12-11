@@ -22,7 +22,6 @@ namespace Pohoda\RaiffeisenBank;
  */
 class Statementor extends PohodaBankClient
 {
-    public string $account;
     public string $scope = '';
     private \VitexSoftware\Raiffeisenbank\Statementor $obtainer;
     private string $statementsDir;
@@ -82,11 +81,11 @@ class Statementor extends PohodaBankClient
      */
     public function getStatementFilenames(string $format): array
     {
-        foreach ($this->getStatements() as $statement) {
-            $statementFilenames[] = str_replace('/', '_', $statement->statementNumber).'_'.
-                    $statement->accountNumber.'_'.
-                    $statement->accountId.'_'.
-                    $statement->currency.'_'.$statement->dateFrom.'.'.$format;
+        foreach ($this->getStatements() as $statementFilePath) {
+            $statementFilenames[] = str_replace('/', '_', $statementFilePath->statementNumber).'_'.
+                    $statementFilePath->accountNumber.'_'.
+                    $statementFilePath->accountId.'_'.
+                    $statementFilePath->currency.'_'.$statementFilePath->dateFrom.'.'.$format;
         }
 
         return $statementFilenames;
@@ -142,14 +141,13 @@ class Statementor extends PohodaBankClient
      *
      * @return list<array<string, string>>
      */
-    public function import(): array
+    public function import(string $bankIds = ''): array
     {
         $inserted = [];
-        $this->account = \Ease\Shared::cfg('POHODA_BANK_IDS', 'RB'); // TODO!!!
         $success = 0;
 
-        foreach ($this->statementsXML as $pos => $statement) {
-            $statementXML = new \SimpleXMLElement(file_get_contents($statement));
+        foreach ($this->statementsXML as $statementFileName => $statementFilePath) {
+            $statementXML = new \SimpleXMLElement(file_get_contents($statementFilePath));
             $statementNumberLong = current((array) $statementXML->BkToCstmrStmt->Stmt->Id);
             $entries = 0;
 
@@ -157,14 +155,14 @@ class Statementor extends PohodaBankClient
                 ++$entries;
                 $this->dataReset();
                 $this->setData($this->entryToPohoda($entry));
-                [$statementNumber, $statementYear] = explode('_', $pos);
-                $this->setDataValue('statementNumber', ['statementNumber' => $statementNumber.'/'.$statementYear]);
+                [$statementNumber, $statementYear] = explode('_', $statementFileName);
+                $this->setDataValue('statementNumber', ['statementNumber' => $statementNumber.'/'.$statementYear]); // TODO: Optional by switch ?
                 //                $this->setDataValue('account', current((array) $entry->NtryRef));
                 //                $this->setDataValue('vypisCisDokl', $statementXML->BkToCstmrStmt->Stmt->Id);
                 //                $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
 
                 try {
-                    $lastInsert = $this->insertTransactionToPohoda();
+                    $lastInsert = $this->insertTransactionToPohoda($bankIds);
 
                     if ($lastInsert) {
                         $inserted[key($lastInsert)] = current($lastInsert);
@@ -422,5 +420,10 @@ class Statementor extends PohodaBankClient
     public function getUntil(): \DateTime
     {
         return $this->until;
+    }
+
+    public function takeXmlStatementFile(string $xmlFilePath): void
+    {
+        $this->statementsXML[basename($xmlFilePath)] = $xmlFilePath;
     }
 }

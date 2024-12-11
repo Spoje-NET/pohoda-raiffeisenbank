@@ -35,7 +35,7 @@ abstract class PohodaBankClient extends \mServer\Bank
     public static string $dateFormat = 'Y-m-d';
     protected \DateTime $since;
     protected \DateTime $until;
-    protected string $bank;
+    protected string $bankIDS;
 
     /**
      * Transaction Handler.
@@ -142,7 +142,7 @@ abstract class PohodaBankClient extends \mServer\Bank
 
                 break;
             case 'auto':
-                $latestRecord = $this->getColumnsFromPohoda(['id', 'lastUpdate'], ['limit' => 1, 'order' => 'lastUpdate@A', 'source' => $this->sourceString(), 'bank' => $this->bank]);
+                $latestRecord = $this->getColumnsFromPohoda(['id', 'lastUpdate'], ['limit' => 1, 'order' => 'lastUpdate@A', 'source' => $this->sourceString(), 'bank' => $this->bankIDS]);
 
                 if (\array_key_exists(0, $latestRecord) && \array_key_exists('lastUpdate', $latestRecord[0])) {
                     $this->since = $latestRecord[0]['lastUpdate'];
@@ -219,7 +219,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      *
      * @return array<int, array<string, string>> Imported Transactions
      */
-    public function insertTransactionToPohoda(): array
+    public function insertTransactionToPohoda(string $bankIDS = ''): array
     {
         $producedId = '';
         $producedNumber = '';
@@ -230,7 +230,12 @@ abstract class PohodaBankClient extends \mServer\Bank
             try {
                 $cache = $this->getData();
                 $this->reset();
+
                 // TODO: $result = $this->sync();
+                if ($bankIDS) {
+                    $cache['account'] = $bankIDS;
+                }
+
                 $this->takeData($cache);
 
                 if ($this->addToPohoda() && $this->commit() && isset($this->response->producedDetails) && \is_array($this->response->producedDetails)) {

@@ -105,7 +105,7 @@ try {
 }
 
 if ($xmlStatements) {
-    $inserted = $engine->import();
+    $inserted = $engine->import(\Ease\Shared::cfg('POHODA_BANK_IDS', ''));
     $report['pohoda'] = $inserted;
 
     if ($inserted) {
