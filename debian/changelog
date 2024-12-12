@@ -1,9 +1,16 @@
-pohoda-raiffeisenbank (1.1.3) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.2.0) UNRELEASED; urgency=medium
 
+  * ACCOUNT_CURRENCY support added
+
+ --  <vitezslav.dvorak@spojenet.cz>  Thu, 12 Dec 2024 19:46:43 +0100
+
+pohoda-raiffeisenbank (1.1.3) jammy; urgency=medium
+
+  [ vitezslav.dvorak@spojenet.cz ]
   * bankIDS processed now
   * Fail with correct exitpode
 
- --  <vitezslav.dvorak@spojenet.cz>  Mon, 09 Dec 2024 11:37:42 +0100
+ --  <vitezslav.dvorak@spojenet.cz>  Thu, 12 Dec 2024 19:46:38 +0100
 
 pohoda-raiffeisenbank (1.1.1) jammy; urgency=medium
 

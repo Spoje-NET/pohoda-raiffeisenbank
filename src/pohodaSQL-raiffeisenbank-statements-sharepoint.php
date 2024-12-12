@@ -42,7 +42,16 @@ $destination = \array_key_exists('output', $options) ? $options['output'] : \Eas
 PohodaBankClient::checkCertificatePresence(Shared::cfg('CERT_FILE'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
-$engine->logBanner('', 'Scope: '.$engine->scope);
+
+if (Shared::cfg('STATEMENT_LINE')) {
+    $engine->setStatementLine(Shared::cfg('STATEMENT_LINE'));
+}
+
+if (Shared::cfg('ACCOUNT_CURRENCY')) {
+    $engine->setCurrency(Shared::cfg('ACCOUNT_CURRENCY'));
+}
+
+$engine->logBanner(Shared::cfg('ACCOUNT_CURRENCY'), 'Scope: '.$engine->scope);
 $exitcode = 0;
 $fileUrls = [];
 $report = [
@@ -55,7 +64,7 @@ try {
     $pdfStatements = $engine->downloadPDF();
 } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
     $report['mesage'] = $exc->getMessage();
-
+    $pdfStatements = [];
     $exitcode = $exc->getCode();
 
     if (!$exitcode) {

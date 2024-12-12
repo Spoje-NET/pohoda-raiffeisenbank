@@ -19,12 +19,12 @@ require_once '../vendor/autoload.php';
 
 \define('APP_NAME', 'Pohoda RaiffeisenBank Offline Statements');
 
-$statementFile = 'statement.xml'; // TODO: specify by commandline
-
+$options = getopt('i::e::', ['input::environment::']);
+$statementFile = \array_key_exists('output', $options) ? $options['output'] : \Ease\Shared::cfg('STATEMENT_FILE', 'php://stdin');
 /**
  * Get today's Statements list.
  */
-\Ease\Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'POHODA_BANK_IDS', 'ACCOUNT_NUMBER'], $argv[1] ?? '../.env');
+\Ease\Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'POHODA_BANK_IDS', 'ACCOUNT_NUMBER'], \array_key_exists('environment', $options) ? $options['environment'] : '../.env');
 $engine = new Statementor(\Ease\Shared::cfg('ACCOUNT_NUMBER'));
 $engine->logBanner('', 'Importing file: '.$statementFile);
 

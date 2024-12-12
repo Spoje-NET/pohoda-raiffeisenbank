@@ -36,6 +36,12 @@
             "defval": "auto",
             "required": true
         },
+        "ACCOUNT_CURRENCY": {
+            "type": "text",
+            "description": "for multicurrency accounts please specify one",
+            "defval": "CZK",
+            "required": false
+        },
         "XIBMCLIENTID": {
             "type": "text",
             "description": "ClientID",

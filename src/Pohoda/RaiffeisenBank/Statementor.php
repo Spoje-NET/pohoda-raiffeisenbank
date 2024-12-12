@@ -25,6 +25,8 @@ class Statementor extends PohodaBankClient
     public string $scope = '';
     private \VitexSoftware\Raiffeisenbank\Statementor $obtainer;
     private string $statementsDir;
+    private string $currency = '';
+    private string $statementLine = 'MAIN';
 
     /**
      * Downloaded XML statements.
@@ -93,7 +95,7 @@ class Statementor extends PohodaBankClient
 
     public function getStatements()
     {
-        return $this->obtainer->getStatements();
+        return $this->obtainer->getStatements($this->currency, $this->statementLine);
     }
 
     public function download($format)
@@ -179,6 +181,17 @@ class Statementor extends PohodaBankClient
         return $inserted;
     }
 
+    public static function simpleXmlAttributes(\SimpleXMLElement $item): array
+    {
+        $attributes = [];
+
+        foreach ($item->attributes() as $key => $value) {
+            $attributes[$key] = (string) $value;
+        }
+
+        return $attributes;
+    }
+
     /**
      * Parse Ntry element and convert into \Pohoda\Banka data.
      *
@@ -198,7 +211,15 @@ class Statementor extends PohodaBankClient
         $data['bankType'] = $moveTrans[trim((string) $entry->CdtDbtInd)];
         //        $data['cisDosle', strval($entry->NtryRef));
         //        $data['datVyst', new \DateTime($entry->BookgDt->DtTm));
-        $data['homeCurrency'] = ['priceNone' => abs((float) $entry->Amt)]; // "price3", "price3Sum", "price3VAT", "priceHigh", "priceHighSum", "priceHighVAT", "priceLow", "priceLowSum", "priceLowVAT", "priceNone", "round"
+
+        $amountAttributes = self::simpleXmlAttributes($entry->Amt);
+
+        if (\array_key_exists('Ccy', $amountAttributes) && $amountAttributes['Ccy'] !== 'CZK') {
+            $data['foreignCurrency'] = ['priceSum' => abs((float) $entry->Amt)]; // "price3", "price3Sum", "price3VAT", "priceHigh", "priceHighSum", "priceHighVAT", "priceLow", "priceLowSum", "priceLowVAT", "priceNone", "round"
+            $data['foreignCurrency']['currency'] = $amountAttributes['Ccy'];
+        } else {
+            $data['homeCurrency'] = ['priceNone' => abs((float) $entry->Amt)]; // "price3", "price3Sum", "price3VAT", "priceHigh", "priceHighSum", "priceHighVAT", "priceLow", "priceLowSum", "priceLowVAT", "priceNone", "round"
+        }
 
         // TODO $data['foreignCurrency', abs(floatval($entry->Amt)));
         //        $data['account', $this->bank);
@@ -425,5 +446,24 @@ class Statementor extends PohodaBankClient
     public function takeXmlStatementFile(string $xmlFilePath): void
     {
         $this->statementsXML[basename($xmlFilePath)] = $xmlFilePath;
+    }
+
+    public function setCurrency(string $currency): void
+    {
+        $this->currency = $currency;
+    }
+
+    public function setStatementLine(string $line): void
+    {
+        switch ($line) {
+            case 'MAIN':
+            case 'ADDITIONAL':
+                $this->statementLine = $line;
+
+                break;
+
+            default:
+                throw new \InvalidArgumentException('Wrong statement line: '.$line);
+        }
     }
 }

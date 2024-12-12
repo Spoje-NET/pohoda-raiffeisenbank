@@ -197,7 +197,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function getCurrencyCode()
     {
-        return Shared::cfg('ACCOUNT_CURRENCY', 'CZK');
+        return $this->currency;
     }
 
     /**
