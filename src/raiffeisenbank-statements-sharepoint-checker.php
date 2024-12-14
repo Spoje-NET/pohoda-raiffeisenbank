@@ -30,8 +30,8 @@ require_once '../vendor/autoload.php';
 $options = getopt('o::e::', ['output::environment::']);
 Shared::init(
     [
+        'OFFICE365_TENANT', 'OFFICE365_PATH', 'OFFICE365_SITE',
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
-        'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
     ],
     \array_key_exists('environment', $options) ? $options['environment'] : '../.env',
 );

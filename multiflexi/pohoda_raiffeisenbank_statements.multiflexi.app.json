@@ -36,11 +36,23 @@
             "defval": "",
             "required": true
         },
-        "STATEMENT_IMPORT_SCOPE": {
+        "IMPORT_SCOPE": {
             "type": "text",
             "description": "Time scope of transactions downloaded",
             "defval": "auto",
             "required": true
+        },
+        "STATEMENT_LINE": {
+            "type": "text",
+            "description": "Statement line can be MAIN or ADDITIONAL",
+            "defval": "MAIN",
+            "required": false
+        },
+        "ACCOUNT_CURRENCY": {
+            "type": "text",
+            "description": "for multicurrency accounts please specify one",
+            "defval": "CZK",
+            "required": false
         },
         "XIBMCLIENTID": {
             "type": "text",

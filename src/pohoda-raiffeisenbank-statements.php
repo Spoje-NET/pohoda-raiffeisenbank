@@ -15,6 +15,8 @@ declare(strict_types=1);
 
 namespace Pohoda\RaiffeisenBank;
 
+use Ease\Shared;
+
 require_once '../vendor/autoload.php';
 
 \define('APP_NAME', 'Pohoda RaiffeisenBank Statements');

@@ -30,6 +30,7 @@ require_once '../vendor/autoload.php';
 $options = getopt('o::e::', ['output::environment::']);
 Shared::init(
     [
+        'OFFICE365_TENANT', 'OFFICE365_PATH', 'OFFICE365_SITE',
         'POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO',
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
         'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
@@ -41,7 +42,16 @@ $destination = \array_key_exists('output', $options) ? $options['output'] : \Eas
 PohodaBankClient::checkCertificatePresence(Shared::cfg('CERT_FILE'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
-$engine->logBanner('', 'Scope: '.$engine->scope);
+
+if (Shared::cfg('STATEMENT_LINE')) {
+    $engine->setStatementLine(Shared::cfg('STATEMENT_LINE'));
+}
+
+if (Shared::cfg('ACCOUNT_CURRENCY')) {
+    $engine->setCurrency(Shared::cfg('ACCOUNT_CURRENCY'));
+}
+
+$engine->logBanner(Shared::cfg('ACCOUNT_CURRENCY'), 'Scope: '.$engine->scope);
 $exitcode = 0;
 $fileUrls = [];
 $report = [
@@ -54,7 +64,7 @@ try {
     $pdfStatements = $engine->downloadPDF();
 } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
     $report['mesage'] = $exc->getMessage();
-
+    $pdfStatements = [];
     $exitcode = $exc->getCode();
 
     if (!$exitcode) {
