@@ -107,6 +107,12 @@
             "description": "Default name for Zabbix Item key name",
             "defval": "Raiff-Statement-{ACCOUNT_NUMBER}-inSharepoint",
             "required": false
+        },
+        "EASE_LOGGER": {
+            "type": "string",
+            "description": "write log messages using",
+            "defval": "console|syslog",
+            "required": false
         }
     },
     "multiflexi": "1.20"

@@ -101,6 +101,12 @@
             "description": "Place for PDF files",
             "defval": "",
             "required": false
+        },
+        "EASE_LOGGER": {
+            "type": "string",
+            "description": "write log messages using",
+            "defval": "console|syslog",
+            "required": false
         }
     },
     "multiflexi": "1.10.2.0"

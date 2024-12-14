@@ -197,6 +197,12 @@
             "description": "Default name for Zabbix Item key name",
             "defval": "Raiff-Import-{ACCOUNT_NUMBER}",
             "required": false
+        },
+        "EASE_LOGGER": {
+            "type": "string",
+            "description": "write log messages using",
+            "defval": "console|syslog",
+            "required": false
         }
     },
     "multiflexi": "1.10.2.0"
