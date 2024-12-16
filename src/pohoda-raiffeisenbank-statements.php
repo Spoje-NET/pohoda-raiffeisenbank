@@ -34,9 +34,9 @@ Shared::init(
 );
 $destination = \array_key_exists('output', $options) ? $options['output'] : \Ease\Shared::cfg('RESULT_FILE', 'php://stdout');
 
-PohodaBankClient::checkCertificatePresence(\Ease\Shared::cfg('CERT_FILE'));
-$engine = new Statementor(\Ease\Shared::cfg('ACCOUNT_NUMBER'));
-$engine->setScope(\Ease\Shared::cfg('IMPORT_SCOPE', 'last_month'));
+PohodaBankClient::checkCertificatePresence(Shared::cfg('CERT_FILE'));
+$engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
+$engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 $engine->logBanner('', 'Scope: '.$engine->scope);
 $report = [
     'sharepoint' => [],

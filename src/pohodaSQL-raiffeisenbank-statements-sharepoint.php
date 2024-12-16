@@ -39,7 +39,7 @@ Shared::init(
 );
 $destination = \array_key_exists('output', $options) ? $options['output'] : \Ease\Shared::cfg('RESULT_FILE', 'php://stdout');
 
-PohodaBankClient::checkCertificatePresence(Shared::cfg('CERT_FILE'));
+PohodaBankClient::checkCertificatePresence(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 
@@ -47,11 +47,11 @@ if (Shared::cfg('STATEMENT_LINE')) {
     $engine->setStatementLine(Shared::cfg('STATEMENT_LINE'));
 }
 
-if (Shared::cfg('ACCOUNT_CURRENCY')) {
+if (Shared::cfg('ACCOUNT_CURRENCY', false)) {
     $engine->setCurrency(Shared::cfg('ACCOUNT_CURRENCY'));
 }
 
-$engine->logBanner(Shared::cfg('ACCOUNT_CURRENCY'), 'Scope: '.$engine->scope);
+$engine->logBanner($engine->getAccount().' '.$engine->getCurrencyCode(), 'Scope: '.$engine->scope);
 $exitcode = 0;
 $fileUrls = [];
 $report = [

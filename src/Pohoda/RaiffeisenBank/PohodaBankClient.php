@@ -33,6 +33,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      * DateTime Formating eg. 2021-08-01T10:00:00.0Z.
      */
     public static string $dateFormat = 'Y-m-d';
+    public string $currency;
     protected \DateTime $since;
     protected \DateTime $until;
     protected string $bankIDS;
@@ -65,11 +66,20 @@ abstract class PohodaBankClient extends \mServer\Bank
      * Try to check certificate readability.
      *
      * @param string $certFile path to certificate
+     * @param mixed  $password
      */
-    public static function checkCertificatePresence($certFile): void
+    public static function checkCertificatePresence($certFile, $password): void
     {
         if ((file_exists($certFile) === false) || (is_readable($certFile) === false)) {
             fwrite(\STDERR, 'Cannot read specified certificate file: '.$certFile.\PHP_EOL);
+
+            exit(1);
+        }
+
+        $certContent = file_get_contents($certFile);
+
+        if (openssl_pkcs12_read($certContent, $certs, $password) === false) {
+            fwrite(\STDERR, 'Cannot read PKCS12 certificate file: '.$certFile.\PHP_EOL);
 
             exit(1);
         }

@@ -23,10 +23,11 @@ namespace Pohoda\RaiffeisenBank;
 class Statementor extends PohodaBankClient
 {
     public string $scope = '';
+    public string $statementsDir;
+    public string $currency = '';
+    public string $account;
+    public string $statementLine = 'MAIN';
     private \VitexSoftware\Raiffeisenbank\Statementor $obtainer;
-    private string $statementsDir;
-    private string $currency = '';
-    private string $statementLine = 'MAIN';
 
     /**
      * Downloaded XML statements.
@@ -49,7 +50,9 @@ class Statementor extends PohodaBankClient
      */
     public function __construct(string $bankAccount, array $options = [])
     {
+        $this->account = $bankAccount;
         parent::__construct($bankAccount, $options);
+        $this->setObjectName($bankAccount.'@'.$this->getObjectName());
         $this->obtainer = new \VitexSoftware\Raiffeisenbank\Statementor($bankAccount);
 
         $this->statementsDir = \Ease\Shared::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir().'/rb');
@@ -93,16 +96,22 @@ class Statementor extends PohodaBankClient
         return $statementFilenames;
     }
 
-    public function getStatements()
+    public function getStatements(): array
     {
         return $this->obtainer->getStatements($this->currency, $this->statementLine);
     }
 
-    public function download($format)
+    public function download(string $format): array
     {
         return $this->obtainer->download($this->statementsDir, $this->getStatements(), $format);
     }
 
+    public function downloadOne($statement, $format)
+    {
+        return $this->obtainer->download($this->statementsDir, [$statement], $format);
+    }
+    
+    
     /**
      * Download Raiffeisen bank XML statement.
      *
@@ -411,7 +420,7 @@ class Statementor extends PohodaBankClient
 
         $this->obtainer->since = $this->since;
         $this->obtainer->until = $this->until;
-
+        $this->scope = $scope;
         //        $this->obtainer->setScope(\Ease\Shared::cfg('STATEMENT_IMPORT_SCOPE', 'last_month'));
     }
 
@@ -465,5 +474,10 @@ class Statementor extends PohodaBankClient
             default:
                 throw new \InvalidArgumentException('Wrong statement line: '.$line);
         }
+    }
+
+    public function getAccount()
+    {
+        return $this->account;
     }
 }
