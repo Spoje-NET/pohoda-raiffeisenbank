@@ -86,6 +86,8 @@ class Statementor extends PohodaBankClient
      */
     public function getStatementFilenames(string $format): array
     {
+        $statementFilenames = [];
+
         foreach ($this->getStatements() as $statementFilePath) {
             $statementFilenames[] = str_replace('/', '_', $statementFilePath->statementNumber).'_'.
                     $statementFilePath->accountNumber.'_'.
@@ -110,8 +112,7 @@ class Statementor extends PohodaBankClient
     {
         return $this->obtainer->download($this->statementsDir, [$statement], $format);
     }
-    
-    
+
     /**
      * Download Raiffeisen bank XML statement.
      *

@@ -63,26 +63,48 @@ abstract class PohodaBankClient extends \mServer\Bank
     }
 
     /**
+     * Try to check certificate.
+     *
+     * @param string $certFile path to certificate
+     * @param string $password
+     */
+    public static function checkCertificate($certFile, $password): bool
+    {
+        return self::checkCertificatePresence($certFile) && self::checkCertificatePassword($certFile, $password);
+    }
+
+    /**
      * Try to check certificate readability.
      *
      * @param string $certFile path to certificate
-     * @param mixed  $password
      */
-    public static function checkCertificatePresence($certFile, $password): void
+    public static function checkCertificatePresence($certFile): bool
     {
         if ((file_exists($certFile) === false) || (is_readable($certFile) === false)) {
             fwrite(\STDERR, 'Cannot read specified certificate file: '.$certFile.\PHP_EOL);
 
-            exit(1);
+            return false;
         }
 
+        return true;
+    }
+    /**
+     * Try to check certificate readability.
+     *
+     * @param string $certFile path to certificate
+     * @param string $password
+     */
+    public static function checkCertificatePassword($certFile, $password): bool
+    {
         $certContent = file_get_contents($certFile);
 
         if (openssl_pkcs12_read($certContent, $certs, $password) === false) {
             fwrite(\STDERR, 'Cannot read PKCS12 certificate file: '.$certFile.\PHP_EOL);
 
-            exit(1);
+            return false;
         }
+
+        return true;
     }
 
     /**

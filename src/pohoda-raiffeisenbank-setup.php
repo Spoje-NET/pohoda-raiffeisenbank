@@ -23,4 +23,4 @@ require_once '../vendor/autoload.php';
 $apiInstance = new \VitexSoftware\Raiffeisenbank\PremiumAPI\GetAccountsApi();
 $x_request_id = time(); // string | Unique request id provided by consumer application for reference and auditing.
 
-Transactor::checkCertificatePresence(\Ease\Shared::cfg('CERT_FILE'));
+PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));

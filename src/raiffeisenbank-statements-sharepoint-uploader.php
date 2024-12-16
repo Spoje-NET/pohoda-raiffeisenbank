@@ -37,7 +37,7 @@ Shared::init(
 );
 $destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
-PohodaBankClient::checkCertificatePresence(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
+PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'), ['user' => '', 'password' => '', 'ico' => '', 'url' => '']);
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 
@@ -96,8 +96,8 @@ try {
                     $ctx->executeQuery();
                     $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
                     $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
-                    $report['sharepoint'][basename($filename)] = $uploaded;
-                    $fileUrls[basename($filename)] = $uploaded;
+                    $report['sharepoint'][basename($pdfStatement)] = $uploaded;
+                    $fileUrls[basename($pdfStatement)] = $uploaded;
                 } catch (\Exception $exc) {
                     fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
 
