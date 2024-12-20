@@ -1,8 +1,8 @@
-pohoda-raiffeisenbank (1.2.1) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.2.1) jammy; urgency=medium
 
   * foregin currency use fix
 
- -- vitex <info@vitexsoftware.cz>  Wed, 18 Dec 2024 13:02:20 +0100
+ -- vitex <info@vitexsoftware.cz>  Fri, 20 Dec 2024 11:13:04 +0100
 
 pohoda-raiffeisenbank (1.2.0) jammy; urgency=medium
 
