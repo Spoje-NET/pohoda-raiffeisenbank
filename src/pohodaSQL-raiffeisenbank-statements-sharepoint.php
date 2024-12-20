@@ -108,7 +108,7 @@ if ($pdfStatements) {
         }
     }
 } else {
-    if (null === $pdfStatements) {
+    if (is_null($pdfStatements) ) {
         $engine->addStatusMessage(_('Error obtaining PDF statements'), 'error');
         $exitcode = 2;
     } else {
@@ -127,7 +127,7 @@ try {
 }
 
 if ($xmlStatements) {
-    $inserted = $engine->import(\Ease\Shared::cfg('POHODA_BANK_IDS', ''));
+    $inserted = $engine->import(Shared::cfg('POHODA_BANK_IDS', ''));
     $report['pohoda'] = $inserted;
 
     if ($inserted) {

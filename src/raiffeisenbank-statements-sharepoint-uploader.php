@@ -45,9 +45,10 @@ if (Shared::cfg('ACCOUNT_CURRENCY', false)) {
     $engine->setCurrency(Shared::cfg('ACCOUNT_CURRENCY'));
 }
 
-if(Shared::cfg('APP_DEBUG', false)){
+if (Shared::cfg('APP_DEBUG', false)) {
     $engine->logBanner($engine->getAccount().' '.$engine->getCurrencyCode(), 'Scope: '.$engine->scope);
 }
+
 $exitcode = 0;
 $fileUrls = [];
 $report = [

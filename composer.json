@@ -14,7 +14,7 @@
         "vgrem/php-spo": "^3",
         "vitexsoftware/pohoda-connector": "^0.5",
         "vitexsoftware/rbczpremiumapi": "dev-main",
-        "spojenet/pohoda-sql": "dev-main"
+        "spojenet/pohoda-sql": "^0.1"
     },
     "autoload": {
         "psr-4": {

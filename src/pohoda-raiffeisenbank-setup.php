@@ -15,12 +15,13 @@ declare(strict_types=1);
 
 namespace Pohoda\RaiffeisenBank;
 
+use Ease\Shared;
+
 require_once '../vendor/autoload.php';
 /**
  * Get List of bank accounts and import it into Pohoda.
  */
-\Ease\Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID'], $argv[1] ?? '../.env');
+Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID'], $argv[1] ?? '../.env');
 $apiInstance = new \VitexSoftware\Raiffeisenbank\PremiumAPI\GetAccountsApi();
-$x_request_id = time(); // string | Unique request id provided by consumer application for reference and auditing.
 
 PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
