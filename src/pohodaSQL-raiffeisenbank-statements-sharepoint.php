@@ -51,7 +51,10 @@ if (Shared::cfg('ACCOUNT_CURRENCY', false)) {
     $engine->setCurrency(Shared::cfg('ACCOUNT_CURRENCY'));
 }
 
-$engine->logBanner($engine->getAccount().' '.$engine->getCurrencyCode(), 'Scope: '.$engine->scope);
+if (Shared::cfg('APP_DEBUG', false)) {
+    $engine->logBanner($engine->getAccount().' '.$engine->getCurrencyCode(), 'Scope: '.$engine->scope);
+}
+
 $exitcode = 0;
 $fileUrls = [];
 $report = [
@@ -76,7 +79,6 @@ try {
 
 if ($pdfStatements) {
     sleep(5);
-
     $pdfStatements = $engine->getPdfStatements();
 
     if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
@@ -108,7 +110,7 @@ if ($pdfStatements) {
         }
     }
 } else {
-    if (is_null($pdfStatements) ) {
+    if (null === $pdfStatements) {
         $engine->addStatusMessage(_('Error obtaining PDF statements'), 'error');
         $exitcode = 2;
     } else {
