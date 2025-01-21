@@ -108,6 +108,12 @@
             "defval": "bank_statement_upoad_{ACCOUNT_NUMBER}.json",
             "required": false
         },
+        "APP_DEBUG": {
+            "type": "checkbox",
+            "description": "Show debug messages",
+            "defval": "False",
+            "required": true
+        },
         "ZABBIX_KEY": {
             "type": "string",
             "description": "Default name for Zabbix Item key name",

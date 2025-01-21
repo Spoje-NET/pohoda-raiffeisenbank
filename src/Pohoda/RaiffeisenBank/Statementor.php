@@ -105,12 +105,12 @@ class Statementor extends PohodaBankClient
 
     public function download(string $format): array
     {
-        return $this->obtainer->download($this->statementsDir, $this->getStatements(), $format);
+        return $this->obtainer->download($this->statementsDir, $this->getStatements(), $format, $this->currency);
     }
 
     public function downloadOne($statement, $format)
     {
-        return $this->obtainer->download($this->statementsDir, [$statement], $format);
+        return $this->obtainer->download($this->statementsDir, [$statement], $format, $this->currency);
     }
 
     /**

@@ -20,7 +20,7 @@ use Ease\Shared;
 require_once '../vendor/autoload.php';
 
 \define('APP_NAME', 'Pohoda RaiffeisenBank Statements');
-
+$exitcode = 0;
 /**
  * Get today's Statements list.
  */
