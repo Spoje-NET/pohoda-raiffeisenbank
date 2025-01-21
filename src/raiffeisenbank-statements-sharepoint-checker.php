@@ -33,7 +33,7 @@ Shared::init(
         'OFFICE365_TENANT', 'OFFICE365_PATH', 'OFFICE365_SITE',
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
     ],
-    \array_key_exists('environment', $options) ? $options['environment'] : '../.env',
+    (\array_key_exists('environment', $options) ? $options['environment'] : (array_key_exists('e', $options) ? $options['e'] : '../.env' ))
 );
 $destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 

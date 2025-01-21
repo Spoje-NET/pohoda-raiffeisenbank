@@ -35,7 +35,7 @@ Shared::init(
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
         'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
     ],
-    \array_key_exists('environment', $options) ? $options['environment'] : '../.env',
+    (\array_key_exists('environment', $options) ? $options['environment'] : (array_key_exists('e', $options) ? $options['e'] : '../.env' ))
 );
 $destination = \array_key_exists('output', $options) ? $options['output'] : \Ease\Shared::cfg('RESULT_FILE', 'php://stdout');
 
