@@ -282,6 +282,7 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $producedId = 'n/a';
                 $producedNumber = 'n/a';
                 $producedAction = 'n/a';
+                $result[$this->getDataValue('7170839739')] = $exc->getMessage();
             }
 
             $this->addStatusMessage('Bank #'.$producedId.' '.$producedAction.' '.$producedNumber, $result ? 'success' : 'error'); // TODO: Parse response for docID

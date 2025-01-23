@@ -281,8 +281,6 @@ class Statementor extends PohodaBankClient
                             $this->addStatusMessage(sprintf(_('%s payment without partnerIdentity name'), $paymentAccount['accountNo']));
                         }
                     }
-                } else {
-                    echo ''; // No Related party ?
                 }
 
                 if (property_exists($entry->NtryDtls->TxDtls, 'RltdAgts')) {
