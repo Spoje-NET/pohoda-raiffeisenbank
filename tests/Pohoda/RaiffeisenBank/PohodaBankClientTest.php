@@ -43,14 +43,10 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::sourceString
-     *
-     * @todo   Implement testsourceString().
      */
     public function testsourceString(): void
     {
-        $this->assertEquals('', $this->object->sourceString());
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $this->assertNotEmpty($this->object->sourceString());
     }
 
     /**
@@ -79,14 +75,10 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::getxRequestId
-     *
-     * @todo   Implement testgetxRequestId().
      */
     public function testgetxRequestId(): void
     {
-        $this->assertEquals('', $this->object->getxRequestId());
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $this->assertNotEmpty($this->object->getxRequestId());
     }
 
     /**
