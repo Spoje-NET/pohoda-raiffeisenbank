@@ -163,17 +163,23 @@ class Statementor extends PohodaBankClient
             $statementNumberLong = current((array) $statementXML->BkToCstmrStmt->Stmt->Id);
             $entries = 0;
 
+            $statementNumber = $statementXML->BkToCstmrStmt->Stmt->LglSeqNb;
+            $statementCreated = new \DateTime((string) $statementXML->BkToCstmrStmt->Stmt->CreDtTm);
+            
+            $this->addStatusMessage( sprintf('Parsing statement %s no. %d created %s', $statementNumberLong , $statementNumber, $statementCreated->format('c')),'debug');
+
             foreach ($statementXML->BkToCstmrStmt->Stmt->Ntry as $entry) {
                 ++$entries;
                 $this->dataReset();
                 $this->setData($this->entryToPohoda($entry));
-                [$statementNumber, $statementYear] = explode('_', $statementFileName);
-                $this->setDataValue('statementNumber', ['statementNumber' => $statementNumber.'/'.$statementYear]); // TODO: Optional by switch ?
+
+                $this->setDataValue('statementNumber', ['statementNumber' => sprintf('%03d/%d', (int) $statementNumber, (int) $statementCreated->format('Y'))]);
                 //                $this->setDataValue('account', current((array) $entry->NtryRef));
                 //                $this->setDataValue('vypisCisDokl', $statementXML->BkToCstmrStmt->Stmt->Id);
                 //                $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
 
                 try {
+                    $this->addStatusMessage(sprintf('Inserting [%s] %s %s',   ($this->getDataValue('bankType') == 'receipt' ? '+' : '-'), (string)$this->getDataValue('text'), $this->getDataValue('symPar')));
                     $lastInsert = $this->insertTransactionToPohoda($bankIds);
 
                     if ($lastInsert) {
@@ -213,7 +219,7 @@ class Statementor extends PohodaBankClient
     public function entryToPohoda(\SimpleXMLElement $entry): array
     {
         $data['symPar'] = current((array) $entry->NtryRef);
-        $data['intNote'] = 'Imported by '.\Ease\Shared::AppName().' '.\Ease\Shared::AppVersion().' Import Job '.\Ease\Shared::cfg('MULTIFLEXI_JOB_ID', \Ease\Shared::cfg('JOB_ID', 'n/a'));
+        $data['intNote'] = sprintf(_('Imported by %s %s  Import Job %s'), \Ease\Shared::AppName(), \Ease\Shared::AppVersion(), \Ease\Shared::cfg('MULTIFLEXI_JOB_ID', \Ease\Shared::cfg('JOB_ID', 'n/a')));
         $data['note'] = '';
         $data['datePayment'] = current((array) $entry->BookgDt->DtTm); // current((array) $entry->ValDt->DtTm);
         $data['dateStatement'] = current((array) $entry->BookgDt->DtTm);
@@ -453,7 +459,11 @@ class Statementor extends PohodaBankClient
 
     public function takeXmlStatementFile(string $xmlFilePath): void
     {
-        $this->statementsXML[basename($xmlFilePath)] = $xmlFilePath;
+        if (file_exists($xmlFilePath) && is_readable($xmlFilePath)) {
+            $this->statementsXML[basename($xmlFilePath)] = $xmlFilePath;
+        } else {
+            throw new \Exception(sprintf('File %s is not readable', $xmlFilePath));
+        }
     }
 
     public function setCurrency(string $currency): void

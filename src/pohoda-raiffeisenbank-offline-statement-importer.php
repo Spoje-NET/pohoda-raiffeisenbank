@@ -15,29 +15,31 @@ declare(strict_types=1);
 
 namespace Pohoda\RaiffeisenBank;
 
+use Ease\Shared;
+
 require_once '../vendor/autoload.php';
 
 \define('APP_NAME', 'Pohoda RaiffeisenBank Offline Statements');
 
 $exitcode = 0;
 $options = getopt('i::e::', ['input::environment::']);
-$statementFile = \array_key_exists('i', $options) ? $options['i'] : (\array_key_exists('input', $options) ? $options['input'] : \Ease\Shared::cfg('STATEMENT_FILE', 'php://stdin'));
-$destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_exists('output', $options) ? $options['output'] : \Ease\Shared::cfg('RESULT_FILE', 'php://stdout'));
+$statementFile = \array_key_exists('i', $options) ? $options['i'] : (\array_key_exists('input', $options) ? $options['input'] : Shared::cfg('STATEMENT_FILE', 'php://stdin'));
+$destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout'));
 
 /**
  * Get today's Statements list.
  */
 \Ease\Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'POHODA_BANK_IDS', 'ACCOUNT_NUMBER'], \array_key_exists('environment', $options) ? $options['environment'] : '../.env');
-$engine = new Statementor(\Ease\Shared::cfg('ACCOUNT_NUMBER'));
+$engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
 $engine->logBanner('', 'Importing file: '.$statementFile);
 
 $report['input'] = $statementFile;
 
 $engine->takeXmlStatementFile($statementFile);
 
-$report['inserted'] = $engine->import(\Ease\Shared::cfg('POHODA_BANK_IDS', ''));
+$report['inserted'] = $engine->import(Shared::cfg('POHODA_BANK_IDS', ''));
 
-$written = file_put_contents($destination, json_encode($report, \Ease\Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
+$written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
 $engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');
 
 exit($exitcode);

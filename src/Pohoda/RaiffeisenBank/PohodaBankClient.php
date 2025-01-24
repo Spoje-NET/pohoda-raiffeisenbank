@@ -340,10 +340,6 @@ abstract class PohodaBankClient extends \mServer\Bank
 
         file_put_contents($this->xmlCache, $this->generateAutomaticLiquidationXML($producedNumber));
 
-        if ($this->debug) {
-            fpassthru(fopen($this->xmlCache, 'rb'));
-        }
-
         $this->addStatusMessage('Automatic liquidation', 'success');
 
         $this->setPostFields(file_get_contents($this->xmlCache));

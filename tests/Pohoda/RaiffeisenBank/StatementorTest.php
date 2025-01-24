@@ -47,6 +47,7 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
     public function testimportXML(): void
     {
         $this->assertIsArray($this->object->importXML('../tests/194_2024_630804003_3780381_CZK_2024-11-06.xml'));
+        $this->assertIsArray($this->object->importXML('../tests/testczk.xml'));
     }
 
     /**
