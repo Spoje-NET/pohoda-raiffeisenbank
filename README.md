@@ -1,5 +1,4 @@
-Raiffeisenbank for Stormware Pohoda
-===================================
+# Raiffeisenbank for Stormware Pohoda
 
 ![](pohoda-raiffeisenbank.svg?raw=true)
 
@@ -13,8 +12,7 @@ When using PohodaSQL, links to PDF statements are attached to all movements.
 
 [![wakatime](https://wakatime.com/badge/user/5abba9ca-813e-43ac-9b5f-b1cfdf3dc1c7/project/018b7d35-a10b-4f4b-ba78-241d1c79b4e6.svg)](https://wakatime.com/badge/user/5abba9ca-813e-43ac-9b5f-b1cfdf3dc1c7/project/018b7d35-a10b-4f4b-ba78-241d1c79b4e6)
 
-Requirements
-------------
+## Requirements
 
 * php 8.1+
 * Pohoda (Pohoda SQL for full functionality) + [mServer](https://www.stormware.cz/pohoda/xml/mserver/)
@@ -22,21 +20,21 @@ Requirements
 * MSSQL login and password
 * [php-sqlsrv](https://learn.microsoft.com/en-us/sql/connect/php/microsoft-php-driver-for-sql-server?view=sql-server-ver16)
 
-Setup command
--------------
+## Setup command
 
 Check certificate presence yet.
 
-Transactions tool
------------------
+## Transactions tool
 
 Import Bank movements from RaiffeisenBank (using [getTransactionList](https://developers.rb.cz/premium/documentation/01rbczpremiumapi#/Get%20Transaction%20List/getTransactionList) as source)
-to Pohoda using mServer 
+to Pohoda using mServer
 
 ![Transactions](transactions.png?raw=true)
 
-Configuration
--------------
+## Configuration
+
+Configuration is stored in `.env` file in the working directory. You can use `.env.example` as template.
+When the configuration file is missing, the application will try to use environment variables.
 
 ```env
 EASE_LOGGER=syslog|console
@@ -53,6 +51,10 @@ API_DEBUG=True
 APP_DEBUG=True
 STATEMENT_LINE=ADDITIONAL
 STATEMENT_SAVE_DIR=/tmp/rb
+
+CNB_CACHE=http://localhost/cnb-cache/
+RATE_OFFSET=today
+FIXED_RATE=25.1
 
 POHODA_ICO=12345678
 POHODA_URL=http://10.11.25.25:10010
@@ -72,35 +74,41 @@ DB_PASSWORD=pohodaSQLpassword
 DB_SETTINGS=encrypt=false
 ```
 
-Import Scopes
--------------
+## Import Scopes
 
-  * `today` 
-  * `yesterday`
-  * `last_week`
-  * `last_month`
-  * `last_two_months`
-  * `previous_month` 
-  * `two_months_ago`
-  * `this_year` (statements only)
-  * `January`  (statements only)
-  * `February` (statements only)
-  * `March` (statements only)
-  * `April` (statements only)
-  * `May` (statements only)
-  * `June` (statements only)
-  * `July` (statements only)
-  * `August` (statements only)
-  * `September` (statements only)
-  * `October` (statements only)
-  * `November` (statements only)
-  * `December` (statements only)
-  * `auto`
-  * `2024-08-05>2024-08-11` - custom scope 
-  * `2024-10-11` - only specific day
+* `today`
+* `yesterday`
+* `last_week`
+* `last_month`
+* `last_two_months`
+* `previous_month`
+* `two_months_ago`
+* `this_year` (statements only)
+* `January`  (statements only)
+* `February` (statements only)
+* `March` (statements only)
+* `April` (statements only)
+* `May` (statements only)
+* `June` (statements only)
+* `July` (statements only)
+* `August` (statements only)
+* `September` (statements only)
+* `October` (statements only)
+* `November` (statements only)
+* `December` (statements only)
+* `auto`
+* `2024-08-05>2024-08-11` - custom scope
+* `2024-10-11` - only specific day
 
-Sharepoint Integration
-----------------------
+## Foregin Currency Transactions
+
+If you have transactions in foreign currency, you can use `FIXED_RATE` to convert them to CZK using preconfigured fixed rate.
+Otherwise you can use `CNB_CACHE` to get actual rate from CNB.
+Then you can also need to specify `RATE_OFFSET`=yesterday to get rate for previous day.
+
+[For CNB currency rates you need to have running CNB cache server!](https://github.com/Spoje-NET/CNB-Cache)
+
+## Sharepoint Integration
 
 Login based auth
 
@@ -125,37 +133,31 @@ OFFICE365_SITE=YourSite
 OFFICE365_PATH='Shared documents/statements'
 ```
 
-Into configuration file .env please put ClientID **OR** Login/Password values. 
+Into configuration file .env please put ClientID **OR** Login/Password values.
 
-Exitcodes
----------
+## ExitCodes
 
 254 - Another Exception without numeric code Ocurred
 
+## Powered by
 
-Powered by
-----------
+* <https://github.com/VitexSoftware/php-vitexsoftware-rbczpremiumapi>
+* <https://github.com/Spoje-NET/PohodaSQL>
+* <https://github.com/VitexSoftware/PHP-Pohoda-Connector>
 
-* https://github.com/VitexSoftware/php-vitexsoftware-rbczpremiumapi
-* https://github.com/Spoje-NET/PohodaSQL
-* https://github.com/VitexSoftware/PHP-Pohoda-Connector
+## See also
 
-See also
---------
+* <https://github.com/Spoje-NET/pohoda-client-checker>
+* <https://github.com/Spoje-NET/raiffeisenbank-statement-tools>
 
-* https://github.com/Spoje-NET/pohoda-client-checker
-* https://github.com/Spoje-NET/raiffeisenbank-statement-tools
-
-MultiFlexi
-----------
+## MultiFlexi
 
 Pohoda RaiffeisenBank is ready for run as [MultiFlexi](https://multiflexi.eu) application.
 See the full list of ready-to-run applications within the MultiFlexi platform on the [application list page](https://www.multiflexi.eu/apps.php).
 
 [![MultiFlexi App](https://github.com/VitexSoftware/MultiFlexi/blob/main/doc/multiflexi-app.svg)](https://www.multiflexi.eu/apps.php)
 
-Debian/Ubuntu installation
---------------------------
+## Debian/Ubuntu installation
 
 Please use the .deb packages. The repository is availble:
 
@@ -168,8 +170,9 @@ Please use the .deb packages. The repository is availble:
 
 Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
 
-  * **pohoda-raiffeisenbank-setup**         - check and/or prepare Bank account setup in Pohoda
-  * **pohoda-raiffeisenbank-transactions**  - Import transactions. From latest imported or within the given scope
-  * **pohoda-raiffeisenbank-statements**    - Import transactions from Account Statements.
-  * **pohoda-raiffeisenbank-xml-statement** - Import transactions from XML Statements file.
-  * **pohodasql-raiffeisenbank-statements-sharepoint** - Import transactions from Account Statements with link to Sharepoint
+* **pohoda-raiffeisenbank-setup**         - check and/or prepare Bank account setup in Pohoda
+* **pohoda-raiffeisenbank-transactions**  - Import transactions. From latest imported or within the given scope
+* **pohoda-raiffeisenbank-statements**    - Import transactions from Account Statements.
+* **pohoda-raiffeisenbank-offline-statement-importer** - Import transactions from XML Statements file.
+* **pohoda-raiffeisenbank-xml-statement** - Import transactions from XML Statements file.
+* **pohodasql-raiffeisenbank-statements-sharepoint** - Import transactions from Account Statements with link to Sharepoint

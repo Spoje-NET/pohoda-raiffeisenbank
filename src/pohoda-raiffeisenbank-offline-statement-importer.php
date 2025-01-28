@@ -30,18 +30,24 @@ $destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_ex
  */
 \Ease\Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'POHODA_BANK_IDS', 'ACCOUNT_NUMBER'], \array_key_exists('environment', $options) ? $options['environment'] : '../.env');
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
-$engine->logBanner('', 'Importing file: '.$statementFile);
+$engine->logBanner('', 'Importing file: ' . $statementFile);
 
 $report['input'] = $statementFile;
 
-$engine->takeXmlStatementFile($statementFile);
+if ($statementFile) {
+    $engine->takeXmlStatementFile($statementFile);
 
-$report['inserted'] = $engine->import(Shared::cfg('POHODA_BANK_IDS', ''));
-$report['messages'] = $engine->getMessages();
-$report['exitcode'] = $engine->getExitCode();
-$exitcode = $engine->getExitCode();
+    $report['inserted'] = $engine->import(Shared::cfg('POHODA_BANK_IDS', ''));
+    $report['messages'] = $engine->getMessages();
+    $report['exitcode'] = $engine->getExitCode();
 
-$written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
-$engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');
+    $exitcode = $engine->getExitCode();
+
+    $written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
+    $engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');
+} else {
+    $exitcode = 1;
+    fwrite(fopen('php://stderr', 'wb'), 'No input file (-i) provided. (cwd: '.getcwd().')'.\PHP_EOL);
+}
 
 exit($exitcode);

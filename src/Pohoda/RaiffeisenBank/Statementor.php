@@ -24,7 +24,7 @@ class Statementor extends PohodaBankClient
 {
     public string $scope = '';
     public string $statementsDir;
-    public string $currency = '';
+    public string $currency = 'CZK';
     public string $account;
     public string $statementLine = 'MAIN';
     private \VitexSoftware\Raiffeisenbank\Statementor $obtainer;
@@ -42,11 +42,14 @@ class Statementor extends PohodaBankClient
      * @var array<string, string>
      */
     private array $statementsPDF = [];
+    protected string $cnbCache = '';
+    private float $fixedRate = 0;
+    private int $rateOffset = 0;
 
     /**
      * Bank Statement Helper.
      *
-     * @param array<string, string> $options
+     * @param array<string, string> $options cnbCache,fixedRate,currency
      */
     public function __construct(string $bankAccount, array $options = [])
     {
@@ -54,11 +57,19 @@ class Statementor extends PohodaBankClient
         parent::__construct($bankAccount, $options);
         $this->setObjectName($bankAccount.'@'.$this->getObjectName());
         $this->obtainer = new \VitexSoftware\Raiffeisenbank\Statementor($bankAccount);
-
+        $this->setupProperty($options,'currency','ACCOUNT_CURRENCY');
+        $this->setupProperty($options,'cnbCache','CNB_CACHE');
+        $this->setupFloatProperty($options,'fixedRate','FIXED_RATE');
+        $this->rateOffset = \Ease\Shared::cfg('RATE_OFFSET') == 'yesterday' ? 1 : 0;
+        
+        if(($this->currency != 'CZK')  && empty($this->fixedRate) && empty($this->cnbCache)){
+            throw new \InvalidArgumentException(_('No FIXED_RATE or CNB_CACHE specified for foregin currency'));
+        }
+        
         $this->statementsDir = \Ease\Shared::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir().'/rb');
 
         if (file_exists($this->statementsDir) === false) {
-            mkdir($this->statementsDir, 0777, true);
+            $this->addStatusMessage(sprintf(_('Creating Statements directory'), $this->statementsDir, mkdir($this->statementsDir, 0777, true) ? 'success' : 'error' ));
         }
     }
 
@@ -234,6 +245,7 @@ class Statementor extends PohodaBankClient
         if (\array_key_exists('Ccy', $amountAttributes) && $amountAttributes['Ccy'] !== 'CZK') {
             $data['foreignCurrency'] = ['priceSum' => abs((float) $entry->Amt)]; // "price3", "price3Sum", "price3VAT", "priceHigh", "priceHighSum", "priceHighVAT", "priceLow", "priceLowSum", "priceLowVAT", "priceNone", "round"
             $data['foreignCurrency']['currency'] = $amountAttributes['Ccy'];
+            $rate = $this->getMovementRate(new \DateTime($data['datePayment']));
         } else {
             $data['homeCurrency'] = ['priceNone' => abs((float) $entry->Amt)]; // "price3", "price3Sum", "price3VAT", "priceHigh", "priceHighSum", "priceHighVAT", "priceLow", "priceLowSum", "priceLowVAT", "priceNone", "round"
         }
@@ -494,5 +506,22 @@ class Statementor extends PohodaBankClient
     public function getMessages()
     {
         return $this->messages;
+    }
+
+    public function getMovementRate(\DateTime $movementDate)
+    {
+/*        
+CNB_CACHE=http://localhost/cnb-cache/
+RATE_OFFSET=today
+FIXED_RATE=25.1
+*/      
+            
+        
+            if($this->cnb_cache){
+                
+            } else {
+                
+            }
+        
     }
 }
