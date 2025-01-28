@@ -37,6 +37,7 @@ abstract class PohodaBankClient extends \mServer\Bank
     protected \DateTime $since;
     protected \DateTime $until;
     protected string $bankIDS;
+    private $exitCode = 0;
 
     /**
      * Transaction Handler.
@@ -261,6 +262,7 @@ abstract class PohodaBankClient extends \mServer\Bank
         if ($this->checkForTransactionPresence() === false) {
             try {
                 $cache = $this->getData();
+                $result['id'] = $this->getDataValue('symPar');
                 $this->reset();
 
                 // TODO: $result = $this->sync();
@@ -274,18 +276,31 @@ abstract class PohodaBankClient extends \mServer\Bank
                     $producedId = $this->response->producedDetails['id'];
                     $producedNumber = $this->response->producedDetails['number'];
                     $producedAction = $this->response->producedDetails['actionType'];
-                    $result[$producedId] = $this->response->producedDetails;
-                    $result[$producedId]['messages'] = $this->response->messages;
+                    $result['details'] = $this->response->producedDetails;
+                    $result['messages'] = $this->response->messages;
                     $this->automaticLiquidation($producedNumber);
+                    $this->addStatusMessage('Bank #'.$producedId.' '.$producedAction.' '.$producedNumber, 'success'); // TODO: Parse response for docID
+                    $result['success'] = true;
+                } else {
+                    $result['success'] = false;
+                    $resultMessages = $this->messages;
+
+                    if (\array_key_exists('error', $resultMessages) && \count($resultMessages['error'])) {
+                        foreach ($resultMessages['error'] as $errMsg) {
+                            $result['messages'][] = 'error: '.$errMsg;
+                        }
+
+                        $this->exitCode = 401;
+                    }
                 }
             } catch (\Exception $exc) {
                 $producedId = 'n/a';
                 $producedNumber = 'n/a';
                 $producedAction = 'n/a';
-                $result[$this->getDataValue('symPar')] = $exc->getMessage();
+                $result['message'] = $exc->getMessage();
+                $result['success'] = false;
+                $this->exitCode = $exc->getCode() ?: 254;
             }
-
-            $this->addStatusMessage('Bank #'.$producedId.' '.$producedAction.' '.$producedNumber, $result ? 'success' : 'error'); // TODO: Parse response for docID
         } else {
             $this->addStatusMessage('Record with remoteNumber TODO already present in Pohoda', 'warning');
         }
@@ -395,6 +410,11 @@ EOD;
         $ruleOfPairing->addChild('id', '1', 'http://www.stormware.cz/schema/version_2/type.xsd');
 
         return $xml->asXML();
+    }
+
+    public function getExitCode(): int
+    {
+        return $this->exitCode;
     }
 
     public function getCompanyId(): string

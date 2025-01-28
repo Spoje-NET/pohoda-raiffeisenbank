@@ -127,6 +127,12 @@ OFFICE365_PATH='Shared documents/statements'
 
 Into configuration file .env please put ClientID **OR** Login/Password values. 
 
+Exitcodes
+---------
+
+254 - Another Exception without numeric code Ocurred
+
+
 Powered by
 ----------
 

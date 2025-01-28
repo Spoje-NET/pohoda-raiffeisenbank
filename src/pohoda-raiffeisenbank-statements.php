@@ -60,6 +60,12 @@ try {
 }
 
 $inserted = $engine->import();
+$report['messages'] = $engine->getMessages();
+$report['exitcode'] = $engine->getExitCode();
+
+if ($engine->getExitCode()) {
+    $exitcode = $engine->getExitCode();
+}
 
 $written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
 $engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');

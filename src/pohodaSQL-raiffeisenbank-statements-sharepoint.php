@@ -132,6 +132,13 @@ if ($xmlStatements) {
     $inserted = $engine->import(Shared::cfg('POHODA_BANK_IDS', ''));
     $report['pohoda'] = $inserted;
 
+    $report['messages'] = $engine->getMessages();
+    $report['exitcode'] = $engine->getExitCode();
+
+    if ($engine->getExitCode()) {
+        $exitcode = $engine->getExitCode();
+    }
+
     if ($inserted) {
         if ($fileUrls) {
             $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'), \count($inserted)), 'debug');

@@ -165,8 +165,8 @@ class Statementor extends PohodaBankClient
 
             $statementNumber = $statementXML->BkToCstmrStmt->Stmt->LglSeqNb;
             $statementCreated = new \DateTime((string) $statementXML->BkToCstmrStmt->Stmt->CreDtTm);
-            
-            $this->addStatusMessage( sprintf('Parsing statement %s no. %d created %s', $statementNumberLong , $statementNumber, $statementCreated->format('c')),'debug');
+
+            $this->addStatusMessage(sprintf('Parsing statement %s no. %d created %s', $statementNumberLong, $statementNumber, $statementCreated->format('c')), 'debug');
 
             foreach ($statementXML->BkToCstmrStmt->Stmt->Ntry as $entry) {
                 ++$entries;
@@ -179,10 +179,11 @@ class Statementor extends PohodaBankClient
                 //                $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
 
                 try {
-                    $this->addStatusMessage(sprintf('Inserting [%s] %s %s',   ($this->getDataValue('bankType') == 'receipt' ? '+' : '-'), (string)$this->getDataValue('text'), $this->getDataValue('symPar')));
+                    $this->addStatusMessage(sprintf('Inserting [%s] %s %s', $this->getDataValue('bankType') === 'receipt' ? '+' : '-', (string) $this->getDataValue('text'), $this->getDataValue('symPar')));
                     $lastInsert = $this->insertTransactionToPohoda($bankIds);
+                    $this->messages[$lastInsert['id']] = $lastInsert;
 
-                    if ($lastInsert) {
+                    if ($lastInsert['success']) {
                         $inserted[key($lastInsert)] = current($lastInsert);
                         ++$success;
                     }
@@ -488,5 +489,10 @@ class Statementor extends PohodaBankClient
     public function getAccount()
     {
         return $this->account;
+    }
+
+    public function getMessages()
+    {
+        return $this->messages;
     }
 }
