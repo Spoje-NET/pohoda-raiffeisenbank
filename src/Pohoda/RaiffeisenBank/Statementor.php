@@ -27,6 +27,10 @@ class Statementor extends PohodaBankClient
     public string $currency = 'CZK';
     public string $account;
     public string $statementLine = 'MAIN';
+    protected string $cnbCache = '';
+    protected float $fixedRate = 0;
+    protected int $fixedRateAmount = 1;
+    protected int $rateOffset = 0;
     private \VitexSoftware\Raiffeisenbank\Statementor $obtainer;
 
     /**
@@ -42,9 +46,6 @@ class Statementor extends PohodaBankClient
      * @var array<string, string>
      */
     private array $statementsPDF = [];
-    protected string $cnbCache = '';
-    private float $fixedRate = 0;
-    private int $rateOffset = 0;
 
     /**
      * Bank Statement Helper.
@@ -57,19 +58,20 @@ class Statementor extends PohodaBankClient
         parent::__construct($bankAccount, $options);
         $this->setObjectName($bankAccount.'@'.$this->getObjectName());
         $this->obtainer = new \VitexSoftware\Raiffeisenbank\Statementor($bankAccount);
-        $this->setupProperty($options,'currency','ACCOUNT_CURRENCY');
-        $this->setupProperty($options,'cnbCache','CNB_CACHE');
-        $this->setupFloatProperty($options,'fixedRate','FIXED_RATE');
-        $this->rateOffset = \Ease\Shared::cfg('RATE_OFFSET') == 'yesterday' ? 1 : 0;
-        
-        if(($this->currency != 'CZK')  && empty($this->fixedRate) && empty($this->cnbCache)){
+        $this->setupProperty($options, 'currency', 'ACCOUNT_CURRENCY');
+        $this->setupProperty($options, 'cnbCache', 'CNB_CACHE');
+        $this->setupFloatProperty($options, 'fixedRate', 'FIXED_RATE');
+        $this->setupIntProperty($options, 'fixedRateAmount', 'FIXED_RATE_AMOUNT');
+        $this->rateOffset = \Ease\Shared::cfg('RATE_OFFSET') === 'yesterday' ? 1 : 0;
+
+        if (($this->currency !== 'CZK') && empty($this->fixedRate) && empty($this->cnbCache)) {
             throw new \InvalidArgumentException(_('No FIXED_RATE or CNB_CACHE specified for foregin currency'));
         }
-        
+
         $this->statementsDir = \Ease\Shared::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir().'/rb');
 
         if (file_exists($this->statementsDir) === false) {
-            $this->addStatusMessage(sprintf(_('Creating Statements directory'), $this->statementsDir, mkdir($this->statementsDir, 0777, true) ? 'success' : 'error' ));
+            $this->addStatusMessage(sprintf(_('Creating Statements directory'), $this->statementsDir, mkdir($this->statementsDir, 0777, true) ? 'success' : 'error'));
         }
     }
 
@@ -245,7 +247,10 @@ class Statementor extends PohodaBankClient
         if (\array_key_exists('Ccy', $amountAttributes) && $amountAttributes['Ccy'] !== 'CZK') {
             $data['foreignCurrency'] = ['priceSum' => abs((float) $entry->Amt)]; // "price3", "price3Sum", "price3VAT", "priceHigh", "priceHighSum", "priceHighVAT", "priceLow", "priceLowSum", "priceLowVAT", "priceNone", "round"
             $data['foreignCurrency']['currency'] = $amountAttributes['Ccy'];
-            $rate = $this->getMovementRate(new \DateTime($data['datePayment']));
+            $rateInfo = $this->getRateInfo(new \DateTime($data['datePayment']));
+
+            $data['foreignCurrency']['rate'] = $rateInfo['rate'];
+            $data['foreignCurrency']['amount'] = $rateInfo['amount'];
         } else {
             $data['homeCurrency'] = ['priceNone' => abs((float) $entry->Amt)]; // "price3", "price3Sum", "price3VAT", "priceHigh", "priceHighSum", "priceHighVAT", "priceLow", "priceLowSum", "priceLowVAT", "priceNone", "round"
         }
@@ -508,20 +513,26 @@ class Statementor extends PohodaBankClient
         return $this->messages;
     }
 
-    public function getMovementRate(\DateTime $movementDate)
+    public function getRateInfo(\DateTime $movementDate): array
     {
-/*        
-CNB_CACHE=http://localhost/cnb-cache/
-RATE_OFFSET=today
-FIXED_RATE=25.1
-*/      
-            
-        
-            if($this->cnb_cache){
-                
+        if ($this->fixedRate) {
+            $rateInfo = ['rate' => $this->fixedRate, 'amount' => $this->fixedRateAmount];
+        } else {
+            if ($this->rateOffset) {
+                $date = $movementDate->modify('-'.$this->rateOffset.' day')->format('Y-m-d');
             } else {
-                
+                $date = $movementDate->format('Y-m-d');
             }
-        
+
+            $rateInfoRaw = file_get_contents(\Ease\Functions::addUrlParams($this->cnbCache, ['currency' => $this->currency, 'date' => $date]));
+
+            if (\is_string($rateInfoRaw) && json_validate($rateInfoRaw)) {
+                $rateInfo = json_decode($rateInfoRaw, true);
+            } else {
+                throw new \RuntimeException(sprintf(_('CNB_CACHE'), $this->cnbCache));
+            }
+        }
+
+        return $rateInfo;
     }
 }

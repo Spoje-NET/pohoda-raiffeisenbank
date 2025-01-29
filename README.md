@@ -55,6 +55,8 @@ STATEMENT_SAVE_DIR=/tmp/rb
 CNB_CACHE=http://localhost/cnb-cache/
 RATE_OFFSET=today
 FIXED_RATE=25.1
+FIXED_RATE_AMOUNT=1
+
 
 POHODA_ICO=12345678
 POHODA_URL=http://10.11.25.25:10010
@@ -103,8 +105,10 @@ DB_SETTINGS=encrypt=false
 ## Foregin Currency Transactions
 
 If you have transactions in foreign currency, you can use `FIXED_RATE` to convert them to CZK using preconfigured fixed rate.
+(for some currencies eg. 💴 you can use FIXED_RATE_AMOUNT=100)
+
 Otherwise you can use `CNB_CACHE` to get actual rate from CNB.
-Then you can also need to specify `RATE_OFFSET`=yesterday to get rate for previous day.
+In this case you can also need to specify `RATE_OFFSET`=yesterday to get rate for previous day.
 
 [For CNB currency rates you need to have running CNB cache server!](https://github.com/Spoje-NET/CNB-Cache)
 

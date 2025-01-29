@@ -30,7 +30,10 @@ $destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_ex
  */
 \Ease\Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'POHODA_BANK_IDS', 'ACCOUNT_NUMBER'], \array_key_exists('environment', $options) ? $options['environment'] : '../.env');
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
-$engine->logBanner('', 'Importing file: ' . $statementFile);
+
+if (Shared::cfg('APP_DEBUG')) {
+    $engine->logBanner('', 'Importing file: '.$statementFile);
+}
 
 $report['input'] = $statementFile;
 
