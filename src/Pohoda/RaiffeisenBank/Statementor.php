@@ -529,7 +529,7 @@ class Statementor extends PohodaBankClient
             if (\is_string($rateInfoRaw) && json_validate($rateInfoRaw)) {
                 $rateInfo = json_decode($rateInfoRaw, true);
             } else {
-                throw new \RuntimeException(sprintf(_('CNB_CACHE'), $this->cnbCache));
+                throw new \RuntimeException(sprintf(_('No ČNB Cache Json on %s: %s'), $this->cnbCache,$rateInfoRaw));
             }
         }
 
