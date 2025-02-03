@@ -42,6 +42,31 @@
             "defval": "",
             "required": true
         },
+        "FIXED_RATE": {
+            "type": "number",
+            "description": "Fixed rate for converting foreign currency transactions to CZK",
+            "defval": "",
+            "required": false
+        },
+        "FIXED_RATE_AMOUNT": {
+            "type": "number",
+            "description": "Fixed rate amount for some currencies (e.g., 💴)",
+            "defval": "100",
+            "required": false
+        },
+        "CNB_CACHE": {
+            "type": "text",
+            "description": "Use CNB cache to get actual rate from CNB",
+            "defval": "http://localhost/cnb-cache",
+            "required": false
+        },
+        "RATE_OFFSET": {
+            "type": "text",
+            "description": "Rate offset to get rate for previous day",
+            "defval": "yesterday",
+            "required": false
+        },
+
         "POHODA_ICO": {
             "type": "text",
             "description": "Pohoda ICO",
