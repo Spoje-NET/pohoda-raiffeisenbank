@@ -68,7 +68,7 @@ class Statementor extends PohodaBankClient
             throw new \InvalidArgumentException(_('No FIXED_RATE or CNB_CACHE specified for foregin currency'));
         }
 
-        $this->statementsDir = \Ease\Shared::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir().'/rb');
+        $this->statementsDir = \Ease\Shared::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir());
 
         if (file_exists($this->statementsDir) === false) {
             $this->addStatusMessage(sprintf(_('Creating Statements directory'), $this->statementsDir, mkdir($this->statementsDir, 0777, true) ? 'success' : 'error'));
@@ -529,7 +529,7 @@ class Statementor extends PohodaBankClient
             if (\is_string($rateInfoRaw) && json_validate($rateInfoRaw)) {
                 $rateInfo = json_decode($rateInfoRaw, true);
             } else {
-                throw new \RuntimeException(sprintf(_('No ČNB Cache Json on %s: %s'), $this->cnbCache,$rateInfoRaw));
+                throw new \RuntimeException(sprintf(_('No ČNB Cache Json on %s: %s'), $this->cnbCache, $rateInfoRaw));
             }
         }
 

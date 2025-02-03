@@ -40,7 +40,11 @@ $destination = \array_key_exists('output', $options) ? $options['output'] : Shar
 PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'), ['user' => '', 'password' => '', 'ico' => '', 'url' => '']);
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
-$engine->logBanner('', 'Scope: '.$engine->scope);
+
+if (Shared::cfg('APP_DEBUG')) {
+    $engine->logBanner('', 'Scope: '.$engine->scope);
+}
+
 $exitcode = 0;
 $fileUrls = [];
 $report = [

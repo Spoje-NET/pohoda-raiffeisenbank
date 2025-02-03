@@ -135,34 +135,38 @@ if ($xmlStatements) {
         $exitcode = $engine->getExitCode();
     }
 
-    if ($inserted) {
-        if ($fileUrls) {
-            $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'), \count($inserted)), 'debug');
+    if (\is_string($inserted)) {
+        $this->addStatusMessage('Statement Inserting ends with string ?!?: '.$inserted, 'error');
+    } else {
+        if ($inserted) {
+            if ($fileUrls) {
+                $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'), \count($inserted)), 'debug');
 
-            $doc = new \SpojeNet\PohodaSQL\DOC();
-            $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
+                $doc = new \SpojeNet\PohodaSQL\DOC();
+                $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
 
-            $filename = key($fileUrls);
-            $sharepointUri = current($fileUrls);
+                $filename = key($fileUrls);
+                $sharepointUri = current($fileUrls);
 
-            foreach ($inserted as $importInfo) {
-                $id = $importInfo['id'];
+                foreach ($inserted as $importInfo) {
+                    $id = $importInfo['id'];
 
-                try {
-                    $result = $doc->urlAttachment((int) $id, $sharepointUri, basename($filename));
-                    $doc->addStatusMessage(sprintf('#%d: %s %s', $id, $importInfo['number'], $sharepointUri), $result ? 'success' : 'error');
-                    $report['pohodaSQL'][$id] = $importInfo['number'];
-                } catch (\Exception $ex) {
-                    $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
-                    $report['pohodaSQL'][$id] = $ex->getMessage();
-                    $exitcode = 4;
+                    try {
+                        $result = $doc->urlAttachment((int) $id, $sharepointUri, basename($filename));
+                        $doc->addStatusMessage(sprintf('#%d: %s %s', $id, $importInfo['number'], $sharepointUri), $result ? 'success' : 'error');
+                        $report['pohodaSQL'][$id] = $importInfo['number'];
+                    } catch (\Exception $ex) {
+                        $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
+                        $report['pohodaSQL'][$id] = $ex->getMessage();
+                        $exitcode = 4;
+                    }
                 }
+            } else {
+                $engine->addStatusMessage(_('No statements uploaded to Sharepoint; Skipping PohodaSQL update'), 'warning');
             }
         } else {
-            $engine->addStatusMessage(_('No statements uploaded to Sharepoint; Skipping PohodaSQL update'), 'warning');
+            $engine->addStatusMessage(_('Empty statement'), 'warning');
         }
-    } else {
-        $engine->addStatusMessage(_('Empty statement'), 'warning');
     }
 } else {
     if (\is_array($xmlStatements)) {
