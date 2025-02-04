@@ -37,7 +37,7 @@ abstract class PohodaBankClient extends \mServer\Bank
     protected \DateTime $since;
     protected \DateTime $until;
     protected string $bankIDS;
-    private $exitCode = 0;
+    private int $exitCode = 0;
 
     /**
      * Transaction Handler.

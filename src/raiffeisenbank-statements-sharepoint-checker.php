@@ -23,7 +23,7 @@ use Office365\SharePoint\ClientContext;
 require_once '../vendor/autoload.php';
 
 \define('APP_NAME', 'RaiffStatementCheck');
-\define('FIXED_RATE',1); //We check only presence of statement
+\define('FIXED_RATE', 1); // We check only presence of statement
 
 /**
  * Get today's Statements list.

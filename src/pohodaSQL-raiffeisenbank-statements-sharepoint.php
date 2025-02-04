@@ -129,44 +129,41 @@ if ($xmlStatements) {
     $report['pohoda'] = $inserted;
 
     $report['messages'] = $engine->getMessages();
-    $report['exitcode'] = $engine->getExitCode();
 
     if ($engine->getExitCode()) {
         $exitcode = $engine->getExitCode();
     }
 
-    if (\is_string($inserted)) {
-        $this->addStatusMessage('Statement Inserting ends with string ?!?: '.$inserted, 'error');
-    } else {
-        if ($inserted) {
-            if ($fileUrls) {
-                $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'), \count($inserted)), 'debug');
+    if ($inserted) {
+        if ($fileUrls) {
+            $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'), \count($inserted)), 'debug');
 
-                $doc = new \SpojeNet\PohodaSQL\DOC();
-                $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
+            $doc = new \SpojeNet\PohodaSQL\DOC();
+            $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
 
-                $filename = key($fileUrls);
-                $sharepointUri = current($fileUrls);
+            $filename = key($fileUrls);
+            $sharepointUri = current($fileUrls);
 
-                foreach ($inserted as $importInfo) {
-                    $id = $importInfo['id'];
+            foreach ($inserted as $refId => $importInfo) {
+                $pohodaId = $importInfo['details']['id'];
 
-                    try {
-                        $result = $doc->urlAttachment((int) $id, $sharepointUri, basename($filename));
-                        $doc->addStatusMessage(sprintf('#%d: %s %s', $id, $importInfo['number'], $sharepointUri), $result ? 'success' : 'error');
-                        $report['pohodaSQL'][$id] = $importInfo['number'];
-                    } catch (\Exception $ex) {
-                        $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
-                        $report['pohodaSQL'][$id] = $ex->getMessage();
-                        $exitcode = 4;
-                    }
+                try {
+                    $result = $doc->urlAttachment((int) $pohodaId, $sharepointUri, basename($filename));
+                    $doc->addStatusMessage(sprintf('#%d: %s 👉 %s', $refId, $pohodaId, $sharepointUri), $result ? 'success' : 'error');
+                    $report['pohodaSQL'][$refId]['status'] = 'success';
+                    $report['pohodaSQL'][$refId]['linkedTo'] = $pohodaId;
+                } catch (\Exception $ex) {
+                    $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
+                    $report['pohodaSQL'][$pohodaId]['status'] = 'failed';
+                    $report['pohodaSQL'][$pohodaId]['message'] = $ex->getMessage();
+                    $exitcode = 4;
                 }
-            } else {
-                $engine->addStatusMessage(_('No statements uploaded to Sharepoint; Skipping PohodaSQL update'), 'warning');
             }
         } else {
-            $engine->addStatusMessage(_('Empty statement'), 'warning');
+            $engine->addStatusMessage(_('No statements uploaded to Sharepoint; Skipping PohodaSQL update'), 'warning');
         }
+    } else {
+        $engine->addStatusMessage(_('Empty statement'), 'warning');
     }
 } else {
     if (\is_array($xmlStatements)) {
@@ -177,7 +174,8 @@ if ($xmlStatements) {
     }
 }
 
-$written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
+$report['exitcode'] = $exitcode;
+$written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT| \JSON_UNESCAPED_UNICODE : 0));
 $engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');
 
 exit($exitcode);

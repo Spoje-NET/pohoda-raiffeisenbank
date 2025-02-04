@@ -76,9 +76,9 @@ class Statementor extends PohodaBankClient
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function importXML(string $xmlFile)
+    public function importXML(string $xmlFile): array
     {
         $this->statementsXML[basename($xmlFile)] = $xmlFile;
         $pdfFile = str_replace('.xml', '.pdf', $xmlFile);
@@ -111,17 +111,32 @@ class Statementor extends PohodaBankClient
         return $statementFilenames;
     }
 
+    /**
+     * Get List of Statement files.
+     *
+     * @return array<string, string>
+     */
     public function getStatements(): array
     {
         return $this->obtainer->getStatements($this->currency, $this->statementLine);
     }
 
-    public function download(string $format): array
+    /**
+     * Download Raiffeisen bank statement.
+     *
+     * @return null|array<string, string>
+     */
+    public function download(string $format): ?array
     {
         return $this->obtainer->download($this->statementsDir, $this->getStatements(), $format, $this->currency);
     }
 
-    public function downloadOne($statement, $format)
+    /**
+     * Download one Raiffeisen bank statement.
+     *
+     * @return array<string, string>
+     */
+    public function downloadOne(string $statement, string $format)
     {
         return $this->obtainer->download($this->statementsDir, [$statement], $format, $this->currency);
     }
@@ -131,7 +146,7 @@ class Statementor extends PohodaBankClient
      *
      * @return array<string, string> List of downloaded XML files
      */
-    public function downloadXML(): array
+    public function downloadXML(): ?array
     {
         $this->statementsXML = $this->download('xml');
 
@@ -143,7 +158,7 @@ class Statementor extends PohodaBankClient
      *
      * @return array<string, string> List of downloaded PDF files
      */
-    public function downloadPDF(): array
+    public function downloadPDF(): ?array
     {
         $this->statementsPDF = $this->download('pdf');
 
@@ -164,7 +179,7 @@ class Statementor extends PohodaBankClient
     /**
      * Import Raiffeisen bank XML statement into Pohoda.
      *
-     * @return list<array<string, string>>
+     * @return array<array<string, string>>
      */
     public function import(string $bankIds = ''): array
     {
@@ -192,12 +207,20 @@ class Statementor extends PohodaBankClient
                 //                $this->setDataValue('cisSouhrnne', $statementXML->BkToCstmrStmt->Stmt->LglSeqNb);
 
                 try {
-                    $this->addStatusMessage(sprintf('Inserting [%s] %s %s', $this->getDataValue('bankType') === 'receipt' ? '+' : '-', (string) $this->getDataValue('text'), $this->getDataValue('symPar')));
+                    if ($this->currency === 'CZK') {
+                        $amount = current($this->getDataValue('homeCurrency'));
+                    } else {
+                        $amount = current($this->getDataValue('foreignCurrency'));
+                    }
+
+                    $this->addStatusMessage(sprintf('Inserting 💸 %s [%s] %s', $this->getDataValue('symPar'), ($this->getDataValue('bankType') === 'receipt' ? '+' : '-').$amount.$this->currency,  (string) $this->getDataValue('text')));
                     $lastInsert = $this->insertTransactionToPohoda($bankIds);
                     $this->messages[$lastInsert['id']] = $lastInsert;
-
+                    $lastInsert['details']['amount'] = $amount;
+                    $lastInsert['details']['currency'] = $this->currency;
+                    
                     if ($lastInsert['success']) {
-                        $inserted[key($lastInsert)] = current($lastInsert);
+                        $inserted[$lastInsert['id']] = $lastInsert;
                         ++$success;
                     }
                 } catch (\Exception $exc) {
@@ -211,6 +234,11 @@ class Statementor extends PohodaBankClient
         return $inserted;
     }
 
+    /**
+     * Parse SimpleXMLElement attributes into array.
+     *
+     * @return array<string, string>
+     */
     public static function simpleXmlAttributes(\SimpleXMLElement $item): array
     {
         $attributes = [];
@@ -449,6 +477,8 @@ class Statementor extends PohodaBankClient
 
     /**
      * List of downloaded PDF statements.
+     *
+     * @return array<string, string>
      */
     public function getPdfStatements(): array
     {
@@ -458,7 +488,7 @@ class Statementor extends PohodaBankClient
     /**
      * List of downloaded XML statements.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function getXmlStatements()
     {
@@ -503,16 +533,26 @@ class Statementor extends PohodaBankClient
         }
     }
 
-    public function getAccount()
+    public function getAccount(): string
     {
         return $this->account;
     }
 
-    public function getMessages()
+    /**
+     * @return array<string, array<string, string>>
+     */
+    public function getMessages(): array
     {
         return $this->messages;
     }
 
+    /**
+     * Summary of getRateInfo.
+     *
+     * @throws \RuntimeException
+     *
+     * @return array<string, float|int>
+     */
     public function getRateInfo(\DateTime $movementDate): array
     {
         if ($this->fixedRate) {

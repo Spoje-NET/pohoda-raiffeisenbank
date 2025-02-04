@@ -141,7 +141,9 @@ Into configuration file .env please put ClientID **OR** Login/Password values.
 
 ## ExitCodes
 
+2 - error obtaining PDF statements
 254 - Another Exception without numeric code Ocurred
+4 - Cannot link to Sharepoint problem
 
 ## Powered by
 
