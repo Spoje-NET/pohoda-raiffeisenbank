@@ -213,12 +213,13 @@ class Statementor extends PohodaBankClient
                         $amount = current($this->getDataValue('foreignCurrency'));
                     }
 
-                    $this->addStatusMessage(sprintf('Inserting 💸 %s [%s] %s', $this->getDataValue('symPar'), ($this->getDataValue('bankType') === 'receipt' ? '+' : '-').$amount.$this->currency,  (string) $this->getDataValue('text')));
+                    $this->addStatusMessage(sprintf('Inserting 💸 %s [%s] %s', $this->getDataValue('symPar'), ($this->getDataValue('bankType') === 'receipt' ? '+' : '-').$amount.$this->currency, (string) $this->getDataValue('text')));
                     $lastInsert = $this->insertTransactionToPohoda($bankIds);
-                    $this->messages[$lastInsert['id']] = $lastInsert;
+                    $this->messages[$lastInsert['id']] = $lastInsert['messages'];
+                    unset($lastInsert['messages']);
                     $lastInsert['details']['amount'] = $amount;
                     $lastInsert['details']['currency'] = $this->currency;
-                    
+
                     if ($lastInsert['success']) {
                         $inserted[$lastInsert['id']] = $lastInsert;
                         ++$success;
