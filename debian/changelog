@@ -1,8 +1,14 @@
-pohoda-raiffeisenbank (1.3.0) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.3.1) UNRELEASED; urgency=medium
+
+  * foregin currency configuration update
+
+ -- vitex <info@vitexsoftware.cz>  Mon, 03 Feb 2025 09:04:07 +0100
+
+pohoda-raiffeisenbank (1.3.0) jammy; urgency=medium
 
   * Currency rates support added
 
- -- vitex <info@vitexsoftware.cz>  Wed, 29 Jan 2025 12:38:29 +0100
+ -- vitex <info@vitexsoftware.cz>  Mon, 03 Feb 2025 09:03:42 +0100
 
 pohoda-raiffeisenbank (1.2.2) jammy; urgency=medium
 

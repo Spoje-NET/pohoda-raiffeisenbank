@@ -12,11 +12,29 @@
     "topics": "Raiffeisen,Bank,Statements,Pohoda",
     "uuid": "d660baec-aa96-4810-ad9f-b4180f27b9f1",
     "environment": {
-        "IMPORT_SCOPE": {
+        "FIXED_RATE": {
+            "type": "number",
+            "description": "Fixed rate for converting foreign currency transactions to CZK",
+            "defval": "",
+            "required": false
+        },
+        "FIXED_RATE_AMOUNT": {
+            "type": "number",
+            "description": "Fixed rate amount for some currencies (e.g., 💴)",
+            "defval": "100",
+            "required": false
+        },
+        "CNB_CACHE": {
             "type": "text",
-            "description": "Time scope of statements downloaded",
+            "description": "Use CNB cache to get actual rate from CNB",
+            "defval": "http://localhost/cnb-cache",
+            "required": false
+        },
+        "RATE_OFFSET": {
+            "type": "text",
+            "description": "Rate offset to get rate for previous day",
             "defval": "yesterday",
-            "required": true
+            "required": false
         },
         "ACCOUNT_NUMBER": {
             "type": "text",
