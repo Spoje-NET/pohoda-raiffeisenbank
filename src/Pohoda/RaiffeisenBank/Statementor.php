@@ -571,6 +571,7 @@ class Statementor extends PohodaBankClient
                 $ch = curl_init();
                 curl_setopt($ch, \CURLOPT_URL, $rateUrl);
                 curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, \CURLOPT_FOLLOWLOCATION, true); // Allow HTTP redirects
                 $rateInfoRaw = curl_exec($ch);
 
                 if (curl_errno($ch)) {
