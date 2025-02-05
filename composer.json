@@ -11,6 +11,7 @@
     "minimum-stability": "dev",
     "bin": ["src/pohoda-raiffeisenbank-transactions.php", "src/pohoda-raiffeisenbank-setup.php"],
     "require": {
+        "php-curl": "*",
         "vgrem/php-spo": "^3",
         "vitexsoftware/pohoda-connector": "dev-main",
         "vitexsoftware/rbczpremiumapi": "dev-main",

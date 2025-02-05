@@ -59,8 +59,11 @@ $report = [
     'pohodaSQL' => [],
 ];
 
+$engine->addStatusMessage('stage 1/6: Download PDF Statements from Raiffeisen Bank', 'debug');
+
 try {
     $pdfStatements = $engine->downloadPDF();
+    $report['raiffeisenbank']['pdf'] = array_values($pdfStatements);
 } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
     $report['mesage'] = $exc->getMessage();
     $pdfStatements = [];
@@ -72,6 +75,8 @@ try {
         }
     }
 }
+
+$engine->addStatusMessage('stage 2/6: Upload PDF Statements to SharePoint', 'debug');
 
 if ($pdfStatements) {
     sleep(5);
@@ -101,7 +106,7 @@ if ($pdfStatements) {
             $fileUrls[basename($filename)] = $uploaded;
         } catch (\Exception $exc) {
             fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
-
+            $report['sharepoint'][basename($filename)] = 'upload failed';
             $exitcode = 1;
         }
     }
@@ -117,14 +122,18 @@ if ($pdfStatements) {
 sleep(5);
 
 try {
+    $engine->addStatusMessage('stage 3/6: Download XML Statements from Raiffeisen Bank', 'debug');
     $xmlStatements = $engine->downloadXML();
+    $report['raiffeisenbank']['xml'] = array_values($xmlStatements);
 } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
     $engine->addStatusMessage($exc->getMessage(), 'error');
+    $report['raiffeisenbank']['xml'] = 'download failed';
     $exitcode = (int) $exc->getCode();
     $xmlStatements = false;
 }
 
 if ($xmlStatements) {
+    $engine->addStatusMessage('stage 4/6: Import XML Statements to Pohoda', 'debug');
     $inserted = $engine->import(Shared::cfg('POHODA_BANK_IDS', ''));
     $report['pohoda'] = $inserted;
 
@@ -135,6 +144,8 @@ if ($xmlStatements) {
     }
 
     if ($inserted) {
+        $engine->addStatusMessage('stage 5/6: Add Sharepoint links to Pohoda', 'debug');
+
         if ($fileUrls) {
             $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'), \count($inserted)), 'debug');
 
@@ -173,6 +184,8 @@ if ($xmlStatements) {
         $exitcode = 3;
     }
 }
+
+$engine->addStatusMessage('stage 6/6: saving report', 'debug');
 
 $report['exitcode'] = $exitcode;
 $written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE : 0));

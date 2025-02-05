@@ -215,7 +215,7 @@ class Statementor extends PohodaBankClient
 
                     $this->addStatusMessage(sprintf('Inserting 💸 %s [%s] %s', $this->getDataValue('symPar'), ($this->getDataValue('bankType') === 'receipt' ? '+' : '-').$amount.$this->currency, (string) $this->getDataValue('text')));
                     $lastInsert = $this->insertTransactionToPohoda($bankIds);
-                    $this->messages[$lastInsert['id']] = $lastInsert['messages'];
+                    $this->messages[$lastInsert['id']] = \array_key_exists('message', $lastInsert) ? $lastInsert['message'] : $lastInsert['messages'];
                     unset($lastInsert['messages']);
                     $lastInsert['details']['amount'] = $amount;
                     $lastInsert['details']['currency'] = $this->currency;
@@ -565,15 +565,67 @@ class Statementor extends PohodaBankClient
                 $date = $movementDate->format('Y-m-d');
             }
 
-            $rateInfoRaw = file_get_contents(\Ease\Functions::addUrlParams($this->cnbCache, ['currency' => $this->currency, 'date' => $date]));
+            $rateUrl = \Ease\Functions::addUrlParams($this->cnbCache, ['currency' => $this->currency, 'date' => $date]);
 
-            if (\is_string($rateInfoRaw) && json_validate($rateInfoRaw)) {
-                $rateInfo = json_decode($rateInfoRaw, true);
+            try {
+                $ch = curl_init();
+                curl_setopt($ch, \CURLOPT_URL, $rateUrl);
+                curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
+                $rateInfoRaw = curl_exec($ch);
+
+                if (curl_errno($ch)) {
+                    throw new \RuntimeException('Curl error: '.curl_error($ch));
+                }
+
+                $httpCode = curl_getinfo($ch, \CURLINFO_HTTP_CODE);
+
+                if ($httpCode !== 200) {
+                    throw new \RuntimeException('HTTP error: '.$httpCode);
+                }
+
+                curl_close($ch);
+            } catch (\Exception $e) {
+                throw new \RuntimeException('Error fetching rate info: '.$rateUrl.': '.$e->getMessage());
+            }
+
+            if (self::isJson($rateInfoRaw)) {
+                $rateInfo = \json_decode($rateInfoRaw, true);
             } else {
                 throw new \RuntimeException(sprintf(_('No ČNB Cache Json on %s: %s'), $this->cnbCache, $rateInfoRaw));
             }
         }
 
         return $rateInfo;
+    }
+
+    /**
+     * Validates a JSON string.
+     *
+     * @param string $json  the JSON string to validate
+     * @param int    $depth Maximum depth. Must be greater than zero.
+     * @param int    $flags bitmask of JSON decode options
+     *
+     * @return bool returns true if the string is a valid JSON, otherwise false
+     */
+    public static function isJson(?string $json, int $depth = 512, int $flags = 0): bool
+    {
+        $isJson = false;
+
+        if (\function_exists('json_validate')) {
+            $isJson = \json_validate($json);
+        } else {
+            if (!\is_string($json)) {
+                $isJson = false;
+            }
+
+            try {
+                json_decode($json, false, $depth, $flags | \JSON_THROW_ON_ERROR);
+                $isJson = true;
+            } catch (\JsonException $e) {
+                $isJson = false;
+            }
+        }
+
+        return $isJson;
     }
 }

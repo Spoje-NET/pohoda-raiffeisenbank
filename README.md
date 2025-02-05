@@ -142,8 +142,9 @@ Into configuration file .env please put ClientID **OR** Login/Password values.
 ## ExitCodes
 
 2 - error obtaining PDF statements
-254 - Another Exception without numeric code Ocurred
 4 - Cannot link to Sharepoint problem
+254 - Another Exception without numeric code Ocurred
+401 - user is not authorized to import import XML files to Pohoda
 
 ## Powered by
 
