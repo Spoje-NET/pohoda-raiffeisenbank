@@ -48,7 +48,7 @@ if (Shared::cfg('STATEMENT_LINE')) {
 }
 
 if (Shared::cfg('APP_DEBUG', false)) {
-    $engine->logBanner($engine->getAccount().' '.$engine->getCurrencyCode(), ' Scope: '.$engine->scope);
+    $engine->logBanner($engine->getAccount().' '.$engine->getCurrencyCode(), ' Scope: '.$engine->scope.' Line: '.$engine->statementLine);
 }
 
 $exitcode = 0;

@@ -49,6 +49,15 @@
             "defval": "",
             "required": true
         },
+        "STATEMENT_LINE": {
+            "type": "select",
+            "description": "Bank Statement line",
+            "defval": "ADDITIONAL",
+            "options": {
+                "MAIN": "Main statement line",
+                "ADDITIONAL": "Additional statement line" 
+            }
+        },
         "POHODA_ICO": {
             "type": "text",
             "description": "Pohoda ICO",
