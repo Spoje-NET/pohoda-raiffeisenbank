@@ -1,8 +1,15 @@
 pohoda-raiffeisenbank (1.3.2) UNRELEASED; urgency=medium
 
+  * mass attachments name problem fix
+
+ -- vitex <info@vitexsoftware.cz>  Thu, 27 Feb 2025 01:20:37 +0100
+
+pohoda-raiffeisenbank (1.3.2) jammy; urgency=medium
+
+  [ Vitex ]
   * resulting json update
 
- -- Vitex <vitezslav.dvorak@spojenet.cz>  Tue, 04 Feb 2025 13:13:03 +0100
+ -- vitex <info@vitexsoftware.cz>  Thu, 27 Feb 2025 01:20:08 +0100
 
 pohoda-raiffeisenbank (1.3.1) jammy; urgency=medium
 

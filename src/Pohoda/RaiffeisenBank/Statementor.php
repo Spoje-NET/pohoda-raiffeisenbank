@@ -193,6 +193,7 @@ class Statementor extends PohodaBankClient
 
             $statementNumber = $statementXML->BkToCstmrStmt->Stmt->LglSeqNb;
             $statementCreated = new \DateTime((string) $statementXML->BkToCstmrStmt->Stmt->CreDtTm);
+            $paymentDate = new \DateTime((string) $statementXML->BkToCstmrStmt->Stmt->FrToDt->ToDtTm);
 
             $this->addStatusMessage(sprintf('Parsing statement %s no. %d created %s', $statementNumberLong, $statementNumber, $statementCreated->format('c')), 'debug');
 
@@ -219,6 +220,7 @@ class Statementor extends PohodaBankClient
                     unset($lastInsert['messages']);
                     $lastInsert['details']['amount'] = $amount;
                     $lastInsert['details']['currency'] = $this->currency;
+                    $lastInsert['details']['date'] = $paymentDate->format('Y-m-d');
 
                     if ($lastInsert['success']) {
                         $inserted[$lastInsert['id']] = $lastInsert;

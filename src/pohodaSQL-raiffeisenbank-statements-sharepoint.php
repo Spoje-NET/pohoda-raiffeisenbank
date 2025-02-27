@@ -96,17 +96,26 @@ if ($pdfStatements) {
     $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
 
     foreach ($pdfStatements as $filename) {
-        $uploadFile = $targetFolder->uploadFile(basename($filename), file_get_contents($filename));
+        $uploadAs = preg_replace_callback('/^(\d+)_/', static function ($matches) {
+            return str_pad($matches[1], 3, '0', \STR_PAD_LEFT).'_';
+        }, basename($filename));
+
+        // Extract the date from the filename
+        preg_match('/\d{4}-\d{2}-\d{2}/', $uploadAs, $dateMatches);
+        $statementDate = $dateMatches[0] ?? '';
+
+        $uploadFile = $targetFolder->uploadFile($uploadAs, file_get_contents($filename));
 
         try {
             $ctx->executeQuery();
             $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
             $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
-            $report['sharepoint'][basename($filename)] = $uploaded;
-            $fileUrls[basename($filename)] = $uploaded;
+            $report['sharepoint'][$uploadAs] = $uploaded;
+            $fileUrls[$uploadAs] = $uploaded;
+            $dayUrls[$statementDate][$uploadAs] = $uploaded;
         } catch (\Exception $exc) {
             fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
-            $report['sharepoint'][basename($filename)] = 'upload failed';
+            $report['sharepoint'][$uploadAs] = 'upload failed';
             $exitcode = 1;
         }
     }
@@ -152,11 +161,12 @@ if ($xmlStatements) {
             $doc = new \SpojeNet\PohodaSQL\DOC();
             $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
 
-            $filename = key($fileUrls);
-            $sharepointUri = current($fileUrls);
-
             foreach ($inserted as $refId => $importInfo) {
                 $pohodaId = $importInfo['details']['id'];
+                $dateStatement = $importInfo['details']['date'];
+
+                $filename = key($dayUrls[$dateStatement]);
+                $sharepointUri = current($dayUrls[$dateStatement]);
 
                 try {
                     $result = $doc->urlAttachment((int) $pohodaId, $sharepointUri, basename($filename));
