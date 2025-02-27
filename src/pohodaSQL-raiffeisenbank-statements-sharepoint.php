@@ -48,7 +48,7 @@ if (Shared::cfg('STATEMENT_LINE')) {
 }
 
 if (Shared::cfg('APP_DEBUG', false)) {
-    $engine->logBanner($engine->getAccount().' '.$engine->getCurrencyCode(), 'Scope: '.$engine->scope);
+    $engine->logBanner($engine->getAccount().' '.$engine->getCurrencyCode(), ' Scope: '.$engine->scope);
 }
 
 $exitcode = 0;
@@ -59,7 +59,7 @@ $report = [
     'pohodaSQL' => [],
 ];
 
-$engine->addStatusMessage('stage 1/6: Download PDF Statements from Raiffeisen Bank', 'debug');
+$engine->addStatusMessage('stage 1/6: Download PDF Statements from Raiffeisen Bank account '.$engine->getAccount(), 'debug');
 
 try {
     $pdfStatements = $engine->downloadPDF();
@@ -122,7 +122,7 @@ if ($pdfStatements) {
 sleep(5);
 
 try {
-    $engine->addStatusMessage('stage 3/6: Download XML Statements from Raiffeisen Bank', 'debug');
+    $engine->addStatusMessage('stage 3/6: Download XML Statements from Raiffeisen Bank account '.$engine->getAccount(), 'debug');
     $xmlStatements = $engine->downloadXML();
     $report['raiffeisenbank']['xml'] = array_values($xmlStatements);
 } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
