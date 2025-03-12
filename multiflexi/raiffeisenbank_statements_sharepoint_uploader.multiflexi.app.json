@@ -36,6 +36,16 @@
             "defval": "auto",
             "required": true
         },
+        "STATEMENT_LINE": {
+            "type": "select",
+            "description": "Bank Statement line",
+	    "defval": "ADDITIONAL",
+            "hint": "MAIN",
+            "options": {
+                "MAIN": "Main statement line",
+                "ADDITIONAL": "Additional statement line" 
+            }
+        },
         "ACCOUNT_CURRENCY": {
             "type": "text",
             "description": "for multicurrency accounts please specify one",

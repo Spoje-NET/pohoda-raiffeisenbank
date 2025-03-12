@@ -52,7 +52,8 @@
         "STATEMENT_LINE": {
             "type": "select",
             "description": "Bank Statement line",
-            "defval": "ADDITIONAL",
+	    "defval": "ADDITIONAL",
+            "hint": "MAIN",
             "options": {
                 "MAIN": "Main statement line",
                 "ADDITIONAL": "Additional statement line" 

@@ -33,7 +33,7 @@ Shared::init(
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
         'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
     ],
-    \array_key_exists('environment', $options) ? $options['environment'] : '../.env',
+    \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
 );
 $destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
@@ -45,8 +45,12 @@ if (Shared::cfg('ACCOUNT_CURRENCY', false)) {
     $engine->setCurrency(Shared::cfg('ACCOUNT_CURRENCY'));
 }
 
+if (Shared::cfg('STATEMENT_LINE')) {
+    $engine->setStatementLine(Shared::cfg('STATEMENT_LINE'));
+}
+
 if (Shared::cfg('APP_DEBUG', false)) {
-    $engine->logBanner($engine->getAccount().' '.$engine->getCurrencyCode(), 'Scope: '.$engine->scope);
+    $engine->logBanner(\Ease\Shared::AppName().' '.\Ease\Shared::AppVersion(), $engine->getAccount().' '.$engine->getCurrencyCode().' Scope: '.$engine->scope.' LINE: '.$engine->statementLine);
 }
 
 $exitcode = 0;
@@ -115,6 +119,7 @@ try {
     $report['mesage'] = $exc->getMessage();
     $engine->addStatusMessage($report['mesage'], 'error');
     $exitcode = $exc->getCode();
+    $report['exitcode'] = $exitcode;
 
     if (!$exitcode) {
         if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {

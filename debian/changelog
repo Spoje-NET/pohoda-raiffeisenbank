@@ -1,8 +1,15 @@
-pohoda-raiffeisenbank (1.3.3) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.3.4) UNRELEASED; urgency=medium
 
+  * Statement line now accepted by upload tool
+
+ -- vitex <info@vitexsoftware.cz>  Wed, 12 Mar 2025 16:03:01 +0100
+
+pohoda-raiffeisenbank (1.3.3) jammy; urgency=medium
+
+  [ Vitex ]
   * More Statement line
 
- -- Vitex <vitezslav.dvorak@spojenet.cz>  Thu, 27 Feb 2025 18:13:25 +0100
+ -- vitex <info@vitexsoftware.cz>  Wed, 12 Mar 2025 16:02:29 +0100
 
 pohoda-raiffeisenbank (1.3.2) jammy; urgency=medium
 
