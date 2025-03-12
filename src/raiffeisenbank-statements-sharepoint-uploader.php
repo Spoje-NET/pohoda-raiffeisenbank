@@ -91,13 +91,31 @@ try {
         }
 
         foreach ($pdfStatements as $pdfStatement) {
-            if (\array_key_exists($pdfStatement, $sharepointFiles)) {
-                $engine->addStatusMessage(sprintf('File %s exists in SharePoint', $pdfStatement), 'success');
-                $report['existing'][] = $pdfStatement;
-            } else {
-                $engine->addStatusMessage(sprintf('File %s does not exist in SharePoint', $pdfStatement), 'warning');
+            $uploadAs = Statementor::statementFilename($pdfStatement);
 
-                $uploadFile = $targetFolder->uploadFile(basename($pdfStatement), file_get_contents($pdfStatement));
+            if (\array_key_exists($uploadAs, $sharepointFiles)) {
+                $engine->addStatusMessage(sprintf('File %s exists in SharePoint', $uploadAs), 'success');
+                $report['existing'][] = $uploadAs;
+            } else {
+                $engine->addStatusMessage(sprintf('File %s does not exist in SharePoint', $uploadAs), 'warning');
+
+                try {
+                    preg_match('/\d{4}-\d{2}-\d{2}/', $uploadAs, $dateMatches);
+                    $engine->setScope($dateMatches[0]);
+                    $downloadedPdf = $engine->downloadPDF();
+                } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
+                    $report['mesage'] = $exc->getMessage();
+
+                    $exitcode = $exc->getCode();
+
+                    if (!$exitcode) {
+                        if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {
+                            $exitcode = (int) $codeRaw[1];
+                        }
+                    }
+                }
+
+                $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents(current($downloadedPdf)));
 
                 try {
                     $ctx->executeQuery();

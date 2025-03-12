@@ -631,4 +631,11 @@ class Statementor extends PohodaBankClient
 
         return $isJson;
     }
+
+    public static function statementFilename($filenameRaw)
+    {
+        return preg_replace_callback('/^(\d+)_/', static function ($matches) {
+            return str_pad($matches[1], 3, '0', \STR_PAD_LEFT).'_';
+        }, basename($filenameRaw));
+    }
 }

@@ -96,9 +96,7 @@ if ($pdfStatements) {
     $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
 
     foreach ($pdfStatements as $filename) {
-        $uploadAs = preg_replace_callback('/^(\d+)_/', static function ($matches) {
-            return str_pad($matches[1], 3, '0', \STR_PAD_LEFT).'_';
-        }, basename($filename));
+        $uploadAs = Statementor::statementFilename($filename);
 
         // Extract the date from the filename
         preg_match('/\d{4}-\d{2}-\d{2}/', $uploadAs, $dateMatches);
