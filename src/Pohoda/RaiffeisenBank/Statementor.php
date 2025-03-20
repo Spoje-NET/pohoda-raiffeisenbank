@@ -374,7 +374,7 @@ class Statementor extends PohodaBankClient
      *
      * @throws \Exception
      */
-    public function setScope($scope): void
+    public function setScope(string $scope): \DatePeriod
     {
         switch ($scope) {
             case 'yesterday':
@@ -475,7 +475,7 @@ class Statementor extends PohodaBankClient
         $this->obtainer->since = $this->since;
         $this->obtainer->until = $this->until;
         $this->scope = $scope;
-        //        $this->obtainer->setScope(\Ease\Shared::cfg('STATEMENT_IMPORT_SCOPE', 'last_month'));
+        return new \DatePeriod($this->since, new \DateInterval('P1D'), $this->until);
     }
 
     /**
@@ -517,12 +517,16 @@ class Statementor extends PohodaBankClient
         }
     }
 
-    public function setCurrency(string $currency): void
+    public function setCurrency(string $currency): self
     {
         $this->currency = $currency;
+        return $this;
     }
 
-    public function setStatementLine(string $line): void
+    /**
+     * Set default Statement Line
+     */
+    public function setStatementLine(string $line): self
     {
         switch ($line) {
             case 'MAIN':
@@ -534,6 +538,7 @@ class Statementor extends PohodaBankClient
             default:
                 throw new \InvalidArgumentException('Wrong statement line: '.$line);
         }
+        return $this;
     }
 
     public function getAccount(): string
