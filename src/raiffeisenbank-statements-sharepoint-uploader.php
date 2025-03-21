@@ -38,8 +38,8 @@ Shared::init(
 $destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
 PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
-define('FIXED_RATE',1);
-$engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'), ['user' => '', 'password' => '', 'ico' => '', 'url' => '']);
+\define('FIXED_RATE', 1);
+$engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'), ['user' => '', 'password' => '', 'ico' => '', 'url' => '', 'cnbCache' => 'none']);
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 
 if (Shared::cfg('ACCOUNT_CURRENCY', false)) {

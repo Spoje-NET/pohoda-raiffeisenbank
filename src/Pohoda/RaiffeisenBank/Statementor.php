@@ -71,7 +71,7 @@ class Statementor extends PohodaBankClient
         $this->statementsDir = \Ease\Shared::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir());
 
         if (file_exists($this->statementsDir) === false) {
-            $this->addStatusMessage(sprintf(_('Creating Statements directory'), $this->statementsDir, mkdir($this->statementsDir, 0777, true) ? 'success' : 'error'));
+            $this->addStatusMessage(sprintf(_('Creating Statements directory'), $this->statementsDir, mkdir($this->statementsDir, 0o777, true) ? 'success' : 'error'));
         }
     }
 
@@ -370,8 +370,6 @@ class Statementor extends PohodaBankClient
     /**
      * Prepare processing interval.
      *
-     * @param string $scope
-     *
      * @throws \Exception
      */
     public function setScope(string $scope): \DatePeriod
@@ -475,6 +473,7 @@ class Statementor extends PohodaBankClient
         $this->obtainer->since = $this->since;
         $this->obtainer->until = $this->until;
         $this->scope = $scope;
+
         return new \DatePeriod($this->since, new \DateInterval('P1D'), $this->until);
     }
 
@@ -520,11 +519,12 @@ class Statementor extends PohodaBankClient
     public function setCurrency(string $currency): self
     {
         $this->currency = $currency;
+
         return $this;
     }
 
     /**
-     * Set default Statement Line
+     * Set default Statement Line.
      */
     public function setStatementLine(string $line): self
     {
@@ -538,6 +538,7 @@ class Statementor extends PohodaBankClient
             default:
                 throw new \InvalidArgumentException('Wrong statement line: '.$line);
         }
+
         return $this;
     }
 
