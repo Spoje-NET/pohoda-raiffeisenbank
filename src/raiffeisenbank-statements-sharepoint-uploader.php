@@ -117,6 +117,7 @@ try {
                             }
                         }
                     }
+                }
 
                     $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents(current($downloadedPdf)));
 
@@ -134,6 +135,8 @@ try {
 
                     $report['missing'][] = $pdfStatement;
                 }
+
+                $report['missing'][] = $pdfStatement;
             }
         } catch (\Office365\Runtime\Http\RequestException $exc) {
             $report['message'] = $exc->getMessage();
