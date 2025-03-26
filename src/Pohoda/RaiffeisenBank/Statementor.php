@@ -71,7 +71,7 @@ class Statementor extends PohodaBankClient
         $this->statementsDir = \Ease\Shared::cfg('STATEMENT_SAVE_DIR', sys_get_temp_dir());
 
         if (file_exists($this->statementsDir) === false) {
-            $this->addStatusMessage(sprintf(_('Creating Statements directory'), $this->statementsDir, mkdir($this->statementsDir, 0777, true) ? 'success' : 'error'));
+            $this->addStatusMessage(sprintf(_('Creating Statements directory'), $this->statementsDir, mkdir($this->statementsDir, 0o777, true) ? 'success' : 'error'));
         }
     }
 

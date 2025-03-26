@@ -30,6 +30,7 @@ require_once '../vendor/autoload.php';
 $options = getopt('o::e::', ['output::environment::']);
 Shared::init(
     [
+        'OFFICE365_SITE', 'OFFICE365_PATH',
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
         'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
     ],
@@ -38,7 +39,7 @@ Shared::init(
 $destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
 PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
-define('FIXED_RATE',1);
+\define('FIXED_RATE', 1);
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'), ['user' => '', 'password' => '', 'ico' => '', 'url' => '']);
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 
@@ -83,55 +84,60 @@ try {
 
         $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
 
-        $sharepointFilesRaw = $targetFolder->getFiles()->get()->executeQuery();
-        $sharepointFiles = [];
+        try {
+            $sharepointFilesRaw = $targetFolder->getFiles()->get()->executeQuery();
+            $sharepointFiles = [];
 
-        // @phpstan-ignore foreach.nonIterable
-        foreach ($sharepointFilesRaw as $fileInSharepint) {
-            $sharepointFiles[$fileInSharepint->getName()] = $fileInSharepint->getServerRelativeUrl();
-        }
+            // @phpstan-ignore foreach.nonIterable
+            foreach ($sharepointFilesRaw as $fileInSharepint) {
+                $sharepointFiles[$fileInSharepint->getName()] = $fileInSharepint->getServerRelativeUrl();
+            }
 
-        foreach ($pdfStatements as $pdfStatement) {
-            $uploadAs = Statementor::statementFilename($pdfStatement);
+            foreach ($pdfStatements as $pdfStatement) {
+                $uploadAs = Statementor::statementFilename($pdfStatement);
 
-            if (\array_key_exists($uploadAs, $sharepointFiles)) {
-                $engine->addStatusMessage(sprintf('File %s exists in SharePoint', $uploadAs), 'success');
-                $report['existing'][] = $uploadAs;
-            } else {
-                $engine->addStatusMessage(sprintf('File %s does not exist in SharePoint', $uploadAs), 'warning');
+                if (\array_key_exists($uploadAs, $sharepointFiles)) {
+                    $engine->addStatusMessage(sprintf('File %s exists in SharePoint', $uploadAs), 'success');
+                    $report['existing'][] = $uploadAs;
+                } else {
+                    $engine->addStatusMessage(sprintf('File %s does not exist in SharePoint', $uploadAs), 'warning');
 
-                try {
-                    preg_match('/\d{4}-\d{2}-\d{2}/', $uploadAs, $dateMatches);
-                    $engine->setScope($dateMatches[0]);
-                    $downloadedPdf = $engine->downloadPDF();
-                } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
-                    $report['mesage'] = $exc->getMessage();
+                    try {
+                        preg_match('/\d{4}-\d{2}-\d{2}/', $uploadAs, $dateMatches);
+                        $engine->setScope($dateMatches[0]);
+                        $downloadedPdf = $engine->downloadPDF();
+                    } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
+                        $report['mesage'] = $exc->getMessage();
 
-                    $exitcode = $exc->getCode();
+                        $exitcode = $exc->getCode();
 
-                    if (!$exitcode) {
-                        if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {
-                            $exitcode = (int) $codeRaw[1];
+                        if (!$exitcode) {
+                            if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {
+                                $exitcode = (int) $codeRaw[1];
+                            }
                         }
                     }
+
+                    $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents(current($downloadedPdf)));
+
+                    try {
+                        $ctx->executeQuery();
+                        $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+                        $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
+                        $report['sharepoint'][basename($pdfStatement)] = $uploaded;
+                        $fileUrls[basename($pdfStatement)] = $uploaded;
+                    } catch (\Exception $exc) {
+                        fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
+
+                        $exitcode = 1;
+                    }
+
+                    $report['missing'][] = $pdfStatement;
                 }
-
-                $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents(current($downloadedPdf)));
-
-                try {
-                    $ctx->executeQuery();
-                    $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
-                    $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
-                    $report['sharepoint'][basename($pdfStatement)] = $uploaded;
-                    $fileUrls[basename($pdfStatement)] = $uploaded;
-                } catch (\Exception $exc) {
-                    fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
-
-                    $exitcode = 1;
-                }
-
-                $report['missing'][] = $pdfStatement;
             }
+        } catch (\Office365\Runtime\Http\RequestException $exc) {
+            $report['message'] = $exc->getMessage();
+            $exitcode = $exc->getCode();
         }
     }
 } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
