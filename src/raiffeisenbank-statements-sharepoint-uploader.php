@@ -27,7 +27,7 @@ require_once '../vendor/autoload.php';
 /**
  * Get today's Statements list.
  */
-$options = getopt('o::e::', ['output::environment::']);
+$options = \getopt('o::e::', ['output::environment::']);
 Shared::init(
     [
         'OFFICE365_SITE', 'OFFICE365_PATH',
@@ -106,6 +106,22 @@ try {
                         preg_match('/\d{4}-\d{2}-\d{2}/', $uploadAs, $dateMatches);
                         $engine->setScope($dateMatches[0]);
                         $downloadedPdf = $engine->downloadPDF();
+
+                        $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents(current($downloadedPdf)));
+
+                        try {
+                            $ctx->executeQuery();
+                            $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+                            $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
+                            $report['sharepoint'][basename($pdfStatement)] = $uploaded;
+                            $fileUrls[basename($pdfStatement)] = $uploaded;
+                        } catch (\Exception $exc) {
+                            fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
+
+                            $exitcode = 1;
+                        }
+
+                        $report['missing'][] = $pdfStatement;
                     } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
                         $report['mesage'] = $exc->getMessage();
 
@@ -118,25 +134,6 @@ try {
                         }
                     }
                 }
-
-                    $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents(current($downloadedPdf)));
-
-                    try {
-                        $ctx->executeQuery();
-                        $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
-                        $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
-                        $report['sharepoint'][basename($pdfStatement)] = $uploaded;
-                        $fileUrls[basename($pdfStatement)] = $uploaded;
-                    } catch (\Exception $exc) {
-                        fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
-
-                        $exitcode = 1;
-                    }
-
-                    $report['missing'][] = $pdfStatement;
-                }
-
-                $report['missing'][] = $pdfStatement;
             }
         } catch (\Office365\Runtime\Http\RequestException $exc) {
             $report['message'] = $exc->getMessage();
@@ -156,7 +153,7 @@ try {
     }
 }
 
-$written = file_put_contents($destination, json_encode($report, \Ease\Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
+$written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
 $engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');
 
 exit($exitcode);
