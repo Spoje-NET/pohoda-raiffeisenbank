@@ -37,7 +37,7 @@
             "required": true
         },
         "STATEMENT_LINE": {
-            "type": "select",
+            "type": "set",
             "description": "Bank Statement line",
 	    "defval": "ADDITIONAL",
             "hint": "MAIN",
@@ -119,7 +119,7 @@
             "required": false
         },
         "APP_DEBUG": {
-            "type": "checkbox",
+            "type": "bool",
             "description": "Show debug messages",
             "defval": "False",
             "required": true
