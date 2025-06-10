@@ -112,6 +112,8 @@ abstract class PohodaBankClient extends \mServer\Bank
      * Prepare processing interval.
      *
      * @throws \Exception
+     *
+     * @return \DatePeriod<\DateTime, \DateInterval, \DateTime>
      */
     public function setScope(string $scope): \DatePeriod
     {
@@ -242,7 +244,8 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function checkForTransactionPresence()
     {
-        $this->addStatusMessage('Checking for transaction presence - Not yet implemented', 'warning');
+        if ($this->recordExists()) {
+        }
 
         return false; // !empty($this->getColumnsFromPohoda('id', ['cisDosle' => $this->getDataValue('cisDosle')])); TODO
     }

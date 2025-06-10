@@ -52,7 +52,7 @@ if (Shared::cfg('STATEMENT_LINE')) {
 }
 
 if (Shared::cfg('APP_DEBUG', false)) {
-    $engine->logBanner(\Ease\Shared::AppName().' '.\Ease\Shared::AppVersion(), $engine->getAccount().' '.$engine->getCurrencyCode().' Scope: '.$engine->scope.' LINE: '.$engine->statementLine);
+    $engine->logBanner(Shared::AppName().' '.Shared::AppVersion(), $engine->getAccount().' '.$engine->getCurrencyCode().' Scope: '.$engine->scope.' LINE: '.$engine->statementLine);
 }
 
 $exitcode = 0;
