@@ -240,17 +240,22 @@ abstract class PohodaBankClient extends \mServer\Bank
      *
      * @todo Implement using Pohoda API UserList
      */
-    public function checkForTransactionPresence(): bool
+    public function checkForTransactionPresence($transactionId): bool
     {
-        /** @var null|string[] $transactions */
-        static $transactions = null;
+        $lrq = $this->queryFilter("Pozn2 like '%#$transactionId#%' " ,  'TransactionID: '.$transactionId);
+        
+        $found = $this->getListing($lrq);
 
-        if ($transactions === null) {
-            $columns = $this->getColumnsFromPohoda(['intNote'], ['dateFrom' => $this->since->format(self::$dateFormat)]);
-            $transactions = \array_unique(\array_filter(\array_column($columns, 'intNote')));
+        return empty($found) === false ;
+    }
+
+    public static function intNote2TransactionId(string $intNote): ?string
+    {
+        if (preg_match('/#(\d+)#/', $intNote, $matches)) {
+            return $matches[1];
         }
 
-        return \in_array($this->getDataValue('intNote'), $transactions, strict: true);
+        return null;
     }
 
     /**
@@ -264,54 +269,48 @@ abstract class PohodaBankClient extends \mServer\Bank
         $producedNumber = '';
         $producedAction = '';
         $result = [];
-        $transactionId = $this->getDataValue('intNote');
+        $transactionId = self::intNote2TransactionId($this->getDataValue('intNote'));
 
-        if ($this->checkForTransactionPresence()) {
-            $this->addStatusMessage("Transaction with ID '{$transactionId}' already present in Pohoda", 'warning');
-            $result['message'] = "Duplicate transaction: {$transactionId}";
-            $result['success'] = false;
-        } else {
-            try {
-                $cache = $this->getData();
-                $result['id'] = $transactionId;
-                $this->reset();
+        try {
+            $cache = $this->getData();
+            $result['id'] = $transactionId;
+            $this->reset();
 
-                // TODO: $result = $this->sync();
-                if ($bankIDS) {
-                    $cache['account'] = $bankIDS;
-                }
-
-                $this->takeData($cache);
-
-                if ($this->addToPohoda() && $this->commit() && isset($this->response->producedDetails) && \is_array($this->response->producedDetails)) {
-                    $producedId = $this->response->producedDetails['id'];
-                    $producedNumber = $this->response->producedDetails['number'];
-                    $producedAction = $this->response->producedDetails['actionType'];
-                    $result['details'] = $this->response->producedDetails;
-                    $result['messages'] = $this->response->messages;
-                    $this->automaticLiquidation($producedNumber);
-                    $this->addStatusMessage('Bank #'.$producedId.' '.$producedAction.' '.$producedNumber, 'success'); // TODO: Parse response for docID
-                    $result['success'] = true;
-                } else {
-                    $result['success'] = false;
-                    $resultMessages = $this->messages;
-
-                    if (\array_key_exists('error', $resultMessages) && \count($resultMessages['error'])) {
-                        foreach ($resultMessages['error'] as $errMsg) {
-                            $result['messages'][] = 'error: '.$errMsg;
-                        }
-
-                        $this->exitCode = 401;
-                    }
-                }
-            } catch (\Exception $exc) {
-                $producedId = 'n/a';
-                $producedNumber = 'n/a';
-                $producedAction = 'n/a';
-                $result['message'] = $exc->getMessage();
-                $result['success'] = false;
-                $this->exitCode = $exc->getCode() ?: 254;
+            // TODO: $result = $this->sync();
+            if ($bankIDS) {
+                $cache['account'] = $bankIDS;
             }
+
+            $this->takeData($cache);
+
+            if ($this->addToPohoda() && $this->commit() && isset($this->response->producedDetails) && \is_array($this->response->producedDetails)) {
+                $producedId = $this->response->producedDetails['id'];
+                $producedNumber = $this->response->producedDetails['number'];
+                $producedAction = $this->response->producedDetails['actionType'];
+                $result['details'] = $this->response->producedDetails;
+                $result['messages'] = $this->response->messages;
+                $this->automaticLiquidation($producedNumber);
+                $this->addStatusMessage('Bank #'.$producedId.' '.$producedAction.' '.$producedNumber, 'success'); // TODO: Parse response for docID
+                $result['success'] = true;
+            } else {
+                $result['success'] = false;
+                $resultMessages = $this->messages;
+
+                if (\array_key_exists('error', $resultMessages) && \count($resultMessages['error'])) {
+                    foreach ($resultMessages['error'] as $errMsg) {
+                        $result['messages'][] = 'error: '.$errMsg;
+                    }
+
+                    $this->exitCode = 401;
+                }
+            }
+        } catch (\Exception $exc) {
+            $producedId = 'n/a';
+            $producedNumber = 'n/a';
+            $producedAction = 'n/a';
+            $result['message'] = $exc->getMessage();
+            $result['success'] = false;
+            $this->exitCode = $exc->getCode() ?: 254;
         }
 
         return $result;

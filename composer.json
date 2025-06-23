@@ -11,8 +11,7 @@
     "minimum-stability": "dev",
     "bin": ["src/pohoda-raiffeisenbank-transactions.php", "src/pohoda-raiffeisenbank-setup.php"],
     "require": {
-        "ext-curl": "*",
-        "vgrem/php-spo": "^3",
+        "vgrem/php-spo": "^3.1.2",
         "vitexsoftware/pohoda-connector": "^0.8",
         "vitexsoftware/rbczpremiumapi": "^1.4",
         "spojenet/pohoda-sql": "^0.1"
@@ -31,9 +30,9 @@
     "require-dev": {
         "phpunit/phpunit": "*",
         "phpstan/phpstan": "*",
-        "friendsofphp/php-cs-fixer": "^3.71",
-        "ergebnis/composer-normalize": "^2.45",
-        "ergebnis/php-cs-fixer-config": "^6.45"
+        "friendsofphp/php-cs-fixer": "^3.75",
+        "ergebnis/composer-normalize": "^2.47",
+        "ergebnis/php-cs-fixer-config": "^6.46"
     },
     "config": {
         "allow-plugins": {

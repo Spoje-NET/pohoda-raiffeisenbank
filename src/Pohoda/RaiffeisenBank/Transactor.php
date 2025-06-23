@@ -114,10 +114,8 @@ class Transactor extends PohodaBankClient
         $this->setDataValue('bankType', $moveTrans[$transactionData->creditDebitIndication]);
         $this->setDataValue('account', \Ease\Shared::cfg('POHODA_BANK_IDS')); // RB
         $this->setDataValue('datePayment', (new \DateTime($transactionData->valueDate))->format('Y-m-d'));
-        // Field intNote is reserved for the transaction ID for now
-        // $this->setDataValue('intNote', _('Automatic Import').': '.\Ease\Shared::appName().' '.\Ease\Shared::appVersion().' '.$transactionData->entryReference);
+        $this->setDataValue('intNote', _('Automatic Import').': '.\Ease\Shared::appName().' '.\Ease\Shared::appVersion().' #'.$transactionData->entryReference);
         $this->setDataValue('statementNumber', ['statementNumber' => $transactionData->bankTransactionCode->code]);
-        $this->setDataValue('intNote', (string) $transactionData->entryReference);
 
         // $bankRecord = [
         // //    "MOSS" => ['ids' => 'AB'],

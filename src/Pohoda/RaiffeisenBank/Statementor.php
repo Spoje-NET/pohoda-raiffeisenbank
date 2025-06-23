@@ -202,6 +202,8 @@ class Statementor extends PohodaBankClient
                 $this->dataReset();
                 $this->setData($this->entryToPohoda($entry));
 
+                $transactionId = PohodaBankClient::intNote2TransactionId($this->getDataValue('intNote'));
+
                 $this->setDataValue('statementNumber', ['statementNumber' => sprintf('%03d/%d', (int) $statementNumber, (int) $statementCreated->format('Y'))]);
                 //                $this->setDataValue('account', current((array) $entry->NtryRef));
                 //                $this->setDataValue('vypisCisDokl', $statementXML->BkToCstmrStmt->Stmt->Id);
@@ -214,20 +216,28 @@ class Statementor extends PohodaBankClient
                         $amount = current($this->getDataValue('foreignCurrency'));
                     }
 
-                    $this->addStatusMessage(sprintf('Inserting 💸 %s [%s] %s', $this->getDataValue('symPar'), ($this->getDataValue('bankType') === 'receipt' ? '+' : '-').$amount.$this->currency, (string) $this->getDataValue('text')));
-                    $lastInsert = $this->insertTransactionToPohoda($bankIds);
-                    $this->messages[$lastInsert['id']] = \array_key_exists('message', $lastInsert) ? $lastInsert['message'] : $lastInsert['messages'];
-                    unset($lastInsert['messages']);
-                    $lastInsert['details']['amount'] = $amount;
-                    $lastInsert['details']['currency'] = $this->currency;
-                    $lastInsert['details']['date'] = $paymentDate->format('Y-m-d');
+                    $this->addStatusMessage(sprintf('Inserting 💸 %s [%s] %s', $transactionId, ($this->getDataValue('bankType') === 'receipt' ? '+' : '-').$amount.$this->currency, (string) $this->getDataValue('text')));
 
-                    if ($lastInsert['success']) {
-                        $inserted[$lastInsert['id']] = $lastInsert;
-                        ++$success;
+                    if ($this->checkForTransactionPresence($transactionId)) {
+                        $this->addStatusMessage("Transaction with ID '{$transactionId}' already present in Pohoda", 'warning');
+                        $result['message'] = "Duplicate transaction: {$transactionId}";
+                        $result['success'] = true;
+                    } else {
+                        $lastInsert = $this->insertTransactionToPohoda($bankIds);
+
+                        $this->messages[$lastInsert['id']] = \array_key_exists('message', $lastInsert) ? $lastInsert['message'] : $lastInsert['messages'];
+                        unset($lastInsert['messages']);
+                        $lastInsert['details']['amount'] = $amount;
+                        $lastInsert['details']['currency'] = $this->currency;
+                        $lastInsert['details']['date'] = $paymentDate->format('Y-m-d');
+
+                        if ($lastInsert['success']) {
+                            $inserted[$lastInsert['id']] = $lastInsert;
+                            ++$success;
+                        }
                     }
                 } catch (\Exception $exc) {
-                    $this->addStatusMessage('Error Inserting Record', 'error');
+                    $this->addStatusMessage('Error Inserting Record'.$exc->getMessage(), 'error');
                 }
             }
 
@@ -263,8 +273,7 @@ class Statementor extends PohodaBankClient
      */
     public function entryToPohoda(\SimpleXMLElement $entry): array
     {
-        $data['symPar'] = current((array) $entry->NtryRef);
-        $data['intNote'] = sprintf(_('Imported by %s %s  Import Job %s'), \Ease\Shared::AppName(), \Ease\Shared::AppVersion(), \Ease\Shared::cfg('MULTIFLEXI_JOB_ID', \Ease\Shared::cfg('JOB_ID', 'n/a')));
+        $data['intNote'] = sprintf(_('Imported by %s %s  Import Job: %s TransactionID: #%s#'), \Ease\Shared::AppName(), \Ease\Shared::AppVersion(), \Ease\Shared::cfg('MULTIFLEXI_JOB_ID', \Ease\Shared::cfg('JOB_ID', 'n/a')), current((array) $entry->NtryRef));
         $data['note'] = '';
         $data['datePayment'] = current((array) $entry->BookgDt->DtTm); // current((array) $entry->ValDt->DtTm);
         $data['dateStatement'] = current((array) $entry->BookgDt->DtTm);

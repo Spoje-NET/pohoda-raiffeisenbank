@@ -37,7 +37,7 @@ Shared::init(
     ],
     \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
 );
-$destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_exists('output', $options) ? $options['output'] : \Ease\Shared::cfg('RESULT_FILE', 'php://stdout'));
+$destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout'));
 
 PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
@@ -65,12 +65,12 @@ try {
     $pdfStatements = $engine->downloadPDF();
     $report['raiffeisenbank']['pdf'] = array_values($pdfStatements);
 } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
-    $report['mesage'] = $exc->getMessage();
+    $report['message'] = $exc->getMessage();
     $pdfStatements = [];
     $exitcode = $exc->getCode();
 
     if (!$exitcode) {
-        if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {
+        if (preg_match('/cURL error ([0-9]*):/', $report['message'], $codeRaw)) {
             $exitcode = (int) $codeRaw[1];
         }
     }
@@ -112,8 +112,8 @@ if ($pdfStatements) {
             $fileUrls[$uploadAs] = $uploaded;
             $dayUrls[$statementDate][$uploadAs] = $uploaded;
         } catch (\Exception $exc) {
-            fwrite(fopen('php://stderr', 'wb'), $exc->getMessage().\PHP_EOL);
-            $report['sharepoint'][$uploadAs] = 'upload failed';
+            $report['sharepoint'][$uploadAs] = $exc->getMessage();
+            $engine->addStatusMessage($exc->getMessage());
             $exitcode = 1;
         }
     }
@@ -140,53 +140,59 @@ try {
 }
 
 if ($xmlStatements) {
-    $engine->addStatusMessage('stage 4/6: Import XML Statements to Pohoda', 'debug');
-    $inserted = $engine->import(Shared::cfg('POHODA_BANK_IDS', ''));
-    $report['pohoda'] = $inserted;
+    if ($engine->isOnline()) {
+        $engine->addStatusMessage('stage 4/6: Import XML Statements to Pohoda', 'debug');
+        $inserted = $engine->import(Shared::cfg('POHODA_BANK_IDS', ''));
 
-    $report['messages'] = $engine->getMessages();
+        $report['pohoda'] = $inserted;
 
-    if ($engine->getExitCode()) {
-        $exitcode = $engine->getExitCode();
-    }
+        $report['messages'] = $engine->getMessages();
 
-    if ($inserted) {
-        $engine->addStatusMessage('stage 5/6: Add Sharepoint links to Pohoda', 'debug');
+        if ($engine->getExitCode()) {
+            $exitcode = $engine->getExitCode();
+        }
 
-        if ($fileUrls) {
-            $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'), \count($inserted)), 'debug');
+        if ($inserted) {
+            $engine->addStatusMessage('stage 5/6: Add Sharepoint links to Pohoda', 'debug');
 
-            $doc = new \SpojeNet\PohodaSQL\DOC();
-            $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
+            if ($fileUrls) {
+                $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'), \count($inserted)), 'debug');
 
-            foreach ($inserted as $refId => $importInfo) {
-                $pohodaId = $importInfo['details']['id'];
-                $dateStatement = $importInfo['details']['date'];
+                $doc = new \SpojeNet\PohodaSQL\DOC();
+                $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
 
-                if (\array_key_exists($dateStatement, $dayUrls)) {
-                    $filename = key($dayUrls[$dateStatement]);
-                    $sharepointUri = current($dayUrls[$dateStatement]);
+                foreach ($inserted as $refId => $importInfo) {
+                    $pohodaId = $importInfo['details']['id'];
+                    $dateStatement = $importInfo['details']['date'];
 
-                    try {
-                        $result = $doc->urlAttachment((int) $pohodaId, $sharepointUri, basename($filename));
-                        $doc->addStatusMessage(sprintf('#%d: %s 👉 %s', $refId, $pohodaId, $sharepointUri), $result ? 'success' : 'error');
-                        $report['pohodaSQL'][$refId]['status'] = 'success';
-                        $report['pohodaSQL'][$refId]['linkedTo'] = $pohodaId;
-                    } catch (\Exception $ex) {
-                        $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
-                        $report['pohodaSQL'][$pohodaId]['status'] = 'failed';
-                        $report['pohodaSQL'][$pohodaId]['message'] = $ex->getMessage();
-                        $exitcode = 4;
+                    if (\array_key_exists($dateStatement, $dayUrls)) {
+                        $filename = key($dayUrls[$dateStatement]);
+                        $sharepointUri = current($dayUrls[$dateStatement]);
+
+                        try {
+                            $result = $doc->urlAttachment((int) $pohodaId, $sharepointUri, basename($filename));
+                            $doc->addStatusMessage(sprintf('#%d: %s 👉 %s', $refId, $pohodaId, $sharepointUri), $result ? 'success' : 'error');
+                            $report['pohodaSQL'][$refId]['status'] = 'success';
+                            $report['pohodaSQL'][$refId]['linkedTo'] = $pohodaId;
+                        } catch (\Exception $ex) {
+                            $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
+                            $report['pohodaSQL'][$pohodaId]['status'] = 'failed';
+                            $report['pohodaSQL'][$pohodaId]['message'] = $ex->getMessage();
+                            $exitcode = 4;
+                        }
+                    } else {
+                        $engine->addStatusMessage(sprintf(_('No fresh statement for %s was uploaded to Sharepoint; Skipping PohodaSQL update'), $dateStatement), 'warning');
                     }
-                } else {
-                    $engine->addStatusMessage(sprintf(_('No fresh statement for %s was uploaded to Sharepoint; Skipping PohodaSQL update'), $dateStatement), 'warning');
                 }
+            } else {
+                $engine->addStatusMessage(_('No statements uploaded to Sharepoint; Skipping PohodaSQL update'), 'warning');
             }
         } else {
-            $engine->addStatusMessage(_('No statements uploaded to Sharepoint; Skipping PohodaSQL update'), 'warning');
+            $engine->addStatusMessage(_('Empty statement(s)'), 'warning');
         }
     } else {
-        $engine->addStatusMessage(_('Empty statement'), 'warning');
+        $engine->addStatusMessage('mServer error: '.$engine->lastCurlResponse, 'error');
+        $exitcode = 3;
     }
 } else {
     if (\is_array($xmlStatements)) {

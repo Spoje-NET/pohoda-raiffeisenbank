@@ -64,9 +64,14 @@ try {
     }
 }
 
-$inserted = $engine->import();
-$report['messages'] = $engine->getMessages();
-$report['exitcode'] = $engine->getExitCode();
+if ($engine->isOnline()) {
+    $inserted = $engine->import();
+    $report['messages'] = $engine->getMessages();
+    $report['exitcode'] = $engine->getExitCode();
+} else {
+    $engine->addStatusMessage('Error accesing mServer '.$this->lastCurlResponse, 'error');
+    $report['exitcode'] = 3;
+}
 
 if ($engine->getExitCode()) {
     $exitcode = $engine->getExitCode();
