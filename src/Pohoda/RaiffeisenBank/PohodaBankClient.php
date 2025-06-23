@@ -112,6 +112,8 @@ abstract class PohodaBankClient extends \mServer\Bank
      * Prepare processing interval.
      *
      * @throws \Exception
+     *
+     * @return \DatePeriod<\DateTime, \DateInterval, \DateTime>
      */
     public function setScope(string $scope): \DatePeriod
     {
