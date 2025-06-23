@@ -239,15 +239,18 @@ abstract class PohodaBankClient extends \mServer\Bank
      * Is Record with current remoteNumber already present in Pohoda ?
      *
      * @todo Implement using Pohoda API UserList
-     *
-     * @return bool
      */
-    public function checkForTransactionPresence()
+    public function checkForTransactionPresence(): bool
     {
-        if ($this->recordExists()) {
+        /** @var null|string[] $transactions */
+        static $transactions = null;
+
+        if ($transactions === null) {
+            $columns = $this->getColumnsFromPohoda(['intNote'], ['dateFrom' => $this->since->format(self::$dateFormat)]);
+            $transactions = \array_unique(\array_filter(\array_column($columns, 'intNote')));
         }
 
-        return false; // !empty($this->getColumnsFromPohoda('id', ['cisDosle' => $this->getDataValue('cisDosle')])); TODO
+        return \in_array($this->getDataValue('intNote'), $transactions, strict: true);
     }
 
     /**
@@ -261,11 +264,16 @@ abstract class PohodaBankClient extends \mServer\Bank
         $producedNumber = '';
         $producedAction = '';
         $result = [];
+        $transactionId = $this->getDataValue('intNote');
 
-        if ($this->checkForTransactionPresence() === false) {
+        if ($this->checkForTransactionPresence()) {
+            $this->addStatusMessage("Transaction with ID '{$transactionId}' already present in Pohoda", 'warning');
+            $result['message'] = "Duplicate transaction: {$transactionId}";
+            $result['success'] = false;
+        } else {
             try {
                 $cache = $this->getData();
-                $result['id'] = $this->getDataValue('symPar');
+                $result['id'] = $transactionId;
                 $this->reset();
 
                 // TODO: $result = $this->sync();
@@ -304,8 +312,6 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $result['success'] = false;
                 $this->exitCode = $exc->getCode() ?: 254;
             }
-        } else {
-            $this->addStatusMessage('Record with remoteNumber TODO already present in Pohoda', 'warning');
         }
 
         return $result;
