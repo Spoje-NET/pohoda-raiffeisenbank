@@ -32,17 +32,18 @@ Shared::init(
     ],
     \array_key_exists('environment', $options) ? $options['environment'] : '../.env',
 );
-$destination = \array_key_exists('output', $options) ? $options['output'] : \Ease\Shared::cfg('RESULT_FILE', 'php://stdout');
+$destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
 PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
+
+$engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
+$engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 
 if (Shared::cfg('STATEMENT_LINE')) {
     $engine->setStatementLine(Shared::cfg('STATEMENT_LINE'));
 }
 
-$engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
-$engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
-$engine->logBanner('', 'Scope: '.$engine->scope);
+$engine->logBanner($engine->statementLine, 'Scope: '.$engine->scope);
 $report = [
     'sharepoint' => [],
     'pohoda' => [],

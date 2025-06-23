@@ -83,10 +83,10 @@ try {
 
         foreach ($pdfStatements as $pdfStatement) {
             if (\array_key_exists($pdfStatement, $sharepointFiles)) {
-                $engine->addStatusMessage(sprintf('File %s exists in SharePoint', $pdfStatement), 'success');
+                $engine->addStatusMessage(sprintf(_('File %s exists in SharePoint'), $pdfStatement), 'success');
                 $report['existing'][] = $pdfStatement;
             } else {
-                $engine->addStatusMessage(sprintf('File %s does not exist in SharePoint', $pdfStatement), 'warning');
+                $engine->addStatusMessage(sprintf(_('File %s does not exist in SharePoint'), $pdfStatement), 'warning');
                 $report['missing'][] = $pdfStatement;
             }
         }
@@ -103,7 +103,7 @@ try {
     }
 }
 
-$written = file_put_contents($destination, json_encode($report, \Ease\Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
+$written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
 $engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');
 
 exit($exitcode);

@@ -28,7 +28,7 @@ $destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_ex
 /**
  * Get today's Statements list.
  */
-\Ease\Shared::init(
+Shared::init(
     ['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'POHODA_BANK_IDS', 'ACCOUNT_NUMBER'],
     \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
 );
