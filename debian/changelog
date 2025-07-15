@@ -1,8 +1,20 @@
-pohoda-raiffeisenbank (1.3.5) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.3.7) UNRELEASED; urgency=medium
+
+  * Duplicity check added
+
+ -- vitex <info@vitexsoftware.cz>  Mon, 23 Jun 2025 11:08:37 +0200
+
+pohoda-raiffeisenbank (1.3.6) jammy; urgency=medium
+
+  * code update
+
+ -- vitex <info@vitexsoftware.cz>  Mon, 23 Jun 2025 11:08:20 +0200
+
+pohoda-raiffeisenbank (1.3.5) jammy; urgency=medium
 
   * upload tool now can upload
 
- -- vitex <info@vitexsoftware.cz>  Wed, 12 Mar 2025 20:54:39 +0100
+ -- vitex <info@vitexsoftware.cz>  Sat, 31 May 2025 03:39:48 +0200
 
 pohoda-raiffeisenbank (1.3.4) jammy; urgency=medium
 

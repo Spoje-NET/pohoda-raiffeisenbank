@@ -69,7 +69,7 @@ if ($engine->isOnline()) {
     $report['messages'] = $engine->getMessages();
     $report['exitcode'] = $engine->getExitCode();
 } else {
-    $engine->addStatusMessage('Error accesing mServer '.$this->lastCurlResponse, 'error');
+    $engine->addStatusMessage('Error accesing mServer '.$engine->lastCurlResponse, 'error');
     $report['exitcode'] = 3;
 }
 
