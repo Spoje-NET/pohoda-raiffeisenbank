@@ -216,7 +216,7 @@ class Statementor extends PohodaBankClient
                         $amount = current($this->getDataValue('foreignCurrency'));
                     }
 
-                    $this->addStatusMessage(sprintf('Inserting 💸 %s [%s] %s', $transactionId, ($this->getDataValue('bankType') === 'receipt' ? '+' : '-').$amount.$this->currency, (string) $this->getDataValue('text')));
+                    $this->addStatusMessage(sprintf('💸 %s [%s] %s', $transactionId, ($this->getDataValue('bankType') === 'receipt' ? '+' : '-').$amount.$this->currency, (string) $this->getDataValue('text')));
 
                     if ($this->checkForTransactionPresence($transactionId)) {
                         $this->addStatusMessage("Transaction with ID '{$transactionId}' already present in Pohoda", 'warning');

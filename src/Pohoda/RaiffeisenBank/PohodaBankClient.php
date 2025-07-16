@@ -238,15 +238,23 @@ abstract class PohodaBankClient extends \mServer\Bank
     /**
      * Is Record with current remoteNumber already present in Pohoda ?
      *
-     * @todo Implement using Pohoda API UserList
+     * @param mixed $transactionId
      */
     public function checkForTransactionPresence($transactionId): bool
     {
-        $lrq = $this->queryFilter("Pozn2 like '%#$transactionId#%' " ,  'TransactionID: '.$transactionId);
-        
+        // Always create only one filter condition for the current transactionId
+        $this->reset(); // Ensure previous filters are cleared
+        $filter = "Pozn2 like '%#{$transactionId}#%' ";
+        $lrq = $this->queryFilter($filter, 'TransactionID: '.$transactionId);
+
         $found = $this->getListing($lrq);
 
-        return empty($found) === false ;
+        // If the result is invalid, throw an exception
+        if ($found === false) {
+            throw new \RuntimeException('Error fetching records for transaction check.');
+        }
+
+        return !empty($found);
     }
 
     public static function intNote2TransactionId(string $intNote): ?string
