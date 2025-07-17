@@ -222,6 +222,7 @@ class Statementor extends PohodaBankClient
                         $this->addStatusMessage("Transaction with ID '{$transactionId}' already present in Pohoda", 'warning');
                         $result['message'] = "Duplicate transaction: {$transactionId}";
                         $result['success'] = true;
+                        $inserted[$transactionId] = $result;
                     } else {
                         $lastInsert = $this->insertTransactionToPohoda($bankIds);
 

@@ -65,7 +65,7 @@ try {
 }
 
 if ($engine->isOnline()) {
-    $inserted = $engine->import();
+    $report['inserted'] = $engine->import();
     $report['messages'] = $engine->getMessages();
     $report['exitcode'] = $engine->getExitCode();
 } else {

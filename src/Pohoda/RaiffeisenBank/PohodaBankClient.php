@@ -49,8 +49,8 @@ abstract class PohodaBankClient extends \mServer\Bank
     {
         parent::__construct(null, $options);
         $this->setDataValue('account', $bankAccount);
-        //        $this->constantor = new \Pohoda\RW(null, ['evidence' => 'konst-symbol']);
-        //        $this->constSymbols = $this->constantor->getColumnsFromPohoda(['kod'], ['limit' => 0], 'kod');
+        $this->userAgent(\Ease\Shared::AppName().'_'.\Ease\Shared::AppVersion().' '.$this->userAgent());
+        $this->defaultHttpHeaders['STW-Application'] = \Ease\Shared::AppName().' '.\Ease\Shared::AppVersion();
     }
 
     /**
@@ -243,11 +243,15 @@ abstract class PohodaBankClient extends \mServer\Bank
     public function checkForTransactionPresence($transactionId): bool
     {
         // Always create only one filter condition for the current transactionId
-        $this->reset(); // Ensure previous filters are cleared
-        $filter = "Pozn2 like '%#{$transactionId}#%' ";
-        $lrq = $this->queryFilter($filter, 'TransactionID: '.$transactionId);
 
-        $found = $this->getListing($lrq);
+        $checker = new \mServer\Bank();
+        $checker->userAgent(\Ease\Shared::AppName().'-'.\Ease\Shared::AppVersion().' '.$this->userAgent());
+        $checker->defaultHttpHeaders['STW-Application'] = \Ease\Shared::AppName().' '.\Ease\Shared::AppVersion();
+
+        $filter = "Pozn2 like '%#{$transactionId}#%' ";
+        $lrq = $checker->queryFilter($filter, 'TransactionID: '.$transactionId);
+
+        $found = $checker->getListing($lrq);
 
         // If the result is invalid, throw an exception
         if ($found === false) {

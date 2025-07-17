@@ -19,6 +19,11 @@ use Ease\Shared;
 
 require_once '../vendor/autoload.php';
 
+class BankProbe extends \mServer\Bank
+{
+    use \Ease\datescope;
+}
+
 \define('APP_NAME', 'Pohoda Bank Statement Reporter');
 
 $options = getopt('o::e::', ['output::environment::', 'scope::']);
@@ -29,11 +34,7 @@ Shared::init([
 $destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 $scope = \array_key_exists('scope', $options) ? $options['scope'] : Shared::cfg('REPORT_SCOPE', 'yesterday');
 
-$engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
-
-if (Shared::cfg('STATEMENT_LINE')) {
-    $engine->setStatementLine(Shared::cfg('STATEMENT_LINE'));
-}
+$engine = new BankProbe();
 
 $engine->setScope($scope);
 
@@ -58,17 +59,17 @@ $payments = [
 ];
 
 try {
-    $statements = $engine->getXmlStatements();
+    $movements = $engine->getColumnsFromPohoda(['id', 'number', 'symVar'], ['dateFrom' => $engine->getSince()->format('Y-m-d'), 'dateTill' => $engine->getUntil()->format('Y-m-d')]);
 } catch (\Exception $exc) {
     $status = $exc->getMessage();
     $exitcode = (int) $exc->getCode();
 }
 
-if (empty($statements) === false) {
-    $payments['status'] = 'statement '.key($statements);
+if (empty($movements) === false) {
+    $payments['status'] = 'statement '.key($movements);
 
     try {
-        foreach ($statements as $statement => $xmlFile) {
+        foreach ($movements as $statement => $xmlFile) {
             $statementXml = simplexml_load_file($xmlFile);
 
             if ($statementXml === false) {
@@ -116,7 +117,7 @@ if (empty($statements) === false) {
     }
 } else {
     if ($exitcode === 0) {
-        $payments['status'] = 'no statements returned';
+        $payments['status'] = 'no movements returned';
     }
 }
 
