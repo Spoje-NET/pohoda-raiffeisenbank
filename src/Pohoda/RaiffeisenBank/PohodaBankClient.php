@@ -257,8 +257,12 @@ abstract class PohodaBankClient extends \mServer\Bank
         return !empty($found);
     }
 
-    public static function intNote2TransactionId(string $intNote): ?string
+    public static function intNote2TransactionId(?string $intNote): ?string
     {
+        if (empty($intNote)) {
+            return null;
+        }
+
         if (preg_match('/#(\d+)#/', $intNote, $matches)) {
             return $matches[1];
         }

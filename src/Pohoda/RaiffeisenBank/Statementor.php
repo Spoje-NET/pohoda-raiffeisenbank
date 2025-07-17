@@ -278,9 +278,14 @@ class Statementor extends PohodaBankClient
         $data['datePayment'] = current((array) $entry->BookgDt->DtTm); // current((array) $entry->ValDt->DtTm);
         $data['dateStatement'] = current((array) $entry->BookgDt->DtTm);
         $moveTrans = ['DBIT' => 'expense', 'CRDT' => 'receipt'];
-        $data['bankType'] = $moveTrans[trim((string) $entry->CdtDbtInd)];
-        //        $data['cisDosle', strval($entry->NtryRef));
-        //        $data['datVyst', new \DateTime($entry->BookgDt->DtTm));
+
+        if (\array_key_exists(trim((string) $entry->CdtDbtInd), $moveTrans)) {
+            $data['bankType'] = $moveTrans[trim((string) $entry->CdtDbtInd)];
+        } else {
+            $this->addStatusMessage(sprintf(_('Unknown CdtDbtInd %s in entry %s'), trim((string) $entry->CdtDbtInd), (string) $entry->NtryRef), 'error');
+
+            throw new \InvalidArgumentException(sprintf(_('Unknown CdtDbtInd %s in entry %s'), trim((string) $entry->CdtDbtInd), (string) $entry->NtryRef));
+        }
 
         $amountAttributes = self::simpleXmlAttributes($entry->Amt);
 

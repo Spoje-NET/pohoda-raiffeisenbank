@@ -184,3 +184,47 @@ Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
 * **pohoda-raiffeisenbank-offline-statement-importer** - Import transactions from XML Statements file.
 * **pohoda-raiffeisenbank-xml-statement** - Import transactions from XML Statements file.
 * **pohodasql-raiffeisenbank-statements-sharepoint** - Import transactions from Account Statements with link to Sharepoint
+
+* **pohoda-bank-transaction-report** - Generate a JSON report of Pohoda bank transactions for a specified period. The output format matches the RaiffeisenBank statement reporter, including totals and transaction breakdowns.
+
+### pohoda-bank-transaction-report
+
+This tool generates a JSON report of bank transactions imported in Pohoda for a given period.
+
+**Usage:**
+
+```shell
+pohoda-bank-transaction-report --scope="last_month" --output="report.json"
+```
+
+**Options:**
+
+* `--scope`   Specify the period (e.g. `yesterday`, `last_month`, custom range)
+* `--output`  Output file (default: stdout)
+* `--environment`  Path to .env file (default: `../.env`)
+
+The report includes:
+
+* Incoming and outgoing transactions
+* Totals and sums
+* IBAN and account info (if available)
+* Date range
+
+Example output:
+
+```json
+{
+  "source": "Statementor",
+  "account": "666666666",
+  "status": "statement 2024-07-01_666666666_CZK_2024-07-01.xml",
+  "in": {"2024-07-01": 1000.00},
+  "out": {"2024-07-02": 500.00},
+  "in_total": 1,
+  "out_total": 1,
+  "in_sum_total": 1000.00,
+  "out_sum_total": 500.00,
+  "from": "2024-07-01",
+  "to": "2024-07-31",
+  "iban": "CZ1234567890123456789012"
+}
+```

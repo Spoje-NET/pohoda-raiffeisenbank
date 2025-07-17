@@ -1,0 +1,4 @@
+#!/bin/bash
+# Pohoda Bank Transaction Report
+# Usage: pohoda-bank-transaction-report [--scope=period] [--output=filename]
+php -f "$(dirname "$0")/../src/pohoda-bank-transaction-report.php" -- "$@"
