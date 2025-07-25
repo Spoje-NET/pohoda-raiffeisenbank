@@ -8,13 +8,13 @@
             "email": "info@vitexsoftware.cz"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "bin": ["src/pohoda-raiffeisenbank-transactions.php", "src/pohoda-raiffeisenbank-setup.php"],
     "require": {
         "vgrem/php-spo": "^3.1.2",
         "vitexsoftware/pohoda-connector": "^0.9.1",
         "vitexsoftware/rbczpremiumapi": "^1.4",
-        "spojenet/pohoda-sql": "^0.1"
+        "spojenet/pohoda-sql": "^0.2"
     },
     "autoload": {
         "psr-4": {

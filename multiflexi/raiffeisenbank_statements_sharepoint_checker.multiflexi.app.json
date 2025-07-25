@@ -3,7 +3,7 @@
     "name": "Raiffeisenbank statements Sharepoint check",
     "description": "Check Raiffeisenbank statements presence in Sharepoint",
     "executable": "raiffeisenbank-statements-sharepoint-checker",
-    "setup": "pohoda-raiffeisenbank-setup",
+    "setup": "",
     "cmdparams": "",
     "deploy": "apt install pohoda-raiffeisenbank",
     "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
@@ -39,7 +39,7 @@
         "STATEMENT_LINE": {
             "type": "set",
             "description": "Bank Statement line",
-	    "defval": "ADDITIONAL",
+	        "defval": "ADDITIONAL",
             "hint": "MAIN",
             "options": {
                 "MAIN": "Main statement line",
