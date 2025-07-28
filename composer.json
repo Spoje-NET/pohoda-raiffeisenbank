@@ -12,7 +12,7 @@
     "bin": ["src/pohoda-raiffeisenbank-transactions.php", "src/pohoda-raiffeisenbank-setup.php"],
     "require": {
         "vgrem/php-spo": "^3.1.2",
-        "vitexsoftware/pohoda-connector": "^0.9.1",
+        "vitexsoftware/pohoda-connector": "^0.10.0",
         "vitexsoftware/rbczpremiumapi": "^1.4",
         "spojenet/pohoda-sql": "^0.2"
     },
