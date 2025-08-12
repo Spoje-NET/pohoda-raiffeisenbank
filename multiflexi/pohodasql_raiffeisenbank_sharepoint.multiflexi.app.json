@@ -7,9 +7,9 @@
     "cmdparams": "",
     "deploy": "apt install pohoda-raiffeisenbank",
     "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-    "requirements": "mServer,SQLServer,RaiffeisenBank,Office365",
+    "requirements": ["mServer", "SQLServer", "RaiffeisenBank", "Office365"],
     "ociimage": "",
-    "topics": "Raiffeisen,Bank,Statements,Pohoda",
+    "topics": ["Raiffeisen", "Bank", "Statements", "Pohoda"],
     "uuid": "e9893573-24aa-4518-bf05-66fae9ad153c",
     "environment": {
         "ACCOUNT_NUMBER": {

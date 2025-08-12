@@ -7,9 +7,9 @@
     "cmdparams": "",
     "deploy": "apt install pohoda-raiffeisenbank",
     "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-    "requirements": "mServer,SQLServer,RaiffeisenBank",
+    "requirements": ["mServer", "SQLServer", "RaiffeisenBank"],
     "ociimage": "",
-    "topics": "Raiffeisen,Bank,Statements,Pohoda",
+    "topics": ["Raiffeisen", "Bank", "Statements", "Pohoda"],
     "uuid": "d660baec-aa96-4810-ad9f-b4180f27b9f1",
     "environment": {
         "FIXED_RATE": {
@@ -45,7 +45,7 @@
         "STATEMENT_LINE": {
             "type": "set",
             "description": "Bank Statement line",
-	    "defval": "ADDITIONAL",
+            "defval": "ADDITIONAL",
             "hint": "MAIN",
             "options": {
                 "MAIN": "Main statement line",
@@ -70,16 +70,7 @@
             "defval": "auto",
             "required": true
         },
-        "STATEMENT_LINE": {
-            "description": "Statement line can be MAIN or ADDITIONAL",
-            "type": "set",
-            "description": "Bank Statement line",
-            "defval": "ADDITIONAL",
-            "options": {
-                "MAIN": "Main statement line",
-                "ADDITIONAL": "Additional statement line" 
-            }
-        },
+
         "ACCOUNT_CURRENCY": {
             "type": "text",
             "description": "for multicurrency accounts please specify one",

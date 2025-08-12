@@ -7,9 +7,9 @@
     "cmdparams": "",
     "deploy": "apt install pohoda-bank-transaction-report",
     "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-    "requirements": "mServer,SQLServer,RaiffeisenBank",
+    "requirements": ["mServer", "SQLServer", "RaiffeisenBank"],
     "ociimage": "",
-    "topics": "Raiffeisen,Bank,Transaction,Report,Pohoda",
+    "topics": ["Raiffeisen", "Bank", "Transaction", "Report", "Pohoda"],
     "uuid": "47bd8f47-8372-4192-a5b5-72a2bb3987bc",
     "environment": {
         "ACCOUNT_NUMBER": {
