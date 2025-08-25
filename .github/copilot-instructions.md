@@ -40,3 +40,5 @@ When writing code, always ensure that it is maintainable and follows best practi
 
 When create new class or update existing class, always create or update its phpunit test files.
 
+All files in the multiflexi/*.app.json directory must conform to the schema available at: https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi
+
