@@ -200,7 +200,7 @@ class Statementor extends PohodaBankClient
             foreach ($statementXML->BkToCstmrStmt->Stmt->Ntry as $entry) {
                 ++$entries;
                 $this->dataReset();
-                $this->setData($this->entryToPohoda($entry));
+                $this->setData($this->entryToPohoda($entry, $statementCreated->getTimestamp()));
 
                 $transactionId = PohodaBankClient::intNote2TransactionId($this->getDataValue('intNote'));
 
@@ -226,7 +226,7 @@ class Statementor extends PohodaBankClient
                     } else {
                         $lastInsert = $this->insertTransactionToPohoda($bankIds);
 
-                        $this->messages[$lastInsert['id']] = \array_key_exists('message', $lastInsert) ? $lastInsert['message'] : $lastInsert['messages'];
+                        $this->messages[$lastInsert['id']] = \array_key_exists('message', $lastInsert) ? $lastInsert['message'] : (\array_key_exists('messages', $lastInsert) ? $lastInsert['messages'] : '?!');
                         unset($lastInsert['messages']);
                         $lastInsert['details']['amount'] = $amount;
                         $lastInsert['details']['currency'] = $this->currency;
@@ -272,9 +272,9 @@ class Statementor extends PohodaBankClient
      *
      * @return array<string, array<string, string>|string>
      */
-    public function entryToPohoda(\SimpleXMLElement $entry): array
+    public function entryToPohoda(\SimpleXMLElement $entry, int $ntryPrefix = 0): array
     {
-        $data['intNote'] = sprintf(_('Imported by %s %s  Import Job: %s TransactionID: #%s#'), \Ease\Shared::AppName(), \Ease\Shared::AppVersion(), \Ease\Shared::cfg('MULTIFLEXI_JOB_ID', \Ease\Shared::cfg('JOB_ID', 'n/a')), current((array) $entry->NtryRef));
+        $data['intNote'] = sprintf(_('%s %s Job: %s Trans: #%s#'), \Ease\Shared::AppName(), \Ease\Shared::AppVersion(), \Ease\Shared::cfg('MULTIFLEXI_JOB_ID', \Ease\Shared::cfg('JOB_ID', 'n/a')), (string) $ntryPrefix.'_'.current((array) $entry->NtryRef));
         $data['note'] = '';
         $data['datePayment'] = current((array) $entry->BookgDt->DtTm); // current((array) $entry->ValDt->DtTm);
         $data['dateStatement'] = current((array) $entry->BookgDt->DtTm);

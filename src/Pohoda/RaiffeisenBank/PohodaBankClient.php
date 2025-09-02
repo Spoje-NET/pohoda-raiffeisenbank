@@ -34,6 +34,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public static string $dateFormat = 'Y-m-d';
     public string $currency;
+    public array $messages = [];
     protected \DateTime $since;
     protected \DateTime $until;
     protected string $bankIDS;
@@ -49,8 +50,8 @@ abstract class PohodaBankClient extends \mServer\Bank
     {
         parent::__construct(null, $options);
         $this->setDataValue('account', $bankAccount);
-        $this->userAgent(\Ease\Shared::AppName().'_'.\Ease\Shared::AppVersion().' '.$this->userAgent());
-        $this->defaultHttpHeaders['STW-Application'] = \Ease\Shared::AppName().' '.\Ease\Shared::AppVersion();
+        $this->userAgent(Shared::AppName().'_'.Shared::AppVersion().' '.$this->userAgent());
+        $this->defaultHttpHeaders['STW-Application'] = Shared::AppName().' '.Shared::AppVersion();
     }
 
     /**
@@ -245,8 +246,8 @@ abstract class PohodaBankClient extends \mServer\Bank
         // Always create only one filter condition for the current transactionId
 
         $checker = new \mServer\Bank();
-        $checker->userAgent(\Ease\Shared::AppName().'-'.\Ease\Shared::AppVersion().' '.$this->userAgent());
-        $checker->defaultHttpHeaders['STW-Application'] = \Ease\Shared::AppName().' '.\Ease\Shared::AppVersion();
+        $checker->userAgent(Shared::AppName().'-'.Shared::AppVersion().' '.$this->userAgent());
+        $checker->defaultHttpHeaders['STW-Application'] = Shared::AppName().' '.Shared::AppVersion();
 
         $filter = "Pozn2 like '%#{$transactionId}#%' ";
         $lrq = $checker->queryFilter($filter, 'TransactionID: '.$transactionId);
@@ -267,8 +268,10 @@ abstract class PohodaBankClient extends \mServer\Bank
             return null;
         }
 
-        if (preg_match('/#(\d+)#/', $intNote, $matches)) {
-            return $matches[1];
+        $matches = [];
+
+        if (preg_match('/#(\d+)_(\d+)#/', $intNote, $matches)) { // TODO: Update
+            return $matches[1].'_'.$matches[2];
         }
 
         return null;
