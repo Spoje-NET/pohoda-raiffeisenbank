@@ -1,126 +1,205 @@
 {
-    "image": "",
-    "name": "Raiffeisenbank transactions for Pohoda",
-    "description": "Import Raiffeisenbank statements into Pohoda",
-    "executable": "pohoda-raiffeisenbank-transactions",
-    "setup": "pohoda-raiffeisenbank-setup",
-    "cmdparams": "",
-    "deploy": "apt install pohoda-raiffeisenbank",
-    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-    "requirements": ["mServer", "SQLServer", "RaiffeisenBank"],
-    "ociimage": "",
-    "topics": ["Raiffeisen", "Bank", "Statements", "Pohoda"],
+    "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+    "schemaVersion": "3.0.0",
     "uuid": "10f24522-66af-460c-8dc1-e6454cfc9a55",
+    "name": {
+        "en": "Raiffeisenbank transactions for Pohoda",
+        "cs": "Raiffeisenbank transactions for Pohoda"
+    },
+    "description": {
+        "en": "Import Raiffeisenbank statements into Pohoda",
+        "cs": "Import Raiffeisenbank statements into Pohoda"
+    },
+    "tags": [
+        "Raiffeisen",
+        "Bank",
+        "Statements",
+        "Pohoda"
+    ],
+    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
+    "image": "",
+    "ociimage": "",
+    "executable": "pohoda-raiffeisenbank-transactions",
     "environment": {
         "ACCOUNT_NUMBER": {
             "type": "text",
-            "description": "Bank Account Number",
+            "description": {
+                "en": "Bank Account Number",
+                "cs": "Bank Account Number"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "CERT_PASS": {
             "type": "password",
-            "description": "Certificate password",
+            "description": {
+                "en": "Certificate password",
+                "cs": "Certificate password"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "CERT_FILE": {
             "type": "string",
-            "description": "Path to RB Certificate file",
+            "description": {
+                "en": "Path to RB Certificate file",
+                "cs": "Path to RB Certificate file"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "IMPORT_SCOPE": {
             "type": "text",
-            "description": "Time scope of transactions downloaded",
+            "description": {
+                "en": "Time scope of transactions downloaded",
+                "cs": "Time scope of transactions downloaded"
+            },
             "defval": "today",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "XIBMCLIENTID": {
             "type": "text",
-            "description": "ClientID",
+            "description": {
+                "en": "ClientID",
+                "cs": "ClientID"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "FIXED_RATE": {
             "type": "number",
-            "description": "Fixed rate for converting foreign currency transactions to CZK",
+            "description": {
+                "en": "Fixed rate for converting foreign currency transactions to CZK",
+                "cs": "Fixed rate for converting foreign currency transactions to CZK"
+            },
             "defval": "",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "FIXED_RATE_AMOUNT": {
             "type": "number",
-            "description": "Fixed rate amount for some currencies (e.g., 💴)",
+            "description": {
+                "en": "Fixed rate amount for some currencies (e.g., 💴)",
+                "cs": "Fixed rate amount for some currencies (e.g., 💴)"
+            },
             "defval": "100",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "CNB_CACHE": {
             "type": "text",
-            "description": "Use CNB cache to get actual rate from CNB",
+            "description": {
+                "en": "Use CNB cache to get actual rate from CNB",
+                "cs": "Use CNB cache to get actual rate from CNB"
+            },
             "defval": "http://localhost/cnb-cache",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "RATE_OFFSET": {
             "type": "text",
-            "description": "Rate offset to get rate for previous day",
+            "description": {
+                "en": "Rate offset to get rate for previous day",
+                "cs": "Rate offset to get rate for previous day"
+            },
             "defval": "yesterday",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
-
         "POHODA_ICO": {
             "type": "text",
-            "description": "Pohoda ICO",
+            "description": {
+                "en": "Pohoda ICO",
+                "cs": "Pohoda ICO"
+            },
             "defval": "12345678",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_URL": {
             "type": "text",
-            "description": "Pohoda URL",
+            "description": {
+                "en": "Pohoda URL",
+                "cs": "Pohoda URL"
+            },
             "defval": "http://127.0.0.1:10010",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_USERNAME": {
             "type": "text",
-            "description": "Pohoda Username",
+            "description": {
+                "en": "Pohoda Username",
+                "cs": "Pohoda Username"
+            },
             "defval": "Admin",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_PASSWORD": {
             "type": "password",
-            "description": "Pohoda Password",
+            "description": {
+                "en": "Pohoda Password",
+                "cs": "Pohoda Password"
+            },
             "defval": "xxxxxxxx",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_TIMEOUT": {
             "type": "number",
-            "description": "Pohoda Timeout",
+            "description": {
+                "en": "Pohoda Timeout",
+                "cs": "Pohoda Timeout"
+            },
             "defval": 60,
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_COMPRESS": {
-            "type": "boolean",
-            "description": "Pohoda Compress",
+            "type": "bool",
+            "description": {
+                "en": "Pohoda Compress",
+                "cs": "Pohoda Compress"
+            },
             "defval": false,
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_DEBUG": {
-            "type": "boolean",
-            "description": "Pohoda Debug",
+            "type": "bool",
+            "description": {
+                "en": "Pohoda Debug",
+                "cs": "Pohoda Debug"
+            },
             "defval": true,
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_BANK_IDS": {
             "type": "text",
-            "description": "Pohoda Bank IDs",
+            "description": {
+                "en": "Pohoda Bank IDs",
+                "cs": "Pohoda Bank IDs"
+            },
             "defval": "KB",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "EASE_LOGGER": {
             "type": "string",
-            "description": "write log messages using",
+            "description": {
+                "en": "write log messages using",
+                "cs": "write log messages using"
+            },
             "defval": "console|syslog",
-            "required": false
+            "required": false,
+            "category": "Behavior"
         }
-    },
-    "multiflexi": "1.10.2.0"
+    }
 }

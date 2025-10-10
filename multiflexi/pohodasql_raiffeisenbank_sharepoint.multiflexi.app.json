@@ -1,258 +1,426 @@
 {
-    "image": "",
-    "name": "Raiffeisenbank statements for PohodaSQL+Sharepoint",
-    "description": "Import Raiffeisenbank statements into PohodaSQL and store in Sharepoint",
-    "executable": "pohodasql-raiffeisenbank-statements-sharepoint",
-    "setup": "pohoda-raiffeisenbank-setup",
-    "cmdparams": "",
-    "deploy": "apt install pohoda-raiffeisenbank",
-    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-    "requirements": ["mServer", "SQLServer", "RaiffeisenBank", "Office365"],
-    "ociimage": "",
-    "topics": ["Raiffeisen", "Bank", "Statements", "Pohoda"],
+    "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+    "schemaVersion": "3.0.0",
     "uuid": "e9893573-24aa-4518-bf05-66fae9ad153c",
+    "name": {
+        "en": "Raiffeisenbank statements for PohodaSQL+Sharepoint",
+        "cs": "Raiffeisenbank statements for PohodaSQL+Sharepoint"
+    },
+    "description": {
+        "en": "Import Raiffeisenbank statements into PohodaSQL and store in Sharepoint",
+        "cs": "Import Raiffeisenbank statements into PohodaSQL and store in Sharepoint"
+    },
+    "tags": [
+        "Raiffeisen",
+        "Bank",
+        "Statements",
+        "Pohoda"
+    ],
+    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
+    "image": "",
+    "ociimage": "",
+    "executable": "pohodasql-raiffeisenbank-statements-sharepoint",
     "environment": {
         "ACCOUNT_NUMBER": {
             "type": "text",
-            "description": "Bank Account Number",
+            "description": {
+                "en": "Bank Account Number",
+                "cs": "Bank Account Number"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "CERT_PASS": {
             "type": "password",
-            "description": "Certificate password",
+            "description": {
+                "en": "Certificate password",
+                "cs": "Certificate password"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "CERT_FILE": {
             "type": "string",
-            "description": "Path to RB Certificate file",
+            "description": {
+                "en": "Path to RB Certificate file",
+                "cs": "Path to RB Certificate file"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "IMPORT_SCOPE": {
             "type": "text",
-            "description": "Time scope of transactions downloaded",
+            "description": {
+                "en": "Time scope of transactions downloaded",
+                "cs": "Time scope of transactions downloaded"
+            },
             "defval": "auto",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "ACCOUNT_CURRENCY": {
             "type": "text",
-            "description": "for multicurrency accounts please specify one",
+            "description": {
+                "en": "for multicurrency accounts please specify one",
+                "cs": "for multicurrency accounts please specify one"
+            },
             "defval": "",
-            "hint": "CZK",
-            "required": false
+            "hint": {
+                "en": "CZK",
+                "cs": "CZK"
+            },
+            "required": false,
+            "category": "Other"
         },
         "XIBMCLIENTID": {
             "type": "text",
-            "description": "ClientID",
+            "description": {
+                "en": "ClientID",
+                "cs": "ClientID"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "STATEMENT_LINE": {
             "type": "set",
-            "description": "Bank Statement line",
-	    "defval": "ADDITIONAL",
-            "hint": "MAIN",
+            "description": {
+                "en": "Bank Statement line",
+                "cs": "Bank Statement line"
+            },
+            "defval": "ADDITIONAL",
+            "hint": {
+                "en": "MAIN",
+                "cs": "MAIN"
+            },
             "options": {
                 "MAIN": "Main statement line",
-                "ADDITIONAL": "Additional statement line" 
-            }
+                "ADDITIONAL": "Additional statement line"
+            },
+            "category": "Other"
         },
         "POHODA_ICO": {
             "type": "text",
-            "description": "Pohoda ICO",
+            "description": {
+                "en": "Pohoda ICO",
+                "cs": "Pohoda ICO"
+            },
             "defval": "12345678",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_URL": {
             "type": "text",
-            "description": "Pohoda URL",
+            "description": {
+                "en": "Pohoda URL",
+                "cs": "Pohoda URL"
+            },
             "defval": "http://127.0.0.1:10010",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_USERNAME": {
             "type": "text",
-            "description": "Pohoda Username",
+            "description": {
+                "en": "Pohoda Username",
+                "cs": "Pohoda Username"
+            },
             "defval": "Admin",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_PASSWORD": {
             "type": "password",
-            "description": "Pohoda Password",
+            "description": {
+                "en": "Pohoda Password",
+                "cs": "Pohoda Password"
+            },
             "defval": "xxxxxxxx",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_TIMEOUT": {
             "type": "number",
-            "description": "Pohoda Timeout",
+            "description": {
+                "en": "Pohoda Timeout",
+                "cs": "Pohoda Timeout"
+            },
             "defval": 60,
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_COMPRESS": {
-            "type": "boolean",
-            "description": "Pohoda Compress",
+            "type": "bool",
+            "description": {
+                "en": "Pohoda Compress",
+                "cs": "Pohoda Compress"
+            },
             "defval": false,
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_DEBUG": {
-            "type": "boolean",
-            "description": "Pohoda Debug",
+            "type": "bool",
+            "description": {
+                "en": "Pohoda Debug",
+                "cs": "Pohoda Debug"
+            },
             "defval": false,
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_BANK_IDS": {
             "type": "text",
-            "description": "Pohoda Bank IDs",
+            "description": {
+                "en": "Pohoda Bank IDs",
+                "cs": "Pohoda Bank IDs"
+            },
             "defval": "KB",
-            "required": true
+            "required": true,
+            "category": "API"
         },
-
         "FIXED_RATE": {
             "type": "number",
-            "description": "Fixed rate for converting foreign currency transactions to CZK",
+            "description": {
+                "en": "Fixed rate for converting foreign currency transactions to CZK",
+                "cs": "Fixed rate for converting foreign currency transactions to CZK"
+            },
             "defval": "",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "FIXED_RATE_AMOUNT": {
             "type": "number",
-            "description": "Fixed rate amount for some currencies (e.g., 💴)",
+            "description": {
+                "en": "Fixed rate amount for some currencies (e.g., 💴)",
+                "cs": "Fixed rate amount for some currencies (e.g., 💴)"
+            },
             "defval": "100",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "CNB_CACHE": {
             "type": "text",
-            "description": "Use CNB cache to get actual rate from CNB",
+            "description": {
+                "en": "Use CNB cache to get actual rate from CNB",
+                "cs": "Use CNB cache to get actual rate from CNB"
+            },
             "defval": "http://localhost/cnb-cache",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "RATE_OFFSET": {
             "type": "text",
-            "description": "Rate offset to get rate for previous day",
+            "description": {
+                "en": "Rate offset to get rate for previous day",
+                "cs": "Rate offset to get rate for previous day"
+            },
             "defval": "yesterday",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
-
         "DB_CONNECTION": {
             "type": "text",
-            "description": "Database Connection",
+            "description": {
+                "en": "Database Connection",
+                "cs": "Database Connection"
+            },
             "defval": "sqlsrv",
-            "required": true
+            "required": true,
+            "category": "Database"
         },
         "DB_HOST": {
             "type": "text",
-            "description": "Database Host",
+            "description": {
+                "en": "Database Host",
+                "cs": "Database Host"
+            },
             "defval": "127.0.0.1",
-            "required": true
+            "required": true,
+            "category": "Database"
         },
         "DB_PORT": {
             "type": "number",
-            "description": "Database Port",
+            "description": {
+                "en": "Database Port",
+                "cs": "Database Port"
+            },
             "defval": 1433,
-            "required": true
+            "required": true,
+            "category": "Database"
         },
         "DB_DATABASE": {
             "type": "text",
-            "description": "Database Name",
+            "description": {
+                "en": "Database Name",
+                "cs": "Database Name"
+            },
             "defval": "StwPh_12345678_2023",
-            "required": true
+            "required": true,
+            "category": "Database"
         },
         "DB_USERNAME": {
             "type": "text",
-            "description": "Database Username",
+            "description": {
+                "en": "Database Username",
+                "cs": "Database Username"
+            },
             "defval": "sa",
-            "required": true
+            "required": true,
+            "category": "Database"
         },
         "DB_PASSWORD": {
             "type": "password",
-            "description": "Database Password",
+            "description": {
+                "en": "Database Password",
+                "cs": "Database Password"
+            },
             "defval": "pohodaSQLpassword",
-            "required": true
+            "required": true,
+            "category": "Database"
         },
         "DB_SETTINGS": {
             "type": "text",
-            "description": "Database Settings like encrypt=false",
+            "description": {
+                "en": "Database Settings like encrypt=false",
+                "cs": "Database Settings like encrypt=false"
+            },
             "defval": "",
-            "required": false
+            "required": false,
+            "category": "Database"
         },
         "OFFICE365_USERNAME": {
             "type": "text",
-            "description": "Office 365 Username",
+            "description": {
+                "en": "Office 365 Username",
+                "cs": "Office 365 Username"
+            },
             "defval": "",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "OFFICE365_PASSWORD": {
             "type": "password",
-            "description": "Office 365 Password",
+            "description": {
+                "en": "Office 365 Password",
+                "cs": "Office 365 Password"
+            },
             "defval": "",
-            "required": false
+            "required": false,
+            "category": "Security"
         },
         "OFFICE365_CLIENTID": {
             "type": "text",
-            "description": "Office 365 Client ID",
+            "description": {
+                "en": "Office 365 Client ID",
+                "cs": "Office 365 Client ID"
+            },
             "defval": "",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "OFFICE365_SECRET": {
             "type": "text",
-            "description": "Office 365 Secret",
+            "description": {
+                "en": "Office 365 Secret",
+                "cs": "Office 365 Secret"
+            },
             "defval": "",
-            "required": false
+            "required": false,
+            "category": "Security"
         },
         "OFFICE365_CLSECRET": {
             "type": "text",
-            "description": "Office 365 Client Secret",
+            "description": {
+                "en": "Office 365 Client Secret",
+                "cs": "Office 365 Client Secret"
+            },
             "defval": "",
-            "required": false
+            "required": false,
+            "category": "Security"
         },
         "OFFICE365_TENANT": {
             "type": "text",
-            "description": "Office 365 Tenant",
+            "description": {
+                "en": "Office 365 Tenant",
+                "cs": "Office 365 Tenant"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "OFFICE365_SITE": {
             "type": "text",
-            "description": "Office 365 Site",
+            "description": {
+                "en": "Office 365 Site",
+                "cs": "Office 365 Site"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "OFFICE365_PATH": {
             "type": "text",
-            "description": "Office 365 Path",
+            "description": {
+                "en": "Office 365 Path",
+                "cs": "Office 365 Path"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "STATEMENT_SAVE_DIR": {
             "type": "text",
-            "description": "Place for PDF files",
+            "description": {
+                "en": "Place for PDF files",
+                "cs": "Place for PDF files"
+            },
             "defval": "",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "APP_DEBUG": {
             "type": "bool",
-            "description": "Show debug messages",
+            "description": {
+                "en": "Show debug messages",
+                "cs": "Show debug messages"
+            },
             "defval": "False",
-            "required": true
+            "required": true,
+            "category": "Behavior"
         },
         "RESULT_FILE": {
             "type": "string",
-            "description": "write output json data to",
+            "description": {
+                "en": "write output json data to",
+                "cs": "write output json data to"
+            },
             "defval": "bank_import_report_{ACCOUNT_NUMBER}.json",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "ZABBIX_KEY": {
             "type": "string",
-            "description": "Default name for Zabbix Item key name",
+            "description": {
+                "en": "Default name for Zabbix Item key name",
+                "cs": "Default name for Zabbix Item key name"
+            },
             "defval": "Raiff-Import-{ACCOUNT_NUMBER}",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "EASE_LOGGER": {
             "type": "string",
-            "description": "write log messages using",
+            "description": {
+                "en": "write log messages using",
+                "cs": "write log messages using"
+            },
             "defval": "console|syslog",
-            "required": false
+            "required": false,
+            "category": "Behavior"
         }
-    },
-    "multiflexi": "1.10.2.0"
+    }
 }

@@ -1,95 +1,156 @@
 {
-    "image": "",
-    "name": "Raiffeisenbank Transaction Report for Pohoda",
-    "description": "Generate detailed transaction reports from Raiffeisenbank statements for Pohoda",
-    "executable": "pohoda-bank-transaction-report",
-    "setup": "pohoda-bank-transaction-report-setup",
-    "cmdparams": "",
-    "deploy": "apt install pohoda-bank-transaction-report",
-    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-    "requirements": ["mServer", "SQLServer", "RaiffeisenBank"],
-    "ociimage": "",
-    "topics": ["Raiffeisen", "Bank", "Transaction", "Report", "Pohoda"],
+    "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+    "schemaVersion": "3.0.0",
     "uuid": "47bd8f47-8372-4192-a5b5-72a2bb3987bc",
+    "name": {
+        "en": "Raiffeisenbank Transaction Report for Pohoda",
+        "cs": "Raiffeisenbank Transaction Report for Pohoda"
+    },
+    "description": {
+        "en": "Generate detailed transaction reports from Raiffeisenbank statements for Pohoda",
+        "cs": "Generate detailed transakce reports from Raiffeisenbank statements for Pohoda"
+    },
+    "tags": [
+        "Raiffeisen",
+        "Bank",
+        "Transaction",
+        "Report",
+        "Pohoda"
+    ],
+    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
+    "image": "",
+    "ociimage": "",
+    "executable": "pohoda-bank-transaction-report",
     "environment": {
         "ACCOUNT_NUMBER": {
             "type": "text",
-            "description": "Bank Account Number",
+            "description": {
+                "en": "Bank Account Number",
+                "cs": "Bank Account Number"
+            },
             "defval": "",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "REPORT_SCOPE": {
             "type": "text",
-            "description": "Time scope of transactions included in the report",
+            "description": {
+                "en": "Time scope of transactions included in the report",
+                "cs": "Time scope of transakces included in the report"
+            },
             "defval": "auto",
-            "required": true
+            "required": true,
+            "category": "Other"
         },
         "ACCOUNT_CURRENCY": {
             "type": "text",
-            "description": "For multicurrency accounts please specify one",
+            "description": {
+                "en": "For multicurrency accounts please specify one",
+                "cs": "For multicurrency accounts please specify one"
+            },
             "defval": "CZK",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "POHODA_ICO": {
             "type": "text",
-            "description": "Pohoda ICO",
+            "description": {
+                "en": "Pohoda ICO",
+                "cs": "Pohoda ICO"
+            },
             "defval": "12345678",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_URL": {
             "type": "text",
-            "description": "Pohoda URL",
+            "description": {
+                "en": "Pohoda URL",
+                "cs": "Pohoda URL"
+            },
             "defval": "http://127.0.0.1:10010",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_USERNAME": {
             "type": "text",
-            "description": "Pohoda Username",
+            "description": {
+                "en": "Pohoda Username",
+                "cs": "Pohoda Username"
+            },
             "defval": "Admin",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_PASSWORD": {
             "type": "password",
-            "description": "Pohoda Password",
+            "description": {
+                "en": "Pohoda Password",
+                "cs": "Pohoda Password"
+            },
             "defval": "xxxxxxxx",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_TIMEOUT": {
             "type": "number",
-            "description": "Pohoda Timeout",
+            "description": {
+                "en": "Pohoda Timeout",
+                "cs": "Pohoda Timeout"
+            },
             "defval": 60,
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_COMPRESS": {
-            "type": "boolean",
-            "description": "Pohoda Compress",
+            "type": "bool",
+            "description": {
+                "en": "Pohoda Compress",
+                "cs": "Pohoda Compress"
+            },
             "defval": false,
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_DEBUG": {
-            "type": "boolean",
-            "description": "Pohoda Debug",
+            "type": "bool",
+            "description": {
+                "en": "Pohoda Debug",
+                "cs": "Pohoda Debug"
+            },
             "defval": true,
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "POHODA_BANK_IDS": {
             "type": "text",
-            "description": "Pohoda Bank IDs",
+            "description": {
+                "en": "Pohoda Bank IDs",
+                "cs": "Pohoda Bank IDs"
+            },
             "defval": "KB",
-            "required": true
+            "required": true,
+            "category": "API"
         },
         "REPORT_SAVE_DIR": {
             "type": "text",
-            "description": "Directory to save generated reports (PDF/CSV)",
+            "description": {
+                "en": "Directory to save generated reports (PDF/CSV)",
+                "cs": "Directory to save generated reports (PDF/CSV)"
+            },
             "defval": "",
-            "required": false
+            "required": false,
+            "category": "Other"
         },
         "EASE_LOGGER": {
             "type": "string",
-            "description": "Write log messages using",
+            "description": {
+                "en": "Write log messages using",
+                "cs": "Write log messages using"
+            },
             "defval": "console|syslog",
-            "required": false
+            "required": false,
+            "category": "Behavior"
         }
-    },
-    "multiflexi": "1.28"
+    }
 }
