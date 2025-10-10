@@ -18,8 +18,6 @@
         "Pohoda"
     ],
     "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-    "image": "",
-    "ociimage": "",
     "executable": "pohoda-bank-transaction-report",
     "environment": {
         "ACCOUNT_NUMBER": {

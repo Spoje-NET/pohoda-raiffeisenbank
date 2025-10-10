@@ -17,8 +17,6 @@
         "Check"
     ],
     "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-    "image": "",
-    "ociimage": "",
     "executable": "raiffeisenbank-statements-sharepoint-uploader",
     "environment": {
         "ACCOUNT_NUMBER": {
