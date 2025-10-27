@@ -156,8 +156,12 @@ All scripts perform certificate validation before attempting API calls. If the c
 * `2` - Certificate validation failed (file not found, not readable, or invalid password)
 * `3` - Error accessing Pohoda mServer
 * `4` - Cannot link to Sharepoint
+* `145` - API authentication error (HTTP 401 Unauthorized - typically certificate blocked or invalid)
 * `254` - Another exception without numeric code occurred
-* `401` - User is not authorized to import XML files to Pohoda
+
+**Note on Exit Codes:** Unix/Linux exit codes are limited to 0-255. When an HTTP error code like 401 (Unauthorized) is used as an exit code, it may be truncated by the shell to its modulo 256 value. For example:
+- HTTP 401 → Unix exit code 145 (401 % 256 = 145)
+- The full HTTP status code and error details are always available in the JSON report's `message` field
 
 **Important:** Exit code `0` is only returned when the entire script completes successfully. Any error during execution (API failures, certificate issues, etc.) will result in a non-zero exit code.
 
