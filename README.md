@@ -139,13 +139,27 @@ OFFICE365_PATH='Shared documents/statements'
 
 Into configuration file .env please put ClientID **OR** Login/Password values.
 
+## Error Handling
+
+All scripts perform certificate validation before attempting API calls. If the certificate cannot be read or validated, a detailed error report is generated including:
+
+* Certificate file path
+* File existence status
+* File readability status
+* File permissions (if file exists)
+* File owner and group (if file exists)
+
 ## ExitCodes
 
-2 - error obtaining PDF statements
-3 - error accessing Pohoda mServer
-4 - Cannot link to Sharepoint problem
-254 - Another Exception without numeric code Ocurred
-401 - user is not authorized to import import XML files to Pohoda
+* `0` - Success, all operations completed without errors
+* `1` - Generic API error (when no specific error code is available)
+* `2` - Certificate validation failed (file not found, not readable, or invalid password)
+* `3` - Error accessing Pohoda mServer
+* `4` - Cannot link to Sharepoint
+* `254` - Another exception without numeric code occurred
+* `401` - User is not authorized to import XML files to Pohoda
+
+**Important:** Exit code `0` is only returned when the entire script completes successfully. Any error during execution (API failures, certificate issues, etc.) will result in a non-zero exit code.
 
 ## Powered by
 
