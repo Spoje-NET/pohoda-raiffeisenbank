@@ -162,6 +162,11 @@ if ($xmlStatements) {
                 $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
 
                 foreach ($inserted as $refId => $importInfo) {
+                    if (!isset($importInfo['details']) || !is_array($importInfo['details'])) {
+                        $engine->addStatusMessage(sprintf(_('Skipping import %s: missing details'), $refId), 'warning');
+                        continue;
+                    }
+                    
                     $pohodaId = $importInfo['details']['id'];
                     $dateStatement = $importInfo['details']['date'];
 
