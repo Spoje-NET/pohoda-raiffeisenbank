@@ -68,7 +68,17 @@ if (!$certValid) {
 
     try {
         $pdfStatements = $engine->downloadPDF();
-        $report['raiffeisenbank']['pdf'] = array_values($pdfStatements);
+        
+        if ($pdfStatements === null || $pdfStatements === false) {
+            $report['raiffeisenbank']['pdf'] = 'download failed';
+            $report['message'] = 'PDF download returned null/false';
+            $pdfStatements = [];
+            if ($exitcode === 0) {
+                $exitcode = 401; // Likely certificate or auth issue
+            }
+        } else {
+            $report['raiffeisenbank']['pdf'] = array_values($pdfStatements);
+        }
     } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
         $report['message'] = $exc->getMessage();
         $report['raiffeisenbank']['pdf'] = 'download failed';
@@ -148,7 +158,17 @@ if (!$certValid) {
     try {
         $engine->addStatusMessage('stage 3/6: Download XML Statements from Raiffeisen Bank account '.$engine->getAccount(), 'debug');
         $xmlStatements = $engine->downloadXML();
-        $report['raiffeisenbank']['xml'] = array_values($xmlStatements);
+        
+        if ($xmlStatements === null || $xmlStatements === false) {
+            $report['raiffeisenbank']['xml'] = 'download failed';
+            $report['message'] = 'XML download returned null/false';
+            $xmlStatements = false;
+            if ($exitcode === 0) {
+                $exitcode = 401; // Likely certificate or auth issue  
+            }
+        } else {
+            $report['raiffeisenbank']['xml'] = array_values($xmlStatements);
+        }
     } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
         $engine->addStatusMessage($exc->getMessage(), 'error');
         $report['raiffeisenbank']['xml'] = 'download failed';
