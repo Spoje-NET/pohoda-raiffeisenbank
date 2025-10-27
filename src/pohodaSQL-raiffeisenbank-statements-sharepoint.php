@@ -39,7 +39,7 @@ Shared::init(
 );
 $destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout'));
 
-PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
+$certValid = PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 
@@ -51,17 +51,22 @@ if (Shared::cfg('APP_DEBUG', false)) {
     $engine->logBanner($engine->getAccount().' '.$engine->getCurrencyCode(), ' Scope: '.$engine->scope.' Line: '.$engine->statementLine);
 }
 
-$exitcode = 0;
+$exitcode = $certValid ? 0 : 1;
 $fileUrls = [];
 $report = [
     'sharepoint' => [],
     'pohoda' => [],
     'pohodaSQL' => [],
+    'certificate_valid' => $certValid,
 ];
 
-$engine->addStatusMessage('stage 1/6: Download PDF Statements from Raiffeisen Bank account '.$engine->getAccount(), 'debug');
+if (!$certValid) {
+    $engine->addStatusMessage(_('Certificate validation failed. Skipping statement processing.'), 'error');
+    $report['error'] = 'Invalid certificate';
+} else {
+    $engine->addStatusMessage('stage 1/6: Download PDF Statements from Raiffeisen Bank account '.$engine->getAccount(), 'debug');
 
-try {
+    try {
     $pdfStatements = $engine->downloadPDF();
     $report['raiffeisenbank']['pdf'] = array_values($pdfStatements);
 } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
@@ -199,12 +204,13 @@ if ($xmlStatements) {
         $engine->addStatusMessage('mServer error: '.$engine->lastCurlResponse, 'error');
         $exitcode = 3;
     }
-} else {
-    if (\is_array($xmlStatements)) {
-        $engine->addStatusMessage(_('No XML statements obtained'), 'info');
     } else {
-        $engine->addStatusMessage(_('Error Obtaining XML statements'), 'error');
-        $exitcode = 3;
+        if (\is_array($xmlStatements)) {
+            $engine->addStatusMessage(_('No XML statements obtained'), 'info');
+        } else {
+            $engine->addStatusMessage(_('Error Obtaining XML statements'), 'error');
+            $exitcode = 3;
+        }
     }
 }
 

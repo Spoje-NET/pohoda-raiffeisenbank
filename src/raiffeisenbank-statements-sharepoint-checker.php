@@ -38,7 +38,7 @@ Shared::init(
 );
 $destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
-PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
+$certValid = PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'), ['user' => '', 'password' => '', 'ico' => '', 'url' => '', 'cnbCache' => 'none']);
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
 
@@ -46,18 +46,23 @@ if (Shared::cfg('APP_DEBUG')) {
     $engine->logBanner('', 'Scope: '.$engine->scope);
 }
 
-$exitcode = 0;
+$exitcode = $certValid ? 0 : 1;
 $fileUrls = [];
 $report = [
     'account' => Shared::cfg('ACCOUNT_NUMBER'),
     'until' => $engine->getUntil()->format('Y-m-d'),
     'since' => $engine->getSince()->format('Y-m-d'),
+    'certificate_valid' => $certValid,
     'missing' => [],
     'existing' => [],
 ];
 
-try {
-    $pdfStatements = $engine->getStatementFilenames('pdf');
+if (!$certValid) {
+    $engine->addStatusMessage(_('Certificate validation failed. Skipping statement check.'), 'error');
+    $report['error'] = 'Invalid certificate';
+} else {
+    try {
+        $pdfStatements = $engine->getStatementFilenames('pdf');
 
     if ($pdfStatements) {
         if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
@@ -91,14 +96,15 @@ try {
             }
         }
     }
-} catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
-    $report['mesage'] = $exc->getMessage();
-    $engine->addStatusMessage($report['mesage'], 'error');
-    $exitcode = $exc->getCode();
+    } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
+        $report['mesage'] = $exc->getMessage();
+        $engine->addStatusMessage($report['mesage'], 'error');
+        $exitcode = $exc->getCode();
 
-    if (!$exitcode) {
-        if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {
-            $exitcode = (int) $codeRaw[1];
+        if (!$exitcode) {
+            if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {
+                $exitcode = (int) $codeRaw[1];
+            }
         }
     }
 }
