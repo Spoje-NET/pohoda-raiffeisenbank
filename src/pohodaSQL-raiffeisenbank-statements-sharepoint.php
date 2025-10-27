@@ -74,7 +74,8 @@ if (!$certValid) {
             $messages = $engine->getStatusMessages();
             $hasAuthError = false;
             foreach ($messages as $msg) {
-                if (stripos($msg, '401') !== false || stripos($msg, 'UNAUTHORISED') !== false || stripos($msg, 'Certificate is blocked') !== false) {
+                $msgText = is_object($msg) ? (string)$msg : $msg;
+                if (stripos($msgText, '401') !== false || stripos($msgText, 'UNAUTHORISED') !== false || stripos($msgText, 'Certificate is blocked') !== false) {
                     $hasAuthError = true;
                     break;
                 }
@@ -178,7 +179,8 @@ if (!$certValid) {
             $messages = $engine->getStatusMessages();
             $hasAuthError = false;
             foreach ($messages as $msg) {
-                if (stripos($msg, '401') !== false || stripos($msg, 'UNAUTHORISED') !== false || stripos($msg, 'Certificate is blocked') !== false) {
+                $msgText = is_object($msg) ? (string)$msg : $msg;
+                if (stripos($msgText, '401') !== false || stripos($msgText, 'UNAUTHORISED') !== false || stripos($msgText, 'Certificate is blocked') !== false) {
                     $hasAuthError = true;
                     break;
                 }
