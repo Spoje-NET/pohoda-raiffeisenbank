@@ -69,12 +69,26 @@ if (!$certValid) {
     try {
         $pdfStatements = $engine->downloadPDF();
         
-        if ($pdfStatements === null || $pdfStatements === false) {
-            $report['raiffeisenbank']['pdf'] = 'download failed';
-            $report['message'] = 'PDF download returned null/false';
-            $pdfStatements = [];
-            if ($exitcode === 0) {
-                $exitcode = 401; // Likely certificate or auth issue
+        if ($pdfStatements === null || $pdfStatements === false || empty($pdfStatements)) {
+            // Check if there were errors in stderr/messages indicating auth failure
+            $messages = $engine->getStatusMessages();
+            $hasAuthError = false;
+            foreach ($messages as $msg) {
+                if (stripos($msg, '401') !== false || stripos($msg, 'UNAUTHORISED') !== false || stripos($msg, 'Certificate is blocked') !== false) {
+                    $hasAuthError = true;
+                    break;
+                }
+            }
+            
+            if ($hasAuthError || $pdfStatements === null || $pdfStatements === false) {
+                $report['raiffeisenbank']['pdf'] = 'download failed';
+                $report['message'] = 'PDF download failed - authentication or certificate error';
+                $pdfStatements = [];
+                if ($exitcode === 0) {
+                    $exitcode = 401; // Certificate or auth issue
+                }
+            } else {
+                $report['raiffeisenbank']['pdf'] = array_values($pdfStatements);
             }
         } else {
             $report['raiffeisenbank']['pdf'] = array_values($pdfStatements);
@@ -159,12 +173,26 @@ if (!$certValid) {
         $engine->addStatusMessage('stage 3/6: Download XML Statements from Raiffeisen Bank account '.$engine->getAccount(), 'debug');
         $xmlStatements = $engine->downloadXML();
         
-        if ($xmlStatements === null || $xmlStatements === false) {
-            $report['raiffeisenbank']['xml'] = 'download failed';
-            $report['message'] = 'XML download returned null/false';
-            $xmlStatements = false;
-            if ($exitcode === 0) {
-                $exitcode = 401; // Likely certificate or auth issue  
+        if ($xmlStatements === null || $xmlStatements === false || empty($xmlStatements)) {
+            // Check if there were errors in stderr/messages indicating auth failure
+            $messages = $engine->getStatusMessages();
+            $hasAuthError = false;
+            foreach ($messages as $msg) {
+                if (stripos($msg, '401') !== false || stripos($msg, 'UNAUTHORISED') !== false || stripos($msg, 'Certificate is blocked') !== false) {
+                    $hasAuthError = true;
+                    break;
+                }
+            }
+            
+            if ($hasAuthError || $xmlStatements === null || $xmlStatements === false) {
+                $report['raiffeisenbank']['xml'] = 'download failed';
+                $report['message'] = 'XML download failed - authentication or certificate error';
+                $xmlStatements = false;
+                if ($exitcode === 0) {
+                    $exitcode = 401; // Certificate or auth issue
+                }
+            } else {
+                $report['raiffeisenbank']['xml'] = array_values($xmlStatements);
             }
         } else {
             $report['raiffeisenbank']['xml'] = array_values($xmlStatements);
