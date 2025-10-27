@@ -73,6 +73,7 @@ if (!$certValid) {
             // Check if there were errors in stderr/messages indicating auth failure
             $messages = $engine->getStatusMessages();
             $hasAuthError = false;
+            $errorMessage = '';
             foreach ($messages as $msg) {
                 // Message objects have a body property
                 if (is_object($msg) && isset($msg->body)) {
@@ -85,13 +86,14 @@ if (!$certValid) {
                 
                 if (stripos($msgText, '401') !== false || stripos($msgText, 'UNAUTHORISED') !== false || stripos($msgText, 'Certificate is blocked') !== false) {
                     $hasAuthError = true;
+                    $errorMessage = $msgText;
                     break;
                 }
             }
             
             if ($hasAuthError || $pdfStatements === null || $pdfStatements === false) {
                 $report['raiffeisenbank']['pdf'] = 'download failed';
-                $report['message'] = 'PDF download failed - authentication or certificate error';
+                $report['message'] = $errorMessage ?: 'PDF download failed - authentication or certificate error';
                 $pdfStatements = [];
                 if ($exitcode === 0) {
                     $exitcode = 401; // Certificate or auth issue
@@ -186,6 +188,7 @@ if (!$certValid) {
             // Check if there were errors in stderr/messages indicating auth failure
             $messages = $engine->getStatusMessages();
             $hasAuthError = false;
+            $xmlErrorMessage = '';
             foreach ($messages as $msg) {
                 // Message objects have a body property
                 if (is_object($msg) && isset($msg->body)) {
@@ -198,13 +201,14 @@ if (!$certValid) {
                 
                 if (stripos($msgText, '401') !== false || stripos($msgText, 'UNAUTHORISED') !== false || stripos($msgText, 'Certificate is blocked') !== false) {
                     $hasAuthError = true;
+                    $xmlErrorMessage = $msgText;
                     break;
                 }
             }
             
             if ($hasAuthError || $xmlStatements === null || $xmlStatements === false) {
                 $report['raiffeisenbank']['xml'] = 'download failed';
-                $report['message'] = 'XML download failed - authentication or certificate error';
+                $report['message'] = $xmlErrorMessage ?: 'XML download failed - authentication or certificate error';
                 $xmlStatements = false;
                 if ($exitcode === 0) {
                     $exitcode = 401; // Certificate or auth issue
