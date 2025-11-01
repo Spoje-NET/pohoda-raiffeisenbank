@@ -84,6 +84,40 @@ abstract class PohodaBankClient extends \mServer\Bank
     {
         if ((file_exists($certFile) === false) || (is_readable($certFile) === false)) {
             fwrite(\STDERR, 'Cannot read specified certificate file: '.$certFile.\PHP_EOL);
+            
+            // Detailed diagnostics
+            if (!file_exists($certFile)) {
+                fwrite(\STDERR, 'Error: File does not exist'.\PHP_EOL);
+                
+                // Check if parent directory exists
+                $dirname = dirname($certFile);
+                if (file_exists($dirname)) {
+                    fwrite(\STDERR, 'Parent directory exists: '.$dirname.\PHP_EOL);
+                    
+                    // List similar files in the directory
+                    $files = glob($dirname.'/*.{p12,pfx,pem,crt}', \GLOB_BRACE);
+                    if ($files) {
+                        fwrite(\STDERR, 'Certificate files found in directory: '.implode(', ', array_map('basename', $files)).\PHP_EOL);
+                    }
+                } else {
+                    fwrite(\STDERR, 'Error: Parent directory does not exist: '.$dirname.\PHP_EOL);
+                }
+            } else {
+                fwrite(\STDERR, 'File exists but is not readable'.\PHP_EOL);
+                
+                // Show file permissions
+                $perms = fileperms($certFile);
+                fwrite(\STDERR, 'File permissions: '.substr(sprintf('%o', $perms), -4).\PHP_EOL);
+                
+                // Show owner and group
+                $owner = posix_getpwuid(fileowner($certFile));
+                $group = posix_getgrgid(filegroup($certFile));
+                fwrite(\STDERR, 'Owner: '.($owner['name'] ?? 'unknown').' Group: '.($group['name'] ?? 'unknown').\PHP_EOL);
+                
+                // Show current user
+                $currentUser = posix_getpwuid(posix_geteuid());
+                fwrite(\STDERR, 'Current user: '.($currentUser['name'] ?? 'unknown').' (UID: '.posix_geteuid().')'.\PHP_EOL);
+            }
 
             return false;
         }
@@ -99,9 +133,28 @@ abstract class PohodaBankClient extends \mServer\Bank
     public static function checkCertificatePassword($certFile, $password): bool
     {
         $certContent = file_get_contents($certFile);
-
+        $certs = [];
         if (openssl_pkcs12_read($certContent, $certs, $password) === false) {
+            $opensslError = openssl_error_string();
             fwrite(\STDERR, 'Cannot read PKCS12 certificate file: '.$certFile.\PHP_EOL);
+            fwrite(\STDERR, 'File size: '.strlen($certContent).' bytes'.\PHP_EOL);
+            
+            if ($opensslError) {
+                fwrite(\STDERR, 'OpenSSL error: '.$opensslError.\PHP_EOL);
+            }
+            
+            // Check if password might be empty
+            if (empty($password)) {
+                fwrite(\STDERR, 'Warning: Certificate password is empty'.\PHP_EOL);
+            }
+            
+            // Check if it's actually a PKCS12 file
+            $fileInfo = finfo_open(\FILEINFO_MIME_TYPE);
+            if ($fileInfo) {
+                $mimeType = finfo_buffer($fileInfo, $certContent);
+                fwrite(\STDERR, 'File MIME type: '.$mimeType.\PHP_EOL);
+                finfo_close($fileInfo);
+            }
 
             return false;
         }

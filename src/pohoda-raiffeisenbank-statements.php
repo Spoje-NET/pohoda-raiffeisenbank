@@ -34,7 +34,29 @@ Shared::init(
 );
 $destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
-PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
+$certFile = Shared::cfg('CERT_FILE');
+if (!PohodaBankClient::checkCertificate($certFile, Shared::cfg('CERT_PASS'))) {
+    $certInfo = [
+        'path' => $certFile,
+        'exists' => file_exists($certFile),
+        'readable' => is_readable($certFile),
+    ];
+    if (file_exists($certFile)) {
+        $certInfo['permissions'] = substr(sprintf('%o', fileperms($certFile)), -4);
+        $certInfo['owner'] = posix_getpwuid(fileowner($certFile))['name'] ?? 'unknown';
+        $certInfo['group'] = posix_getgrgid(filegroup($certFile))['name'] ?? 'unknown';
+    }
+    $report = [
+        'sharepoint' => [],
+        'pohoda' => [],
+        'pohodaSQL' => [],
+        'message' => 'Certificate validation failed',
+        'certificate' => $certInfo,
+        'exitcode' => 2,
+    ];
+    file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
+    exit(2);
+}
 
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
@@ -60,6 +82,8 @@ try {
     if (!$exitcode) {
         if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {
             $exitcode = (int) $codeRaw[1];
+        } else {
+            $exitcode = 1; // Generic error if no specific code available
         }
     }
 }
