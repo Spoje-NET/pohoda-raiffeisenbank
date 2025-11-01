@@ -7,6 +7,11 @@ output.xml
 .phpdoc
 /.phpunit.result.cache
 /.env
+.env.*
+!.env.example.sanitized
+daramisEUR.env
+.env.daramis
+.env.spoje
 /RAIFF_MULTIFLEXI.p12
 /debian/debhelper-build-stamp
 /debian/abraflexi-raiffeisenbank.debhelper.log

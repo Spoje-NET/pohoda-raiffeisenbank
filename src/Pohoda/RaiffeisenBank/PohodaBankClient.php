@@ -25,6 +25,10 @@ use Ease\Shared;
 abstract class PohodaBankClient extends \mServer\Bank
 {
     /**
+     * Exit code for authentication / certificate related issues.
+     */
+    public const EXIT_AUTH = 145; // 401 % 256
+    /**
      * DateTime Formating eg. 2021-08-01T10:00:00.0Z.
      */
     public static string $dateTimeFormat = 'Y-m-d\\TH:i:s.0\\Z';
@@ -109,14 +113,19 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $perms = fileperms($certFile);
                 fwrite(\STDERR, 'File permissions: '.substr(sprintf('%o', $perms), -4).\PHP_EOL);
                 
-                // Show owner and group
-                $owner = posix_getpwuid(fileowner($certFile));
-                $group = posix_getgrgid(filegroup($certFile));
-                fwrite(\STDERR, 'Owner: '.($owner['name'] ?? 'unknown').' Group: '.($group['name'] ?? 'unknown').\PHP_EOL);
-                
+                // Show owner and group (POSIX extension may be missing)
+                if (function_exists('posix_getpwuid') && function_exists('posix_getgrgid')) {
+                    $ownerInfo = posix_getpwuid(fileowner($certFile));
+                    $groupInfo = posix_getgrgid(filegroup($certFile));
+                    fwrite(\STDERR, 'Owner: '.($ownerInfo['name'] ?? 'unknown').' Group: '.($groupInfo['name'] ?? 'unknown').\PHP_EOL);
+                }
+
                 // Show current user
-                $currentUser = posix_getpwuid(posix_geteuid());
-                fwrite(\STDERR, 'Current user: '.($currentUser['name'] ?? 'unknown').' (UID: '.posix_geteuid().')'.\PHP_EOL);
+                if (function_exists('posix_geteuid') && function_exists('posix_getpwuid')) {
+                    $euid = posix_geteuid();
+                    $currentUserInfo = posix_getpwuid($euid);
+                    fwrite(\STDERR, 'Current user: '.($currentUserInfo['name'] ?? 'unknown').' (UID: '.$euid.')'.\PHP_EOL);
+                }
             }
 
             return false;
@@ -167,7 +176,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      *
      * @throws \Exception
      *
-     * @return \DatePeriod<\DateTime, \DateInterval, \DateTime>
+     * @return \DatePeriod Period iterating over days from since to until
      */
     public function setScope(string $scope): \DatePeriod
     {
@@ -266,7 +275,8 @@ abstract class PohodaBankClient extends \mServer\Bank
             $this->until = $this->until->setTime(23, 59, 59, 999);
         }
 
-        return new \DatePeriod($this->since, new \DateInterval('P1D'), $this->until);
+    // DatePeriod signature: DatePeriod(DateTimeInterface $start, DateInterval $interval, DateTimeInterface $end)
+    return new \DatePeriod($this->since, new \DateInterval('P1D'), $this->until);
     }
 
     /**
@@ -307,8 +317,8 @@ abstract class PohodaBankClient extends \mServer\Bank
 
         $found = $checker->getListing($lrq);
 
-        // If the result is invalid, throw an exception
-        if ($found === false) {
+        // If fetch failed (null) treat as error
+        if ($found === null) {
             throw new \RuntimeException('Error fetching records for transaction check.');
         }
 
@@ -333,7 +343,7 @@ abstract class PohodaBankClient extends \mServer\Bank
     /**
      * Insert Transaction to Pohoda.
      *
-     * @return array<int, array<string, string>> Imported Transactions
+     * @return array<string, mixed> Imported transaction result details
      */
     public function insertTransactionToPohoda(string $bankIDS = ''): array
     {
@@ -500,5 +510,52 @@ EOD;
     public function getCompanyId(): string
     {
         return Shared::cfg('POHODA_ICO');
+    }
+
+    /**
+     * Determine whether given message text indicates an authentication error.
+     *
+     * @param string $text Log or exception message
+     *
+     * @return bool True if message matches known auth error patterns
+     */
+    public static function isAuthError(string $text): bool
+    {
+        $patterns = [
+            '/\\b401\\b/i',
+            '/UNAUTHORISED/i',
+            '/UNAUTHORIZED/i',
+            '/Certificate is blocked/i',
+            '/invalid certificate/i',
+        ];
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $text)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Scan an array of status messages (objects or strings) and return first auth error message.
+     *
+     * @param array<int, mixed> $messages Status messages from engine
+     *
+     * @return string|null Auth error message if found
+     */
+    public static function detectAuthError(array $messages): ?string
+    {
+        foreach ($messages as $msg) {
+            $text = null;
+            if (is_object($msg) && isset($msg->body)) {
+                $text = (string) $msg->body;
+            } elseif (is_string($msg)) {
+                $text = $msg;
+            }
+            if ($text && self::isAuthError($text)) {
+                return $text;
+            }
+        }
+        return null;
     }
 }

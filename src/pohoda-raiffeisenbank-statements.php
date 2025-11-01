@@ -104,4 +104,15 @@ if ($engine->getExitCode()) {
 $written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
 $engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');
 
+// Detect authentication related errors in collected messages and adjust exit code accordingly
+if (\Pohoda\RaiffeisenBank\PohodaBankClient::detectAuthError($report['messages'] ?? [])) {
+    $exitcode = PohodaBankClient::EXIT_AUTH;
+    $report['exitcode'] = $exitcode;
+}
+
+// Ensure report exitcode reflects final chosen exit code
+if (!isset($report['exitcode']) || $report['exitcode'] !== $exitcode) {
+    $report['exitcode'] = $exitcode;
+}
+
 exit($exitcode);

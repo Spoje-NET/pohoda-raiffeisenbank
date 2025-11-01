@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?><Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
+    <BkToCstmrStmt>
+        <GrpHdr>
+            <MsgId>camt.053-2025-01-23-001</MsgId>
+            <CreDtTm>2025-01-23T01:18:31</CreDtTm>
+            <MsgRcpt>
+                <Nm>Daramis Heights s. r. o.</Nm>
+                <PstlAdr>
+                    <AdrLine>Daramis Heights s. r. o.</AdrLine>
+                    <AdrLine>Jankovcova 1595/14</AdrLine>
+                    <AdrLine>Praha 7</AdrLine>
+                    <AdrLine>17000</AdrLine>
+                </PstlAdr>
+                <Id>
+                    <OrgId>
+                        <Othr>
+                            <Id>Daramis Heights s. r. o.</Id>
+                        </Othr>
+                    </OrgId>
+                </Id>
+            </MsgRcpt>
+            <AddtlInf>Denní</AddtlInf>
+        </GrpHdr>
+        <Stmt>
+            <Id>CZ7255000000005140012815-2025-01-22</Id>
+            <ElctrncSeqNb>22</ElctrncSeqNb>
+            <LglSeqNb>22</LglSeqNb>
+            <CreDtTm>2025-01-23T01:18:31</CreDtTm>
+            <FrToDt>
+                <FrDtTm>2025-01-22T00:00:00</FrDtTm>
+                <ToDtTm>2025-01-22T23:59:59</ToDtTm>
+            </FrToDt>
+            <Acct>
+                <Id>
+                    <IBAN>CZ7255000000005140012815</IBAN>
+                </Id>
+                <Tp>
+                    <Cd>CACC</Cd>
+                </Tp>
+                <Ccy>CZK</Ccy>
+                <Nm>DARAMIS HEIGHTS SRO</Nm>
+                <Ownr>
+                    <Nm>Daramis Heights s. r. o.</Nm>
+                    <PstlAdr>
+                        <AdrLine>Daramis Heights s. r. o.</AdrLine>
+                        <AdrLine>Jankovcova 1595/14</AdrLine>
+                        <AdrLine>Praha 7</AdrLine>
+                        <AdrLine>17000</AdrLine>
+                    </PstlAdr>
+                    <Id>
+                        <OrgId>
+                            <Othr>
+                                <Id>Daramis Heights s. r. o.</Id>
+                            </Othr>
+                        </OrgId>
+                    </Id>
+                </Ownr>
+                <Svcr>
+                    <FinInstnId>
+                        <BIC>RZBCCZPP</BIC>
+                        <Othr>
+                            <Id>5500</Id>
+                        </Othr>
+                    </FinInstnId>
+                </Svcr>
+            </Acct>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>PRCD</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="CZK">4294744.35</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Dt>
+                    <Dt>2025-01-22</Dt>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>OPAV</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="CZK">0</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Dt>
+                    <Dt>2025-01-22</Dt>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>CLAV</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="CZK">4294744.35</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Dt>
+                    <Dt>2025-01-22</Dt>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>CLBD</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="CZK">12864806.35</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Dt>
+                    <Dt>2025-01-22</Dt>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>XPCD</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="CZK">0</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Dt>
+                    <Dt>2025-01-22</Dt>
+                </Dt>
+            </Bal>
+            <Bal>
+                <Tp>
+                    <CdOrPrtry>
+                        <Cd>CLAV</Cd>
+                    </CdOrPrtry>
+                </Tp>
+                <Amt Ccy="CZK">12864806.35</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Dt>
+                    <Dt>2025-01-22</Dt>
+                </Dt>
+            </Bal>
+            <TxsSummry>
+                <TtlNtries>
+                    <NbOfNtries>2</NbOfNtries>
+                    <Sum>8570062</Sum>
+                    <TtlNetNtryAmt>8570062</TtlNetNtryAmt>
+                    <CdtDbtInd>CRDT</CdtDbtInd>
+                </TtlNtries>
+                <TtlCdtNtries>
+                    <NbOfNtries>2</NbOfNtries>
+                    <Sum>8570062</Sum>
+                </TtlCdtNtries>
+                <TtlDbtNtries>
+                    <NbOfNtries>0</NbOfNtries>
+                    <Sum>0</Sum>
+                </TtlDbtNtries>
+            </TxsSummry>
+            <Ntry>
+                <NtryRef>7168974868</NtryRef>
+                <Amt Ccy="CZK">4994775</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Sts>BOOK</Sts>
+                <BookgDt>
+                    <DtTm>2025-01-22T01:36:56</DtTm>
+                </BookgDt>
+                <ValDt>
+                    <DtTm>2025-01-22T01:36:56</DtTm>
+                </ValDt>
+                <BkTxCd>
+                    <Prtry>
+                        <Cd>10000107000</Cd>
+                    </Prtry>
+                </BkTxCd>
+                <NtryDtls>
+                    <TxDtls>
+                        <Refs>
+                            <MsgId>1</MsgId>
+                            <AcctSvcrRef>7168974868</AcctSvcrRef>
+                            <EndToEndId>1101</EndToEndId>
+                        </Refs>
+                        <RltdPties>
+                            <DbtrAcct>
+                                <Id>
+                                    <Othr>
+                                        <Id>861828109</Id>
+                                    </Othr>
+                                </Id>
+                                <Nm>Wágner Dugová Alena</Nm>
+                            </DbtrAcct>
+                        </RltdPties>
+                        <RltdAgts>
+                            <DbtrAgt>
+                                <FinInstnId>
+                                    <Othr>
+                                        <Id>0800</Id>
+                                    </Othr>
+                                </FinInstnId>
+                            </DbtrAgt>
+                        </RltdAgts>
+                        <RmtInf>
+                            <Strd>
+                                <CdtrRefInf>
+                                    <Ref>VS:1101</Ref>
+                                </CdtrRefInf>
+                            </Strd>
+                        </RmtInf>
+                    </TxDtls>
+                </NtryDtls>
+            </Ntry>
+            <Ntry>
+                <NtryRef>7170728221</NtryRef>
+                <Amt Ccy="CZK">3575287</Amt>
+                <CdtDbtInd>CRDT</CdtDbtInd>
+                <Sts>BOOK</Sts>
+                <BookgDt>
+                    <DtTm>2025-01-22T10:54:03</DtTm>
+                </BookgDt>
+                <ValDt>
+                    <DtTm>2025-01-22T10:54:03</DtTm>
+                </ValDt>
+                <BkTxCd>
+                    <Prtry>
+                        <Cd>10000107000</Cd>
+                    </Prtry>
+                </BkTxCd>
+                <NtryDtls>
+                    <TxDtls>
+                        <Refs>
+                            <MsgId>2</MsgId>
+                            <AcctSvcrRef>7170728221</AcctSvcrRef>
+                            <EndToEndId>1110</EndToEndId>
+                        </Refs>
+                        <RltdPties>
+                            <Dbtr>
+                                <Nm>ČSOB Hypoteční banka, a.s.Radlická 333/150Praha-Radlice Hlavní město PrahaKateřina Ptačovská</Nm>
+                            </Dbtr>
+                            <DbtrAcct>
+                                <Id>
+                                    <Othr>
+                                        <Id>82904811</Id>
+                                    </Othr>
+                                </Id>
+                                <Nm>ČSOB Hypoteční banka</Nm>
+                            </DbtrAcct>
+                        </RltdPties>
+                        <RltdAgts>
+                            <DbtrAgt>
+                                <FinInstnId>
+                                    <Othr>
+                                        <Id>2100</Id>
+                                    </Othr>
+                                </FinInstnId>
+                            </DbtrAgt>
+                        </RltdAgts>
+                        <RmtInf>
+                            <Strd>
+                                <CdtrRefInf>
+                                    <Ref>VS:1110</Ref>
+                                </CdtrRefInf>
+                            </Strd>
+                        </RmtInf>
+                        <AddtlTxInf>Kupuji - dokládám kupní smlouvu</AddtlTxInf>
+                    </TxDtls>
+                </NtryDtls>
+            </Ntry>
+        </Stmt>
+    </BkToCstmrStmt>
+</Document>
+
