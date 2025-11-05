@@ -112,7 +112,16 @@ if (!$certValid) {
                         $engine->setScope($dateMatches[0]);
                         $downloadedPdf = $engine->downloadPDF();
 
-                        $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents(current($downloadedPdf)));
+                        if (empty($downloadedPdf) || !is_array($downloadedPdf)) {
+                            throw new \RuntimeException('Failed to download PDF statement');
+                        }
+
+                        $pdfFilePath = current($downloadedPdf);
+                        if ($pdfFilePath === false || !is_string($pdfFilePath) || !file_exists($pdfFilePath)) {
+                            throw new \RuntimeException('Invalid PDF file path returned');
+                        }
+
+                        $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents($pdfFilePath));
 
                         try {
                             $ctx->executeQuery();

@@ -1,8 +1,14 @@
-pohoda-raiffeisenbank (1.4.0) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.4.1) UNRELEASED; urgency=medium
 
+  [ vitex ]
   * TransactionIdentifier now contains the timestamp
 
- -- vitex <info@vitexsoftware.cz>  Tue, 02 Sep 2025 21:38:01 +0200
+  [ Vítězslav Vitex Dvořák ]
+  * Certificate validation improvements with comprehensive diagnostics
+    and proper exit code handling
+  * Check for null/false download returns and set proper exit code
+
+ -- Vítězslav Vitex Dvořák <info@vitexsoftware.cz>  Mon, 27 Oct 2025 16:19:37 +0100
 
 pohoda-raiffeisenbank (1.3.8) jammy; urgency=medium
 
