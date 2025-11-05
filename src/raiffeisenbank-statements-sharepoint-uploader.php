@@ -66,6 +66,7 @@ $report = [
     'certificate_valid' => $certValid,
     'missing' => [],
     'existing' => [],
+    'download_errors' => [],
 ];
 
 if (!$certValid) {
@@ -110,15 +111,32 @@ if (!$certValid) {
                     try {
                         preg_match('/\d{4}-\d{2}-\d{2}/', $uploadAs, $dateMatches);
                         $engine->setScope($dateMatches[0]);
-                        $downloadedPdf = $engine->downloadPDF();
+                        
+                        try {
+                            $downloadedPdf = $engine->downloadPDF();
+                        } catch (\VitexSoftware\Raiffeisenbank\ApiException $downloadExc) {
+                            $engine->addStatusMessage(sprintf('Failed to download PDF for %s: %s', $uploadAs, $downloadExc->getMessage()), 'error');
+                            $report['download_errors'][$uploadAs] = $downloadExc->getMessage();
+                            continue;
+                        } catch (\Exception $downloadExc) {
+                            $engine->addStatusMessage(sprintf('Failed to download PDF for %s: %s', $uploadAs, $downloadExc->getMessage()), 'error');
+                            $report['download_errors'][$uploadAs] = $downloadExc->getMessage();
+                            continue;
+                        }
 
                         if (empty($downloadedPdf) || !is_array($downloadedPdf)) {
-                            throw new \RuntimeException('Failed to download PDF statement');
+                            $errorMsg = 'PDF download returned empty result or invalid format';
+                            $engine->addStatusMessage(sprintf('Failed to download PDF for %s: %s', $uploadAs, $errorMsg), 'error');
+                            $report['download_errors'][$uploadAs] = $errorMsg;
+                            continue;
                         }
 
                         $pdfFilePath = current($downloadedPdf);
                         if ($pdfFilePath === false || !is_string($pdfFilePath) || !file_exists($pdfFilePath)) {
-                            throw new \RuntimeException('Invalid PDF file path returned');
+                            $errorMsg = 'Invalid PDF file path returned or file does not exist';
+                            $engine->addStatusMessage(sprintf('Failed to process PDF for %s: %s', $uploadAs, $errorMsg), 'error');
+                            $report['download_errors'][$uploadAs] = $errorMsg;
+                            continue;
                         }
 
                         $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents($pdfFilePath));

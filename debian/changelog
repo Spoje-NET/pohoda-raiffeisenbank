@@ -1,4 +1,11 @@
-pohoda-raiffeisenbank (1.4.1) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.4.2) UNRELEASED; urgency=medium
+
+  * Better error handling in raiffeisenbank-statements-sharepoint-
+    uploader
+
+ -- Vítězslav Vitex Dvořák <info@vitexsoftware.cz>  Wed, 05 Nov 2025 12:50:50 +0100
+
+pohoda-raiffeisenbank (1.4.1) noble; urgency=medium
 
   [ vitex ]
   * TransactionIdentifier now contains the timestamp
@@ -8,7 +15,7 @@ pohoda-raiffeisenbank (1.4.1) UNRELEASED; urgency=medium
     and proper exit code handling
   * Check for null/false download returns and set proper exit code
 
- -- Vítězslav Vitex Dvořák <info@vitexsoftware.cz>  Mon, 27 Oct 2025 16:19:37 +0100
+ -- Vítězslav Vitex Dvořák <info@vitexsoftware.cz>  Wed, 05 Nov 2025 12:50:00 +0100
 
 pohoda-raiffeisenbank (1.3.8) jammy; urgency=medium
 
