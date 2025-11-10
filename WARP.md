@@ -7,6 +7,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 This is a PHP application that integrates RaiffeisenBank Premium API with Stormware Pohoda accounting system. It downloads PDF and XML bank statements, imports bank transactions, and provides SharePoint integration for document management.
 
 Key features:
+
 - Downloads bank statements from RaiffeisenBank Premium API
 - Imports transactions into Pohoda via mServer
 - Uploads statements to SharePoint
@@ -25,6 +26,7 @@ Key features:
 ### Binary Commands
 
 All executable scripts are in the `src/` directory:
+
 - `pohoda-raiffeisenbank-transactions.php`: Import individual transactions
 - `pohoda-raiffeisenbank-statements.php`: Import from XML statements
 - `pohoda-raiffeisenbank-setup.php`: Setup bank accounts in Pohoda
@@ -35,6 +37,7 @@ All executable scripts are in the `src/` directory:
 ## Development Commands
 
 ### Dependencies and Setup
+
 ```bash
 # Install PHP dependencies
 make vendor
@@ -44,6 +47,7 @@ make vendor
 ```
 
 ### Testing
+
 ```bash
 # Run PHPUnit tests
 make phpunit
@@ -52,6 +56,7 @@ make tests
 ```
 
 ### Code Quality
+
 ```bash
 # Fix coding standards (PSR-12)
 make cs
@@ -68,6 +73,7 @@ make static-code-analysis-baseline
 Configuration is managed via `.env` files. Use `.env.example` as template. Key configuration categories:
 
 ### RaiffeisenBank API
+
 - `CERT_FILE`: Path to .p12 certificate file
 - `CERT_PASS`: Certificate password
 - `XIBMCLIENTID`: API Client ID
@@ -75,18 +81,22 @@ Configuration is managed via `.env` files. Use `.env.example` as template. Key c
 - `ACCOUNT_CURRENCY`: Currency code (default: CZK)
 
 ### Pohoda Integration
-- `POHODA_URL`: mServer URL (e.g., http://10.11.25.25:10010)
+
+- `POHODA_URL`: mServer URL (e.g., <http://10.11.25.25:10010>)
 - `POHODA_USERNAME`/`POHODA_PASSWORD`: mServer credentials
 - `POHODA_ICO`: Company tax ID
 - `POHODA_BANK_IDS`: Bank identifier in Pohoda
 
 ### Database (for PohodaSQL)
+
 - `DB_CONNECTION=sqlsrv`
 - `DB_HOST`, `DB_PORT`, `DB_DATABASE`: MSSQL connection details
 - `DB_USERNAME`, `DB_PASSWORD`: Database credentials
 
 ### SharePoint Integration
+
 Either login-based or ClientID-based authentication:
+
 ```env
 # Login-based
 OFFICE365_USERNAME=user@company.com
@@ -101,6 +111,7 @@ OFFICE365_CLSECRET=...
 ## Import Scopes
 
 The application supports various time scopes for importing transactions:
+
 - `today`, `yesterday`
 - `last_week`, `last_month`, `last_two_months`
 - `previous_month`, `two_months_ago`
@@ -113,6 +124,7 @@ The application supports various time scopes for importing transactions:
 ## Foreign Currency Handling
 
 For non-CZK transactions:
+
 - Use `FIXED_RATE` for fixed conversion rate
 - Use `CNB_CACHE` for dynamic CNB rates (requires CNB cache server)
 - Set `RATE_OFFSET=yesterday` for previous day rates
@@ -122,9 +134,10 @@ For non-CZK transactions:
 
 The project is configured as MultiFlexi applications. JSON configuration files in `multiflexi/` define application metadata, environment variables, and deployment options for the MultiFlexi platform.
 
-All `*.app.json` files must conform to the MultiFlexi schema at: https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json
+All `*.app.json` files must conform to the MultiFlexi schema at: <https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json>
 
 Validate MultiFlexi JSON files:
+
 ```bash
 multiflexi-cli application validate-json --json multiflexi/[filename].app.json
 ```
@@ -143,6 +156,7 @@ multiflexi-cli application validate-json --json multiflexi/[filename].app.json
 ## Error Handling
 
 The application uses specific exit codes:
+
 - `2`: Error obtaining PDF statements
 - `3`: Error accessing Pohoda mServer  
 - `4`: SharePoint connection problem
@@ -156,6 +170,7 @@ The system prevents duplicate imports by checking transaction IDs in Pohoda usin
 ## Dependencies
 
 Key external libraries:
+
 - `vitexsoftware/rbczpremiumapi`: RaiffeisenBank Premium API client
 - `vitexsoftware/pohoda-connector`: Pohoda mServer integration
 - `spojenet/pohoda-sql`: Direct PohodaSQL database operations
@@ -164,6 +179,7 @@ Key external libraries:
 ## Testing Environment
 
 Use the test certificate and credentials from the vendor directory for development:
+
 ```env
 CERT_FILE=vendor/vitexsoftware/rbczpremiumapi/examples/test_cert.p12
 CERT_PASS=test12345678
@@ -172,6 +188,7 @@ CERT_PASS=test12345678
 ## See Also
 
 Related projects:
+
 - [pohoda-client-checker](https://github.com/Spoje-NET/pohoda-client-checker)
 - [raiffeisenbank-statement-tools](https://github.com/Spoje-NET/raiffeisenbank-statement-tools)
 - [CNB-Cache](https://github.com/Spoje-NET/CNB-Cache) - Required for dynamic currency rates

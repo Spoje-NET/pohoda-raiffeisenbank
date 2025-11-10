@@ -1,45 +1,33 @@
-<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
 
-All code comments should be written in English.
+# Copilot Workspace Instructions
 
-All messages, including error messages, should be written in English.
+## General Coding Rules
+- Write all code and comments in English.
+- Use PHP 8.4 or newer.
+- Follow PSR-12 coding standard for all PHP code.
+- Use meaningful variable names; avoid magic numbers/strings—define constants instead.
+- Always include type hints for function parameters and return types.
+- Add docblocks to every function and class, describing purpose, parameters, and return types.
+- Handle exceptions properly and provide clear, actionable error messages.
+- Use the i18n library for all translatable strings (wrap with _()).
+- Never expose sensitive information in code or comments.
+- Optimize for performance and maintain compatibility with latest PHP and libraries.
+- Ensure code is maintainable and follows best practices.
 
-All code should be written in PHP 8.4 or later.
+## Testing & Quality
+- Use PHPUnit for all tests; follow PSR-12 in test code.
+- When creating or updating a class, also create or update its PHPUnit test file.
+- After every PHP file edit, run `php -l` to lint and ensure code sanity before proceeding further (mandatory).
 
-All code should follow the PSR-12 coding standard.
+## Documentation & Commits
+- Write documentation in Markdown format.
+- Use imperative mood for commit messages; keep them concise and relevant.
 
-When writing code, always include a docblock for functions and classes, describing their purpose, parameters, and return types.
+## MultiFlexi Integration
+- All files in `multiflexi/*.app.json` must conform to the schema: https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi
 
-When writing tests, use PHPUnit and follow the PSR-12 coding standard.
+## Copilot Guidance
+- Prefer clear, concise, and actionable suggestions.
+- When generating code, always follow the above rules.
+- When updating or creating files, ensure all requirements are met before marking a task complete.
 
-When writing documentation, use MarkDown format.
-
-When writing commit messages, use the imperative mood and keep them concise.
-
-When writing code comments, use complete sentences and proper grammar.
-
-When writing code, always use meaningful variable names that describe their purpose.
-
-When writing code, avoid using magic numbers or strings; instead, define constants for them.
-
-When writing code, always handle exceptions properly and provide meaningful error messages.
-
-When writing code, always include type hints for function parameters and return types.
-
-We are using the i18n library for internationalization, so always use the _() functions for strings that need to be translated.
-
-When writing code, always ensure that it is secure and does not expose any sensitive information.
-
-When writing code, always consider performance and optimize where necessary.
-
-When writing code, always ensure that it is compatible with the latest version of PHP and the libraries we are using.
-
-When writing code, always ensure that it is well-tested and includes unit tests where applicable.
-
-When writing code, always ensure that it is maintainable and follows best practices.
-
-When create new class or update existing class, always create or update its phpunit test files.
-
-All files in the multiflexi/*.app.json directory must conform to the schema available at: https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi
-
-After every single edit to a PHP file, always run `php -l` on the edited file to lint it and ensure code sanity before proceeding further. This is mandatory for all PHP code changes.
