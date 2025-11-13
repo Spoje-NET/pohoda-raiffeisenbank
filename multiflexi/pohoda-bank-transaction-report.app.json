@@ -159,7 +159,7 @@
             "defval": "bank_transaction_report_{ACCOUNT_NUMBER}.json",
             "required": false,
             "category": "Other"
-        },
+        }
     },
     "artifacts": [{
             "name": {
