@@ -226,5 +226,17 @@
             "required": false,
             "category": "Behavior"
         }
-    }
+    },
+    "artifacts": [{
+            "name": {
+                "cs": "Report importu a uložení",
+                "en": "Download and store report"
+            },
+            "type": "file",
+            "path": "bank_statement_upload_{\\d+}.json$",
+            "description": {
+                "en": "Stauses of Statement: download from bank, upload to Shatepoint",
+                "cs": "Stavy výpisu: stažení z banky, nahrání do sharepointu"
+            }
+    }]
 }

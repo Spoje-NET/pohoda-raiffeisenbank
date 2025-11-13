@@ -235,6 +235,28 @@
             "defval": "console|syslog",
             "required": false,
             "category": "Behavior"
-        }
-    }
+        },
+        "RESULT_FILE": {
+            "type": "string",
+            "description": {
+                "en": "write output json data to",
+                "cs": "write output json data to"
+            },
+            "defval": "bank_import_report_{ACCOUNT_NUMBER}.json",
+            "required": false,
+            "category": "Other"
+        },
+    },
+    "artifacts": [{
+            "name": {
+                "cs": "Report importu",
+                "en": "Import report"
+            },
+            "type": "file",
+            "path": "bank_import_report_{\\d+}.json$",
+            "description": {
+                "en": "Stauses of Statement: download from bank, import to Pohoda",
+                "cs": "Stavy výpisu: stažení z banky, import do pohody"
+            }
+    }]
 }

@@ -139,7 +139,7 @@ All `*.app.json` files must conform to the MultiFlexi schema at: <https://raw.gi
 Validate MultiFlexi JSON files:
 
 ```bash
-multiflexi-cli application validate-json --json multiflexi/[filename].app.json
+multiflexi-cli application validate-json --file multiflexi/[filename].app.json
 ```
 
 ## Coding Standards

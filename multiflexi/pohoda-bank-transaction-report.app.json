@@ -149,6 +149,28 @@
             "defval": "console|syslog",
             "required": false,
             "category": "Behavior"
-        }
-    }
+        },
+        "RESULT_FILE": {
+            "type": "string",
+            "description": {
+                "en": "write output json data to",
+                "cs": "write output json data to"
+            },
+            "defval": "bank_transaction_report_{ACCOUNT_NUMBER}.json",
+            "required": false,
+            "category": "Other"
+        },
+    },
+    "artifacts": [{
+            "name": {
+                "cs": "Report transakcí",
+                "en": "Transaction report"
+            },
+            "type": "file",
+            "path": "bank_transaction_report_{\\d+}.json$",
+            "description": {
+                "en": "Destiled bank statement",
+                "cs": "Destilovaný bankovní výpis"
+            }
+    }]
 }

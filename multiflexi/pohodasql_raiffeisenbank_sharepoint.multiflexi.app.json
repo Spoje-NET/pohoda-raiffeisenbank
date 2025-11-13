@@ -141,7 +141,7 @@
             "category": "API"
         },
         "POHODA_TIMEOUT": {
-            "type": "number",
+            "type": "integer",
             "description": {
                 "en": "Pohoda Timeout",
                 "cs": "Pohoda Timeout"
@@ -181,7 +181,7 @@
             "category": "API"
         },
         "FIXED_RATE": {
-            "type": "number",
+            "type": "integer",
             "description": {
                 "en": "Fixed rate for converting foreign currency transactions to CZK",
                 "cs": "Fixed rate for converting foreign currency transactions to CZK"
@@ -191,7 +191,7 @@
             "category": "Other"
         },
         "FIXED_RATE_AMOUNT": {
-            "type": "number",
+            "type": "integer",
             "description": {
                 "en": "Fixed rate amount for some currencies (e.g., 💴)",
                 "cs": "Fixed rate amount for some currencies (e.g., 💴)"
@@ -241,7 +241,7 @@
             "category": "Database"
         },
         "DB_PORT": {
-            "type": "number",
+            "type": "integer",
             "description": {
                 "en": "Database Port",
                 "cs": "Database Port"
@@ -420,5 +420,17 @@
             "required": false,
             "category": "Behavior"
         }
-    }
+    },
+    "artifacts": [{
+            "name": {
+                "cs": "Report importu",
+                "en": "Import report"
+            },
+            "type": "file",
+            "path": "bank_import_report_{\\d+}.json$",
+            "description": {
+                "en": "Stauses of Statement: download from bank, import to Pohoda, upload to Shatepoint,  Attachment link in Pohoda",
+                "cs": "Stavy výpisu: stažení z banky, import do pohody, nahrátí do sharepointu, příloha linku do Pohody"
+            }
+    }]
 }
