@@ -30,9 +30,9 @@ Shared::init(
         'POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO',
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
     ],
-    \array_key_exists('environment', $options) ? $options['environment'] : '../.env',
+    array_key_exists('environment', $options) ? $options['environment'] : '../.env',
 );
-$destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
+$destination = array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
 $certFile = Shared::cfg('CERT_FILE');
 if (!PohodaBankClient::checkCertificate($certFile, Shared::cfg('CERT_PASS'))) {

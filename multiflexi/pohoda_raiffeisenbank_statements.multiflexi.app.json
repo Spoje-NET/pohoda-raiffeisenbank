@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
-    "schemaVersion": "3.0.0",
+    "schemaVersion": "3.1.0",
     "uuid": "d660baec-aa96-4810-ad9f-b4180f27b9f1",
     "name": {
         "en": "Raiffeisenbank statements for Pohoda",
@@ -247,7 +247,8 @@
             "category": "Other"
         }
     },
-    "artifacts": [{
+    "artifacts": [
+        {
             "name": {
                 "cs": "Report importu",
                 "en": "Import report"
@@ -258,5 +259,32 @@
                 "en": "Stauses of Statement: download from bank, import to Pohoda",
                 "cs": "Stavy výpisu: stažení z banky, import do pohody"
             }
-    }]
+        }
+    ],
+    "exitCodes": {
+        "0": {
+            "description": {
+                "en": "Success",
+                "cs": "Úspěch"
+            },
+            "severity": "success",
+            "retry": false
+        },
+        "1": {
+            "description": {
+                "en": "General error",
+                "cs": "Obecná chyba"
+            },
+            "severity": "error",
+            "retry": true
+        },
+        "2": {
+            "description": {
+                "en": "Misuse of shell command",
+                "cs": "Nesprávné použití příkazu"
+            },
+            "severity": "error",
+            "retry": false
+        }
+    }
 }

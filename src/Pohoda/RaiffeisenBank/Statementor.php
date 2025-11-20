@@ -226,7 +226,7 @@ class Statementor extends PohodaBankClient
                     } else {
                         $lastInsert = $this->insertTransactionToPohoda($bankIds);
 
-                        $this->messages[$lastInsert['id']] = \array_key_exists('message', $lastInsert) ? $lastInsert['message'] : (\array_key_exists('messages', $lastInsert) ? $lastInsert['messages'] : '?!');
+                        $this->messages[$lastInsert['id']] = array_key_exists('message', $lastInsert) ? $lastInsert['message'] : (array_key_exists('messages', $lastInsert) ? $lastInsert['messages'] : '?!');
                         unset($lastInsert['messages']);
                         $lastInsert['details']['amount'] = $amount;
                         $lastInsert['details']['currency'] = $this->currency;
@@ -280,7 +280,7 @@ class Statementor extends PohodaBankClient
         $data['dateStatement'] = current((array) $entry->BookgDt->DtTm);
         $moveTrans = ['DBIT' => 'expense', 'CRDT' => 'receipt'];
 
-        if (\array_key_exists(trim((string) $entry->CdtDbtInd), $moveTrans)) {
+        if (array_key_exists(trim((string) $entry->CdtDbtInd), $moveTrans)) {
             $data['bankType'] = $moveTrans[trim((string) $entry->CdtDbtInd)];
         } else {
             $this->addStatusMessage(sprintf(_('Unknown CdtDbtInd %s in entry %s'), trim((string) $entry->CdtDbtInd), (string) $entry->NtryRef), 'error');
@@ -290,7 +290,7 @@ class Statementor extends PohodaBankClient
 
         $amountAttributes = self::simpleXmlAttributes($entry->Amt);
 
-        if (\array_key_exists('Ccy', $amountAttributes) && $amountAttributes['Ccy'] !== 'CZK') {
+        if (array_key_exists('Ccy', $amountAttributes) && $amountAttributes['Ccy'] !== 'CZK') {
             $data['foreignCurrency'] = ['priceSum' => abs((float) $entry->Amt)]; // "price3", "price3Sum", "price3VAT", "priceHigh", "priceHighSum", "priceHighVAT", "priceLow", "priceLowSum", "priceLowVAT", "priceNone", "round"
             $data['foreignCurrency']['currency'] = $amountAttributes['Ccy'];
             $rateInfo = $this->getRateInfo(new \DateTime($data['datePayment']));
@@ -450,7 +450,7 @@ class Statementor extends PohodaBankClient
                 //  "EAN", "code", "company", "dateFrom", "dateTill", "dic", "ico", "id", "internet", "lastChanges", "name", "storage", "store".
                 $latestRecord = $this->getColumnsFromPohoda();
 
-                if (\array_key_exists(0, $latestRecord) && \array_key_exists('lastUpdate', $latestRecord[0])) {
+                if (array_key_exists(0, $latestRecord) && array_key_exists('lastUpdate', $latestRecord[0])) {
                     $this->since = $latestRecord[0]['lastUpdate'];
                 } else {
                     $this->addStatusMessage('Previous record for "auto since" not found. Defaulting to today\'s 00:00', 'warning');

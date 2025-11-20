@@ -240,7 +240,7 @@ abstract class PohodaBankClient extends \mServer\Bank
             case 'auto':
                 $latestRecord = $this->getColumnsFromPohoda(['id', 'lastUpdate'], ['limit' => 1, 'order' => 'lastUpdate@A', 'source' => $this->sourceString(), 'bank' => $this->bankIDS]);
 
-                if (\array_key_exists(0, $latestRecord) && \array_key_exists('lastUpdate', $latestRecord[0])) {
+                if (array_key_exists(0, $latestRecord) && array_key_exists('lastUpdate', $latestRecord[0])) {
                     $this->since = $latestRecord[0]['lastUpdate'];
                 } else {
                     $this->addStatusMessage('Previous record for "auto since" not found. Defaulting to today\'s 00:00', 'warning');
@@ -378,7 +378,7 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $result['success'] = false;
                 $resultMessages = $this->messages;
 
-                if (\array_key_exists('error', $resultMessages) && \count($resultMessages['error'])) {
+                if (array_key_exists('error', $resultMessages) && \count($resultMessages['error'])) {
                     foreach ($resultMessages['error'] as $errMsg) {
                         $result['messages'][] = 'error: '.$errMsg;
                     }

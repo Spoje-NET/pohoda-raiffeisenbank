@@ -34,9 +34,9 @@ Shared::init(
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
         'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
     ],
-    \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
+    array_key_exists('environment', $options) ? $options['environment'] : (array_key_exists('e', $options) ? $options['e'] : '../.env'),
 );
-$destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
+$destination = array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
 $certValid = PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
 \define('FIXED_RATE', 1);
@@ -102,7 +102,7 @@ if (!$certValid) {
             foreach ($pdfStatements as $pdfStatement) {
                 $uploadAs = Statementor::statementFilename($pdfStatement);
 
-                if (\array_key_exists($uploadAs, $sharepointFiles)) {
+                if (array_key_exists($uploadAs, $sharepointFiles)) {
                     $engine->addStatusMessage(sprintf('File %s exists in SharePoint', $uploadAs), 'success');
                     $report['existing'][] = $uploadAs;
                 } else {

@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
-    "schemaVersion": "3.0.0",
+    "schemaVersion": "3.1.0",
     "uuid": "e9893573-24aa-4518-bf05-66fae9ad153c",
     "name": {
         "en": "Raiffeisenbank statements for PohodaSQL+Sharepoint",
@@ -421,7 +421,8 @@
             "category": "Behavior"
         }
     },
-    "artifacts": [{
+    "artifacts": [
+        {
             "name": {
                 "cs": "Report importu",
                 "en": "Import report"
@@ -432,5 +433,56 @@
                 "en": "Stauses of Statement: download from bank, import to Pohoda, upload to Shatepoint,  Attachment link in Pohoda",
                 "cs": "Stavy výpisu: stažení z banky, import do pohody, nahrátí do sharepointu, příloha linku do Pohody"
             }
-    }]
+        }
+    ],
+    "exitCodes": {
+        "0": {
+            "description": {
+                "en": "Success",
+                "cs": "Úspěch"
+            },
+            "severity": "success",
+            "retry": false
+        },
+        "1": {
+            "description": {
+                "en": "General error",
+                "cs": "Obecná chyba"
+            },
+            "severity": "error",
+            "retry": true
+        },
+        "2": {
+            "description": {
+                "en": "Misuse of shell command",
+                "cs": "Nesprávné použití příkazu"
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "3": {
+            "description": {
+                "en": "Application-specific error code 3",
+                "cs": "Aplikační chybový kód 3"
+            },
+            "severity": "error",
+            "retry": true
+        },
+        "4": {
+            "description": {
+                "en": "Application-specific error code 4",
+                "cs": "Aplikační chybový kód 4"
+            },
+            "severity": "error",
+            "retry": true
+        },
+        "401": {
+            "description": {
+                "en": "Unauthorized - authentication failed",
+                "cs": "Neautorizováno - ověření selhalo"
+            },
+            "severity": "error",
+            "retry": false
+        }
+    }
 }

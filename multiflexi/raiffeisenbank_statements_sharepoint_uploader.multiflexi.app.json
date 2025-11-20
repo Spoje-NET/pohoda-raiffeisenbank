@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
-    "schemaVersion": "3.0.0",
+    "schemaVersion": "3.1.0",
     "uuid": "3f5dc042-afa3-40b8-9bf0-ed836dae9980",
     "name": {
         "en": "Raiffeisenbank statements Sharepoint upload",
@@ -227,7 +227,8 @@
             "category": "Behavior"
         }
     },
-    "artifacts": [{
+    "artifacts": [
+        {
             "name": {
                 "cs": "Report importu a uložení",
                 "en": "Download and store report"
@@ -238,5 +239,24 @@
                 "en": "Stauses of Statement: download from bank, upload to Shatepoint",
                 "cs": "Stavy výpisu: stažení z banky, nahrání do sharepointu"
             }
-    }]
+        }
+    ],
+    "exitCodes": {
+        "0": {
+            "description": {
+                "en": "Success",
+                "cs": "Úspěch"
+            },
+            "severity": "success",
+            "retry": false
+        },
+        "1": {
+            "description": {
+                "en": "General error",
+                "cs": "Obecná chyba"
+            },
+            "severity": "error",
+            "retry": true
+        }
+    }
 }

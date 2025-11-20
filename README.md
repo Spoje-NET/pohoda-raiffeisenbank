@@ -246,3 +246,14 @@ Example output:
   "iban": "CZ1234567890123456789012"
 }
 ```
+
+## Exit Codes
+
+Applications in this package use the following exit codes:
+
+- `0`: Success
+- `1`: General error
+- `2`: Misuse of shell command
+- `3`: Application-specific error
+- `4`: Application-specific error
+- `401`: Unauthorized - authentication failed
