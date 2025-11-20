@@ -30,9 +30,9 @@ $options = getopt('o::e::', ['output::environment::', 'scope::']);
 Shared::init([
     'POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO',
     'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
-], \array_key_exists('environment', $options) ? $options['environment'] : '../.env');
-$destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
-$scope = \array_key_exists('scope', $options) ? $options['scope'] : Shared::cfg('REPORT_SCOPE', 'yesterday');
+], array_key_exists('environment', $options) ? $options['environment'] : '../.env');
+$destination = array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
+$scope = array_key_exists('scope', $options) ? $options['scope'] : Shared::cfg('REPORT_SCOPE', 'yesterday');
 
 $engine = new BankProbe();
 

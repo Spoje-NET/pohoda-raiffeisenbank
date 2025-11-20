@@ -51,7 +51,7 @@ class Transactor extends PohodaBankClient
                     $result['lastPage'] = true;
                 }
 
-                if (\array_key_exists('transactions', $result)) {
+                if (array_key_exists('transactions', $result)) {
                     $transactions = array_merge($transactions, $result['transactions']);
                 }
             } while ($result['lastPage'] === false);
@@ -59,7 +59,7 @@ class Transactor extends PohodaBankClient
             $errorMessage = $e->getMessage();
             preg_match('/cURL error ([0-9]+)/', $errorMessage, $matches);
 
-            if (\array_key_exists(1, $matches)) {
+            if (array_key_exists(1, $matches)) {
                 $errorCode = $matches[1];
             } elseif (preg_match('/\[([0-9]+)\]/', $errorMessage, $matches)) {
                 $errorCode = $matches[1];
@@ -228,7 +228,7 @@ class Transactor extends PohodaBankClient
             case 'auto':
                 //                $latestRecord = $this->getColumnsFromPohoda(['id', 'lastUpdate'], ['limit' => 1, 'order' => 'lastUpdate@A', 'source' => $this->sourceString(), 'banka' => $this->bank]);
                 //
-                //                if (\array_key_exists(0, $latestRecord) && \array_key_exists('lastUpdate', $latestRecord[0])) {
+                //                if (array_key_exists(0, $latestRecord) && array_key_exists('lastUpdate', $latestRecord[0])) {
                 //                    $this->since = $latestRecord[0]['lastUpdate'];
                 //                } else {
                 //                    $this->addStatusMessage('Previous record for "auto since" not found. Defaulting to today\'s 00:00', 'warning');

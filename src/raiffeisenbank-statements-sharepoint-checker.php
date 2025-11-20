@@ -34,9 +34,9 @@ Shared::init(
         'OFFICE365_TENANT', 'OFFICE365_PATH', 'OFFICE365_SITE',
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
     ],
-    \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
+    array_key_exists('environment', $options) ? $options['environment'] : (array_key_exists('e', $options) ? $options['e'] : '../.env'),
 );
-$destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
+$destination = array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
 $certValid = PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'), ['user' => '', 'password' => '', 'ico' => '', 'url' => '', 'cnbCache' => 'none']);
@@ -87,7 +87,7 @@ if (!$certValid) {
         }
 
         foreach ($pdfStatements as $pdfStatement) {
-            if (\array_key_exists($pdfStatement, $sharepointFiles)) {
+            if (array_key_exists($pdfStatement, $sharepointFiles)) {
                 $engine->addStatusMessage(sprintf(_('File %s exists in SharePoint'), $pdfStatement), 'success');
                 $report['existing'][] = $pdfStatement;
             } else {

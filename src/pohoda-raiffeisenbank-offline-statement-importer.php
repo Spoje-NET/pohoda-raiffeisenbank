@@ -22,15 +22,15 @@ require_once '../vendor/autoload.php';
 \define('APP_NAME', 'Pohoda RaiffeisenBank Offline Statements');
 
 $options = getopt('i::e::o::', ['input::environment::output::']);
-$statementFile = \array_key_exists('i', $options) ? $options['i'] : (\array_key_exists('input', $options) ? $options['input'] : Shared::cfg('STATEMENT_FILE', 'php://stdin'));
-$destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout'));
+$statementFile = array_key_exists('i', $options) ? $options['i'] : (array_key_exists('input', $options) ? $options['input'] : Shared::cfg('STATEMENT_FILE', 'php://stdin'));
+$destination = array_key_exists('o', $options) ? $options['o'] : (array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout'));
 
 /**
  * Get today's Statements list.
  */
 Shared::init(
     ['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 'POHODA_BANK_IDS', 'ACCOUNT_NUMBER'],
-    \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
+    array_key_exists('environment', $options) ? $options['environment'] : (array_key_exists('e', $options) ? $options['e'] : '../.env'),
 );
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
 
