@@ -1,238 +1,243 @@
 {
-    "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
-    "schemaVersion": "3.1.0",
-    "uuid": "2461feac-a694-4171-a37e-069fe3f56cef",
-    "name": {
-        "en": "Raiffeisenbank statements Sharepoint check",
-        "cs": "Raiffeisenbank statements Sharepoint check"
+  "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+  "schemaVersion": "3.1.0",
+  "uuid": "2461feac-a694-4171-a37e-069fe3f56cef",
+  "name": {
+    "en": "Raiffeisenbank statements Sharepoint check",
+    "cs": "Kontrola výpisů Raiffeisenbank v Sharepointu"
+  },
+  "description": {
+    "en": "Check Raiffeisenbank statements presence in Sharepoint",
+    "cs": "Zkontrolujte přítomnost výpisů Raiffeisenbank v Sharepointu"
+  },
+  "tags": ["Raiffeisen", "Bank", "Statements", "Check"],
+  "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
+  "executable": "raiffeisenbank-statements-sharepoint-checker",
+  "environment": {
+    "ACCOUNT_NUMBER": {
+      "type": "text",
+      "description": {
+        "en": "Bank Account Number",
+        "cs": "Číslo bankovního účtu"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
     },
-    "description": {
-        "en": "Check Raiffeisenbank statements presence in Sharepoint",
-        "cs": "Check Raiffeisenbank statements presence in Sharepoint"
+    "CERT_PASS": {
+      "type": "password",
+      "description": {
+        "en": "Certificate password",
+        "cs": "Heslo certifikátu"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
     },
-    "tags": [
-        "Raiffeisen",
-        "Bank",
-        "Statements",
-        "Check"
-    ],
-    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-    "executable": "raiffeisenbank-statements-sharepoint-checker",
-    "environment": {
-        "ACCOUNT_NUMBER": {
-            "type": "text",
-            "description": {
-                "en": "Bank Account Number",
-                "cs": "Bank Account Number"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "CERT_PASS": {
-            "type": "password",
-            "description": {
-                "en": "Certificate password",
-                "cs": "Certificate password"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "CERT_FILE": {
-            "type": "string",
-            "description": {
-                "en": "Path to RB Certificate file",
-                "cs": "Path to RB Certificate file"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "IMPORT_SCOPE": {
-            "type": "text",
-            "description": {
-                "en": "Time scope of transactions downloaded",
-                "cs": "Time scope of transactions downloaded"
-            },
-            "defval": "auto",
-            "required": true,
-            "category": "Other"
-        },
-        "STATEMENT_LINE": {
-            "type": "set",
-            "description": {
-                "en": "Bank Statement line",
-                "cs": "Bank Statement line"
-            },
-            "defval": "ADDITIONAL",
-            "hint": {
-                "en": "MAIN",
-                "cs": "MAIN"
-            },
-            "options": {
-                "MAIN": "Main statement line",
-                "ADDITIONAL": "Additional statement line"
-            },
-            "category": "Other"
-        },
-        "ACCOUNT_CURRENCY": {
-            "type": "text",
-            "description": {
-                "en": "for multicurrency accounts please specify one",
-                "cs": "for multicurrency accounts please specify one"
-            },
-            "defval": "CZK",
-            "required": false,
-            "category": "Other"
-        },
-        "XIBMCLIENTID": {
-            "type": "text",
-            "description": {
-                "en": "ClientID",
-                "cs": "ClientID"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "OFFICE365_USERNAME": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Username",
-                "cs": "Office 365 Username"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Other"
-        },
-        "OFFICE365_PASSWORD": {
-            "type": "password",
-            "description": {
-                "en": "Office 365 Password",
-                "cs": "Office 365 Password"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Security"
-        },
-        "OFFICE365_CLIENTID": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Client ID",
-                "cs": "Office 365 Client ID"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Other"
-        },
-        "OFFICE365_SECRET": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Secret",
-                "cs": "Office 365 Secret"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Security"
-        },
-        "OFFICE365_CLSECRET": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Client Secret",
-                "cs": "Office 365 Client Secret"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Security"
-        },
-        "OFFICE365_TENANT": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Tenant",
-                "cs": "Office 365 Tenant"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "OFFICE365_SITE": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Site",
-                "cs": "Office 365 Site"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "OFFICE365_PATH": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Path",
-                "cs": "Office 365 Path"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "STATEMENT_SAVE_DIR": {
-            "type": "text",
-            "description": {
-                "en": "Place for PDF files",
-                "cs": "Place for PDF files"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Other"
-        },
-        "RESULT_FILE": {
-            "type": "string",
-            "description": {
-                "en": "write output json data to",
-                "cs": "write output json data to"
-            },
-            "defval": "bank_statement_check_{ACCOUNT_NUMBER}.json",
-            "required": false,
-            "category": "Other"
-        },
-        "ZABBIX_KEY": {
-            "type": "string",
-            "description": {
-                "en": "Default name for Zabbix Item key name",
-                "cs": "Default name for Zabbix Item key name"
-            },
-            "defval": "Raiff-Statement-{ACCOUNT_NUMBER}-inSharepoint",
-            "required": false,
-            "category": "Other"
-        },
-        "EASE_LOGGER": {
-            "type": "string",
-            "description": {
-                "en": "write log messages using",
-                "cs": "write log messages using"
-            },
-            "defval": "console|syslog",
-            "required": false,
-            "category": "Behavior"
-        }
+    "CERT_FILE": {
+      "type": "string",
+      "description": {
+        "en": "Path to RB Certificate file",
+        "cs": "Cesta k souboru certifikátu RB"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
     },
-    "exitCodes": {
-        "0": {
-            "description": {
-                "en": "Success",
-                "cs": "Úspěch"
-            },
-            "severity": "success",
-            "retry": false
-        },
-        "1": {
-            "description": {
-                "en": "General error",
-                "cs": "Obecná chyba"
-            },
-            "severity": "error",
-            "retry": true
-        }
+    "IMPORT_SCOPE": {
+      "type": "text",
+      "description": {
+        "en": "Time scope of transactions downloaded",
+        "cs": "Časový rozsah stahovaných transakcí"
+      },
+      "defval": "auto",
+      "required": true,
+      "category": "Other"
+    },
+    "STATEMENT_LINE": {
+      "type": "set",
+      "description": {
+        "en": "Bank Statement line",
+        "cs": "Řádek bankovního výpisu"
+      },
+      "defval": "ADDITIONAL",
+      "hint": {
+        "en": "MAIN",
+        "cs": "MAIN"
+      },
+      "options": {
+        "MAIN": "Main statement line",
+        "ADDITIONAL": "Additional statement line"
+      },
+      "category": "Other"
+    },
+    "ACCOUNT_CURRENCY": {
+      "type": "text",
+      "description": {
+        "en": "for multicurrency accounts please specify one",
+        "cs": "U víceměnových účtů prosím zadejte měnu"
+      },
+      "defval": "CZK",
+      "required": false,
+      "category": "Other"
+    },
+    "XIBMCLIENTID": {
+      "type": "text",
+      "description": {
+        "en": "ClientID",
+        "cs": "ClientID"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "OFFICE365_USERNAME": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Username",
+        "cs": "Uživatelské jméno Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
+    "OFFICE365_PASSWORD": {
+      "type": "password",
+      "description": {
+        "en": "Office 365 Password",
+        "cs": "Heslo Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Security"
+    },
+    "OFFICE365_CLIENTID": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Client ID",
+        "cs": "Client ID Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
+    "OFFICE365_SECRET": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Secret",
+        "cs": "Secret Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Security"
+    },
+    "OFFICE365_CLSECRET": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Client Secret",
+        "cs": "Client Secret Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Security"
+    },
+    "OFFICE365_TENANT": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Tenant",
+        "cs": "Tenant Office 365"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "OFFICE365_SITE": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Site",
+        "cs": "Site Office 365"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "OFFICE365_PATH": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Path",
+        "cs": "Cesta Office 365"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "STATEMENT_SAVE_DIR": {
+      "type": "text",
+      "description": {
+        "en": "Place for PDF files",
+        "cs": "Místo pro PDF soubory"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
+    "RESULT_FILE": {
+      "type": "string",
+      "description": {
+        "en": "write output json data to",
+        "cs": "Zápis výstupních dat do JSON"
+      },
+      "defval": "bank_statement_check_{ACCOUNT_NUMBER}.json",
+      "required": false,
+      "category": "Other"
+    },
+    "ZABBIX_KEY": {
+      "type": "string",
+      "description": {
+        "en": "Default name for Zabbix Item key name",
+        "cs": "Výchozí název klíče položky Zabbix"
+      },
+      "defval": "Raiff-Statement-{ACCOUNT_NUMBER}-inSharepoint",
+      "required": false,
+      "category": "Other"
+    },
+    "RBAPI_RATE_LIMIT_JSON_FILE": {
+      "type": "string",
+      "description": {
+        "en": "write API rate limit file using",
+        "cs": "Zápis souboru s limity přístupů API"
+      },
+      "defval": "{MULTIFLEXI_TMP}/rbczpremiumapi_rates.json",
+      "required": false,
+      "category": "API"
+    },
+    "EASE_LOGGER": {
+      "type": "string",
+      "description": {
+        "en": "write log messages using",
+        "cs": "Způsob zápisu logovacích zpráv"
+      },
+      "defval": "console|syslog",
+      "required": false,
+      "category": "Behavior"
     }
+  },
+  "exitCodes": {
+    "0": {
+      "description": {
+        "en": "Success",
+        "cs": "Úspěšné dokončení"
+      },
+      "severity": "success",
+      "retry": false
+    },
+    "1": {
+      "description": {
+        "en": "General error",
+        "cs": "Obecná chyba"
+      },
+      "severity": "error",
+      "retry": true
+    }
+  }
 }

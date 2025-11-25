@@ -1,290 +1,295 @@
 {
-    "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
-    "schemaVersion": "3.1.0",
-    "uuid": "d660baec-aa96-4810-ad9f-b4180f27b9f1",
-    "name": {
-        "en": "Raiffeisenbank statements for Pohoda",
-        "cs": "Raiffeisenbank statements for Pohoda"
+  "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+  "schemaVersion": "3.1.0",
+  "uuid": "d660baec-aa96-4810-ad9f-b4180f27b9f1",
+  "name": {
+    "en": "Raiffeisenbank statements for Pohoda",
+    "cs": "Výpisy Raiffeisenbank pro Pohodu"
+  },
+  "description": {
+    "en": "Import Raiffeisenbank statements into Pohoda",
+    "cs": "Importujte výpisy Raiffeisenbank do Pohody"
+  },
+  "tags": ["Raiffeisen", "Bank", "Statements", "Pohoda"],
+  "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
+  "executable": "pohoda-raiffeisenbank-statements",
+  "environment": {
+    "FIXED_RATE": {
+      "type": "integer",
+      "description": {
+        "en": "Fixed rate for converting foreign currency transactions to CZK",
+        "cs": "Pevný kurz pro převod zahraničních transakcí na CZK"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
     },
-    "description": {
-        "en": "Import Raiffeisenbank statements into Pohoda",
-        "cs": "Import Raiffeisenbank statements into Pohoda"
+    "FIXED_RATE_AMOUNT": {
+      "type": "integer",
+      "description": {
+        "en": "Fixed rate amount for some currencies (e.g., 💴)",
+        "cs": "Pevná částka kurzu pro některé měny (např. 💴)"
+      },
+      "defval": "100",
+      "required": false,
+      "category": "Other"
     },
-    "tags": [
-        "Raiffeisen",
-        "Bank",
-        "Statements",
-        "Pohoda"
-    ],
-    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-    "executable": "pohoda-raiffeisenbank-statements",
-    "environment": {
-        "FIXED_RATE": {
-            "type": "integer",
-            "description": {
-                "en": "Fixed rate for converting foreign currency transactions to CZK",
-                "cs": "Fixed rate for converting foreign currency transactions to CZK"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Other"
-        },
-        "FIXED_RATE_AMOUNT": {
-            "type": "integer",
-            "description": {
-                "en": "Fixed rate amount for some currencies (e.g., 💴)",
-                "cs": "Fixed rate amount for some currencies (e.g., 💴)"
-            },
-            "defval": "100",
-            "required": false,
-            "category": "Other"
-        },
-        "CNB_CACHE": {
-            "type": "text",
-            "description": {
-                "en": "Use CNB cache to get actual rate from CNB",
-                "cs": "Use CNB cache to get actual rate from CNB"
-            },
-            "defval": "http://localhost/cnb-cache",
-            "required": false,
-            "category": "Other"
-        },
-        "RATE_OFFSET": {
-            "type": "text",
-            "description": {
-                "en": "Rate offset to get rate for previous day",
-                "cs": "Rate offset to get rate for previous day"
-            },
-            "defval": "yesterday",
-            "required": false,
-            "category": "Other"
-        },
-        "ACCOUNT_NUMBER": {
-            "type": "text",
-            "description": {
-                "en": "Bank Account Number",
-                "cs": "Bank Account Number"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "STATEMENT_LINE": {
-            "type": "set",
-            "description": {
-                "en": "Bank Statement line",
-                "cs": "Bank Statement line"
-            },
-            "defval": "ADDITIONAL",
-            "hint": {
-                "en": "MAIN",
-                "cs": "MAIN"
-            },
-            "options": {
-                "MAIN": "Main statement line",
-                "ADDITIONAL": "Additional statement line"
-            },
-            "category": "Other"
-        },
-        "CERT_PASS": {
-            "type": "password",
-            "description": {
-                "en": "Certificate password",
-                "cs": "Certificate password"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "CERT_FILE": {
-            "type": "string",
-            "description": {
-                "en": "Path to RB Certificate file",
-                "cs": "Path to RB Certificate file"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "IMPORT_SCOPE": {
-            "type": "text",
-            "description": {
-                "en": "Time scope of transactions downloaded",
-                "cs": "Time scope of transactions downloaded"
-            },
-            "defval": "auto",
-            "required": true,
-            "category": "Other"
-        },
-        "ACCOUNT_CURRENCY": {
-            "type": "text",
-            "description": {
-                "en": "for multicurrency accounts please specify one",
-                "cs": "for multicurrency accounts please specify one"
-            },
-            "defval": "CZK",
-            "required": false,
-            "category": "Other"
-        },
-        "XIBMCLIENTID": {
-            "type": "text",
-            "description": {
-                "en": "ClientID",
-                "cs": "ClientID"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "POHODA_ICO": {
-            "type": "text",
-            "description": {
-                "en": "Pohoda ICO",
-                "cs": "Pohoda ICO"
-            },
-            "defval": "12345678",
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_URL": {
-            "type": "text",
-            "description": {
-                "en": "Pohoda URL",
-                "cs": "Pohoda URL"
-            },
-            "defval": "http://127.0.0.1:10010",
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_USERNAME": {
-            "type": "text",
-            "description": {
-                "en": "Pohoda Username",
-                "cs": "Pohoda Username"
-            },
-            "defval": "Admin",
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_PASSWORD": {
-            "type": "password",
-            "description": {
-                "en": "Pohoda Password",
-                "cs": "Pohoda Password"
-            },
-            "defval": "xxxxxxxx",
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_TIMEOUT": {
-            "type": "integer",
-            "description": {
-                "en": "Pohoda Timeout",
-                "cs": "Pohoda Timeout"
-            },
-            "defval": 60,
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_COMPRESS": {
-            "type": "bool",
-            "description": {
-                "en": "Pohoda Compress",
-                "cs": "Pohoda Compress"
-            },
-            "defval": false,
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_DEBUG": {
-            "type": "bool",
-            "description": {
-                "en": "Pohoda Debug",
-                "cs": "Pohoda Debug"
-            },
-            "defval": true,
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_BANK_IDS": {
-            "type": "text",
-            "description": {
-                "en": "Pohoda Bank IDs",
-                "cs": "Pohoda Bank IDs"
-            },
-            "defval": "KB",
-            "required": true,
-            "category": "API"
-        },
-        "STATEMENT_SAVE_DIR": {
-            "type": "text",
-            "description": {
-                "en": "Place for PDF files",
-                "cs": "Place for PDF files"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Other"
-        },
-        "EASE_LOGGER": {
-            "type": "string",
-            "description": {
-                "en": "write log messages using",
-                "cs": "write log messages using"
-            },
-            "defval": "console|syslog",
-            "required": false,
-            "category": "Behavior"
-        },
-        "RESULT_FILE": {
-            "type": "string",
-            "description": {
-                "en": "write output json data to",
-                "cs": "write output json data to"
-            },
-            "defval": "bank_import_report_{ACCOUNT_NUMBER}.json",
-            "required": false,
-            "category": "Other"
-        }
+    "CNB_CACHE": {
+      "type": "text",
+      "description": {
+        "en": "Use CNB cache to get actual rate from CNB",
+        "cs": "Použít CNB cache pro získání aktuálního kurzu z ČNB"
+      },
+      "defval": "http://localhost/cnb-cache",
+      "required": false,
+      "category": "Other"
     },
-    "artifacts": [
-        {
-            "name": {
-                "cs": "Report importu",
-                "en": "Import report"
-            },
-            "type": "file",
-            "path": "bank_import_report_{\\d+}.json$",
-            "description": {
-                "en": "Stauses of Statement: download from bank, import to Pohoda",
-                "cs": "Stavy výpisu: stažení z banky, import do pohody"
-            }
-        }
-    ],
-    "exitCodes": {
-        "0": {
-            "description": {
-                "en": "Success",
-                "cs": "Úspěch"
-            },
-            "severity": "success",
-            "retry": false
-        },
-        "1": {
-            "description": {
-                "en": "General error",
-                "cs": "Obecná chyba"
-            },
-            "severity": "error",
-            "retry": true
-        },
-        "2": {
-            "description": {
-                "en": "Misuse of shell command",
-                "cs": "Nesprávné použití příkazu"
-            },
-            "severity": "error",
-            "retry": false
-        }
+    "RATE_OFFSET": {
+      "type": "text",
+      "description": {
+        "en": "Rate offset to get rate for previous day",
+        "cs": "Posun kurzu pro získání kurzu z předchozího dne"
+      },
+      "defval": "yesterday",
+      "required": false,
+      "category": "Other"
+    },
+    "ACCOUNT_NUMBER": {
+      "type": "text",
+      "description": {
+        "en": "Bank Account Number",
+        "cs": "Číslo bankovního účtu"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "STATEMENT_LINE": {
+      "type": "set",
+      "description": {
+        "en": "Bank Statement line",
+        "cs": "Řádek bankovního výpisu"
+      },
+      "defval": "ADDITIONAL",
+      "hint": {
+        "en": "MAIN",
+        "cs": "MAIN"
+      },
+      "options": {
+        "MAIN": "Main statement line",
+        "ADDITIONAL": "Additional statement line"
+      },
+      "category": "Other"
+    },
+    "CERT_PASS": {
+      "type": "password",
+      "description": {
+        "en": "Certificate password",
+        "cs": "Heslo certifikátu"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "CERT_FILE": {
+      "type": "string",
+      "description": {
+        "en": "Path to RB Certificate file",
+        "cs": "Cesta k souboru certifikátu RB"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "IMPORT_SCOPE": {
+      "type": "text",
+      "description": {
+        "en": "Time scope of transactions downloaded",
+        "cs": "Časový rozsah stahovaných transakcí"
+      },
+      "defval": "auto",
+      "required": true,
+      "category": "Other"
+    },
+    "ACCOUNT_CURRENCY": {
+      "type": "text",
+      "description": {
+        "en": "for multicurrency accounts please specify one",
+        "cs": "U víceměnových účtů prosím zadejte měnu"
+      },
+      "defval": "CZK",
+      "required": false,
+      "category": "Other"
+    },
+    "XIBMCLIENTID": {
+      "type": "text",
+      "description": {
+        "en": "ClientID",
+        "cs": "ClientID"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "POHODA_ICO": {
+      "type": "text",
+      "description": {
+        "en": "Pohoda ICO",
+        "cs": "IČO Pohoda"
+      },
+      "defval": "12345678",
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_URL": {
+      "type": "text",
+      "description": {
+        "en": "Pohoda URL",
+        "cs": "URL Pohoda"
+      },
+      "defval": "http://127.0.0.1:10010",
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_USERNAME": {
+      "type": "text",
+      "description": {
+        "en": "Pohoda Username",
+        "cs": "Uživatelské jméno Pohoda"
+      },
+      "defval": "Admin",
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_PASSWORD": {
+      "type": "password",
+      "description": {
+        "en": "Pohoda Password",
+        "cs": "Heslo Pohoda"
+      },
+      "defval": "xxxxxxxx",
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_TIMEOUT": {
+      "type": "integer",
+      "description": {
+        "en": "Pohoda Timeout",
+        "cs": "Časový limit Pohoda"
+      },
+      "defval": 60,
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_COMPRESS": {
+      "type": "bool",
+      "description": {
+        "en": "Pohoda Compress",
+        "cs": "Komprese Pohoda"
+      },
+      "defval": false,
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_DEBUG": {
+      "type": "bool",
+      "description": {
+        "en": "Pohoda Debug",
+        "cs": "Ladění Pohoda"
+      },
+      "defval": true,
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_BANK_IDS": {
+      "type": "text",
+      "description": {
+        "en": "Pohoda Bank IDs",
+        "cs": "ID banky Pohoda"
+      },
+      "defval": "KB",
+      "required": true,
+      "category": "API"
+    },
+    "STATEMENT_SAVE_DIR": {
+      "type": "text",
+      "description": {
+        "en": "Place for PDF files",
+        "cs": "Místo pro PDF soubory"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
+    "EASE_LOGGER": {
+      "type": "string",
+      "description": {
+        "en": "write log messages using",
+        "cs": "Způsob zápisu logovacích zpráv"
+      },
+      "defval": "console|syslog",
+      "required": false,
+      "category": "Behavior"
+    },
+    "RBAPI_RATE_LIMIT_JSON_FILE": {
+      "type": "string",
+      "description": {
+        "en": "write API rate limit file using",
+        "cs": "Zápis souboru s limity přístupů API"
+      },
+      "defval": "{MULTIFLEXI_TMP}/rbczpremiumapi_rates.json",
+      "required": false,
+      "category": "API"
+    },
+    "RESULT_FILE": {
+      "type": "string",
+      "description": {
+        "en": "write output json data to",
+        "cs": "Zápis výstupních dat do JSON"
+      },
+      "defval": "bank_import_report_{ACCOUNT_NUMBER}.json",
+      "required": false,
+      "category": "Other"
     }
+  },
+  "artifacts": [
+    {
+      "name": {
+        "cs": "Zpráva o importu",
+        "en": "Import report"
+      },
+      "type": "file",
+      "path": "bank_import_report_{\\d+}.json$",
+      "description": {
+        "en": "Stauses of Statement: download from bank, import to Pohoda",
+        "cs": "Stavy výpisu: stažení z banky, import do Pohody"
+      }
+    }
+  ],
+  "exitCodes": {
+    "0": {
+      "description": {
+        "en": "Success",
+        "cs": "Úspěšné dokončení"
+      },
+      "severity": "success",
+      "retry": false
+    },
+    "1": {
+      "description": {
+        "en": "General error",
+        "cs": "Obecná chyba"
+      },
+      "severity": "error",
+      "retry": true
+    },
+    "2": {
+      "description": {
+        "en": "Misuse of shell command",
+        "cs": "Nesprávné použití příkazu"
+      },
+      "severity": "error",
+      "retry": false
+    }
+  }
 }

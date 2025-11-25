@@ -1,488 +1,493 @@
 {
-    "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
-    "schemaVersion": "3.1.0",
-    "uuid": "e9893573-24aa-4518-bf05-66fae9ad153c",
-    "name": {
-        "en": "Raiffeisenbank statements for PohodaSQL+Sharepoint",
-        "cs": "Raiffeisenbank statements for PohodaSQL+Sharepoint"
+  "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+  "schemaVersion": "3.1.0",
+  "uuid": "e9893573-24aa-4518-bf05-66fae9ad153c",
+  "name": {
+    "en": "Raiffeisenbank statements for PohodaSQL+Sharepoint",
+    "cs": "Výpisy Raiffeisenbank pro PohodaSQL a Sharepoint"
+  },
+  "description": {
+    "en": "Import Raiffeisenbank statements into PohodaSQL and store in Sharepoint",
+    "cs": "Importujte výpisy Raiffeisenbank do PohodaSQL a uložte je do Sharepointu"
+  },
+  "tags": ["Raiffeisen", "Bank", "Statements", "Pohoda"],
+  "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
+  "executable": "pohodasql-raiffeisenbank-statements-sharepoint",
+  "environment": {
+    "ACCOUNT_NUMBER": {
+      "type": "text",
+      "description": {
+        "en": "Bank Account Number",
+        "cs": "Číslo bankovního účtu"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
     },
-    "description": {
-        "en": "Import Raiffeisenbank statements into PohodaSQL and store in Sharepoint",
-        "cs": "Import Raiffeisenbank statements into PohodaSQL and store in Sharepoint"
+    "CERT_PASS": {
+      "type": "password",
+      "description": {
+        "en": "Certificate password",
+        "cs": "Heslo certifikátu"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
     },
-    "tags": [
-        "Raiffeisen",
-        "Bank",
-        "Statements",
-        "Pohoda"
-    ],
-    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-    "executable": "pohodasql-raiffeisenbank-statements-sharepoint",
-    "environment": {
-        "ACCOUNT_NUMBER": {
-            "type": "text",
-            "description": {
-                "en": "Bank Account Number",
-                "cs": "Bank Account Number"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "CERT_PASS": {
-            "type": "password",
-            "description": {
-                "en": "Certificate password",
-                "cs": "Certificate password"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "CERT_FILE": {
-            "type": "string",
-            "description": {
-                "en": "Path to RB Certificate file",
-                "cs": "Path to RB Certificate file"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "IMPORT_SCOPE": {
-            "type": "text",
-            "description": {
-                "en": "Time scope of transactions downloaded",
-                "cs": "Time scope of transactions downloaded"
-            },
-            "defval": "auto",
-            "required": true,
-            "category": "Other"
-        },
-        "ACCOUNT_CURRENCY": {
-            "type": "text",
-            "description": {
-                "en": "for multicurrency accounts please specify one",
-                "cs": "for multicurrency accounts please specify one"
-            },
-            "defval": "",
-            "hint": {
-                "en": "CZK",
-                "cs": "CZK"
-            },
-            "required": false,
-            "category": "Other"
-        },
-        "XIBMCLIENTID": {
-            "type": "text",
-            "description": {
-                "en": "ClientID",
-                "cs": "ClientID"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "STATEMENT_LINE": {
-            "type": "set",
-            "description": {
-                "en": "Bank Statement line",
-                "cs": "Bank Statement line"
-            },
-            "defval": "ADDITIONAL",
-            "hint": {
-                "en": "MAIN",
-                "cs": "MAIN"
-            },
-            "options": {
-                "MAIN": "Main statement line",
-                "ADDITIONAL": "Additional statement line"
-            },
-            "category": "Other"
-        },
-        "POHODA_ICO": {
-            "type": "text",
-            "description": {
-                "en": "Pohoda ICO",
-                "cs": "Pohoda ICO"
-            },
-            "defval": "12345678",
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_URL": {
-            "type": "text",
-            "description": {
-                "en": "Pohoda URL",
-                "cs": "Pohoda URL"
-            },
-            "defval": "http://127.0.0.1:10010",
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_USERNAME": {
-            "type": "text",
-            "description": {
-                "en": "Pohoda Username",
-                "cs": "Pohoda Username"
-            },
-            "defval": "Admin",
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_PASSWORD": {
-            "type": "password",
-            "description": {
-                "en": "Pohoda Password",
-                "cs": "Pohoda Password"
-            },
-            "defval": "xxxxxxxx",
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_TIMEOUT": {
-            "type": "integer",
-            "description": {
-                "en": "Pohoda Timeout",
-                "cs": "Pohoda Timeout"
-            },
-            "defval": 60,
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_COMPRESS": {
-            "type": "bool",
-            "description": {
-                "en": "Pohoda Compress",
-                "cs": "Pohoda Compress"
-            },
-            "defval": false,
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_DEBUG": {
-            "type": "bool",
-            "description": {
-                "en": "Pohoda Debug",
-                "cs": "Pohoda Debug"
-            },
-            "defval": false,
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_BANK_IDS": {
-            "type": "text",
-            "description": {
-                "en": "Pohoda Bank IDs",
-                "cs": "Pohoda Bank IDs"
-            },
-            "defval": "KB",
-            "required": true,
-            "category": "API"
-        },
-        "FIXED_RATE": {
-            "type": "integer",
-            "description": {
-                "en": "Fixed rate for converting foreign currency transactions to CZK",
-                "cs": "Fixed rate for converting foreign currency transactions to CZK"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Other"
-        },
-        "FIXED_RATE_AMOUNT": {
-            "type": "integer",
-            "description": {
-                "en": "Fixed rate amount for some currencies (e.g., 💴)",
-                "cs": "Fixed rate amount for some currencies (e.g., 💴)"
-            },
-            "defval": "100",
-            "required": false,
-            "category": "Other"
-        },
-        "CNB_CACHE": {
-            "type": "text",
-            "description": {
-                "en": "Use CNB cache to get actual rate from CNB",
-                "cs": "Use CNB cache to get actual rate from CNB"
-            },
-            "defval": "http://localhost/cnb-cache",
-            "required": false,
-            "category": "Other"
-        },
-        "RATE_OFFSET": {
-            "type": "text",
-            "description": {
-                "en": "Rate offset to get rate for previous day",
-                "cs": "Rate offset to get rate for previous day"
-            },
-            "defval": "yesterday",
-            "required": false,
-            "category": "Other"
-        },
-        "DB_CONNECTION": {
-            "type": "text",
-            "description": {
-                "en": "Database Connection",
-                "cs": "Database Connection"
-            },
-            "defval": "sqlsrv",
-            "required": true,
-            "category": "Database"
-        },
-        "DB_HOST": {
-            "type": "text",
-            "description": {
-                "en": "Database Host",
-                "cs": "Database Host"
-            },
-            "defval": "127.0.0.1",
-            "required": true,
-            "category": "Database"
-        },
-        "DB_PORT": {
-            "type": "integer",
-            "description": {
-                "en": "Database Port",
-                "cs": "Database Port"
-            },
-            "defval": 1433,
-            "required": true,
-            "category": "Database"
-        },
-        "DB_DATABASE": {
-            "type": "text",
-            "description": {
-                "en": "Database Name",
-                "cs": "Database Name"
-            },
-            "defval": "StwPh_12345678_2023",
-            "required": true,
-            "category": "Database"
-        },
-        "DB_USERNAME": {
-            "type": "text",
-            "description": {
-                "en": "Database Username",
-                "cs": "Database Username"
-            },
-            "defval": "sa",
-            "required": true,
-            "category": "Database"
-        },
-        "DB_PASSWORD": {
-            "type": "password",
-            "description": {
-                "en": "Database Password",
-                "cs": "Database Password"
-            },
-            "defval": "pohodaSQLpassword",
-            "required": true,
-            "category": "Database"
-        },
-        "DB_SETTINGS": {
-            "type": "text",
-            "description": {
-                "en": "Database Settings like encrypt=false",
-                "cs": "Database Settings like encrypt=false"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Database"
-        },
-        "OFFICE365_USERNAME": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Username",
-                "cs": "Office 365 Username"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Other"
-        },
-        "OFFICE365_PASSWORD": {
-            "type": "password",
-            "description": {
-                "en": "Office 365 Password",
-                "cs": "Office 365 Password"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Security"
-        },
-        "OFFICE365_CLIENTID": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Client ID",
-                "cs": "Office 365 Client ID"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Other"
-        },
-        "OFFICE365_SECRET": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Secret",
-                "cs": "Office 365 Secret"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Security"
-        },
-        "OFFICE365_CLSECRET": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Client Secret",
-                "cs": "Office 365 Client Secret"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Security"
-        },
-        "OFFICE365_TENANT": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Tenant",
-                "cs": "Office 365 Tenant"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "OFFICE365_SITE": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Site",
-                "cs": "Office 365 Site"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "OFFICE365_PATH": {
-            "type": "text",
-            "description": {
-                "en": "Office 365 Path",
-                "cs": "Office 365 Path"
-            },
-            "defval": "",
-            "required": true,
-            "category": "Other"
-        },
-        "STATEMENT_SAVE_DIR": {
-            "type": "text",
-            "description": {
-                "en": "Place for PDF files",
-                "cs": "Place for PDF files"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Other"
-        },
-        "APP_DEBUG": {
-            "type": "bool",
-            "description": {
-                "en": "Show debug messages",
-                "cs": "Show debug messages"
-            },
-            "defval": "False",
-            "required": true,
-            "category": "Behavior"
-        },
-        "RESULT_FILE": {
-            "type": "string",
-            "description": {
-                "en": "write output json data to",
-                "cs": "write output json data to"
-            },
-            "defval": "bank_import_report_{ACCOUNT_NUMBER}.json",
-            "required": false,
-            "category": "Other"
-        },
-        "ZABBIX_KEY": {
-            "type": "string",
-            "description": {
-                "en": "Default name for Zabbix Item key name",
-                "cs": "Default name for Zabbix Item key name"
-            },
-            "defval": "Raiff-Import-{ACCOUNT_NUMBER}",
-            "required": false,
-            "category": "Other"
-        },
-        "EASE_LOGGER": {
-            "type": "string",
-            "description": {
-                "en": "write log messages using",
-                "cs": "write log messages using"
-            },
-            "defval": "console|syslog",
-            "required": false,
-            "category": "Behavior"
-        }
+    "CERT_FILE": {
+      "type": "string",
+      "description": {
+        "en": "Path to RB Certificate file",
+        "cs": "Cesta k souboru certifikátu RB"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
     },
-    "artifacts": [
-        {
-            "name": {
-                "cs": "Report importu",
-                "en": "Import report"
-            },
-            "type": "file",
-            "path": "bank_import_report_{\\d+}.json$",
-            "description": {
-                "en": "Stauses of Statement: download from bank, import to Pohoda, upload to Shatepoint,  Attachment link in Pohoda",
-                "cs": "Stavy výpisu: stažení z banky, import do pohody, nahrátí do sharepointu, příloha linku do Pohody"
-            }
-        }
-    ],
-    "exitCodes": {
-        "0": {
-            "description": {
-                "en": "Success",
-                "cs": "Úspěch"
-            },
-            "severity": "success",
-            "retry": false
-        },
-        "1": {
-            "description": {
-                "en": "General error",
-                "cs": "Obecná chyba"
-            },
-            "severity": "error",
-            "retry": true
-        },
-        "2": {
-            "description": {
-                "en": "Misuse of shell command",
-                "cs": "Nesprávné použití příkazu"
-            },
-            "severity": "error",
-            "retry": false
-        },
-        "3": {
-            "description": {
-                "en": "Application-specific error code 3",
-                "cs": "Aplikační chybový kód 3"
-            },
-            "severity": "error",
-            "retry": true
-        },
-        "4": {
-            "description": {
-                "en": "Application-specific error code 4",
-                "cs": "Aplikační chybový kód 4"
-            },
-            "severity": "error",
-            "retry": true
-        },
-        "401": {
-            "description": {
-                "en": "Unauthorized - authentication failed",
-                "cs": "Neautorizováno - ověření selhalo"
-            },
-            "severity": "error",
-            "retry": false
-        }
+    "IMPORT_SCOPE": {
+      "type": "text",
+      "description": {
+        "en": "Time scope of transactions downloaded",
+        "cs": "Časový rozsah stahovaných transakcí"
+      },
+      "defval": "auto",
+      "required": true,
+      "category": "Other"
+    },
+    "ACCOUNT_CURRENCY": {
+      "type": "text",
+      "description": {
+        "en": "for multicurrency accounts please specify one",
+        "cs": "U víceměnových účtů prosím zadejte měnu"
+      },
+      "defval": "",
+      "hint": {
+        "en": "CZK",
+        "cs": "CZK"
+      },
+      "required": false,
+      "category": "Other"
+    },
+    "XIBMCLIENTID": {
+      "type": "text",
+      "description": {
+        "en": "ClientID",
+        "cs": "ClientID"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "STATEMENT_LINE": {
+      "type": "set",
+      "description": {
+        "en": "Bank Statement line",
+        "cs": "Řádek bankovního výpisu"
+      },
+      "defval": "ADDITIONAL",
+      "hint": {
+        "en": "MAIN",
+        "cs": "MAIN"
+      },
+      "options": {
+        "MAIN": "Main statement line",
+        "ADDITIONAL": "Additional statement line"
+      },
+      "category": "Other"
+    },
+    "POHODA_ICO": {
+      "type": "text",
+      "description": {
+        "en": "Pohoda ICO",
+        "cs": "Pohoda IČO"
+      },
+      "defval": "12345678",
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_URL": {
+      "type": "text",
+      "description": {
+        "en": "Pohoda URL",
+        "cs": "URL Pohody"
+      },
+      "defval": "http://127.0.0.1:10010",
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_USERNAME": {
+      "type": "text",
+      "description": {
+        "en": "Pohoda Username",
+        "cs": "Uživatelské jméno Pohody"
+      },
+      "defval": "Admin",
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_PASSWORD": {
+      "type": "password",
+      "description": {
+        "en": "Pohoda Password",
+        "cs": "Heslo Pohody"
+      },
+      "defval": "xxxxxxxx",
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_TIMEOUT": {
+      "type": "integer",
+      "description": {
+        "en": "Pohoda Timeout",
+        "cs": "Časový limit Pohody"
+      },
+      "defval": 60,
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_COMPRESS": {
+      "type": "bool",
+      "description": {
+        "en": "Pohoda Compress",
+        "cs": "Komprese Pohody"
+      },
+      "defval": false,
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_DEBUG": {
+      "type": "bool",
+      "description": {
+        "en": "Pohoda Debug",
+        "cs": "Ladění Pohody"
+      },
+      "defval": false,
+      "required": true,
+      "category": "API"
+    },
+    "POHODA_BANK_IDS": {
+      "type": "text",
+      "description": {
+        "en": "Pohoda Bank IDs",
+        "cs": "ID banky v Pohodě"
+      },
+      "defval": "KB",
+      "required": true,
+      "category": "API"
+    },
+    "FIXED_RATE": {
+      "type": "integer",
+      "description": {
+        "en": "Fixed rate for converting foreign currency transactions to CZK",
+        "cs": "Pevný kurz pro převod transakcí v cizí měně na CZK"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
+    "FIXED_RATE_AMOUNT": {
+      "type": "integer",
+      "description": {
+        "en": "Fixed rate amount for some currencies (e.g., 💴)",
+        "cs": "Pevná částka kurzu pro některé měny (např. 💴)"
+      },
+      "defval": "100",
+      "required": false,
+      "category": "Other"
+    },
+    "CNB_CACHE": {
+      "type": "text",
+      "description": {
+        "en": "Use CNB cache to get actual rate from CNB",
+        "cs": "Použijte CNB cache pro získání aktuálního kurzu z ČNB"
+      },
+      "defval": "http://localhost/cnb-cache",
+      "required": false,
+      "category": "Other"
+    },
+    "RATE_OFFSET": {
+      "type": "text",
+      "description": {
+        "en": "Rate offset to get rate for previous day",
+        "cs": "Posun kurzu pro získání kurzu předchozího dne"
+      },
+      "defval": "yesterday",
+      "required": false,
+      "category": "Other"
+    },
+    "DB_CONNECTION": {
+      "type": "text",
+      "description": {
+        "en": "Database Connection",
+        "cs": "Připojení k databázi"
+      },
+      "defval": "sqlsrv",
+      "required": true,
+      "category": "Database"
+    },
+    "DB_HOST": {
+      "type": "text",
+      "description": {
+        "en": "Database Host",
+        "cs": "Hostitel databáze"
+      },
+      "defval": "127.0.0.1",
+      "required": true,
+      "category": "Database"
+    },
+    "DB_PORT": {
+      "type": "integer",
+      "description": {
+        "en": "Database Port",
+        "cs": "Port databáze"
+      },
+      "defval": 1433,
+      "required": true,
+      "category": "Database"
+    },
+    "DB_DATABASE": {
+      "type": "text",
+      "description": {
+        "en": "Database Name",
+        "cs": "Název databáze"
+      },
+      "defval": "StwPh_12345678_2023",
+      "required": true,
+      "category": "Database"
+    },
+    "DB_USERNAME": {
+      "type": "text",
+      "description": {
+        "en": "Database Username",
+        "cs": "Uživatelské jméno databáze"
+      },
+      "defval": "sa",
+      "required": true,
+      "category": "Database"
+    },
+    "DB_PASSWORD": {
+      "type": "password",
+      "description": {
+        "en": "Database Password",
+        "cs": "Heslo databáze"
+      },
+      "defval": "pohodaSQLpassword",
+      "required": true,
+      "category": "Database"
+    },
+    "DB_SETTINGS": {
+      "type": "text",
+      "description": {
+        "en": "Database Settings like encrypt=false",
+        "cs": "Nastavení databáze, například encrypt=false"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Database"
+    },
+    "OFFICE365_USERNAME": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Username",
+        "cs": "Uživatelské jméno Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
+    "OFFICE365_PASSWORD": {
+      "type": "password",
+      "description": {
+        "en": "Office 365 Password",
+        "cs": "Heslo Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Security"
+    },
+    "OFFICE365_CLIENTID": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Client ID",
+        "cs": "Client ID Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
+    "OFFICE365_SECRET": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Secret",
+        "cs": "Secret Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Security"
+    },
+    "OFFICE365_CLSECRET": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Client Secret",
+        "cs": "Client Secret Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Security"
+    },
+    "OFFICE365_TENANT": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Tenant",
+        "cs": "Tenant Office 365"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "OFFICE365_SITE": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Site",
+        "cs": "Site Office 365"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "OFFICE365_PATH": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Path",
+        "cs": "Cesta Office 365"
+      },
+      "defval": "",
+      "required": true,
+      "category": "Other"
+    },
+    "STATEMENT_SAVE_DIR": {
+      "type": "text",
+      "description": {
+        "en": "Place for PDF files",
+        "cs": "Místo pro PDF soubory"
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
+    "APP_DEBUG": {
+      "type": "bool",
+      "description": {
+        "en": "Show debug messages",
+        "cs": "Zobrazit ladicí zprávy"
+      },
+      "defval": "False",
+      "required": true,
+      "category": "Behavior"
+    },
+    "RESULT_FILE": {
+      "type": "string",
+      "description": {
+        "en": "write output json data to",
+        "cs": "Zápis výstupních dat do JSON"
+      },
+      "defval": "bank_import_report_{ACCOUNT_NUMBER}.json",
+      "required": false,
+      "category": "Other"
+    },
+    "ZABBIX_KEY": {
+      "type": "string",
+      "description": {
+        "en": "Default name for Zabbix Item key name",
+        "cs": "Výchozí název klíče položky Zabbix"
+      },
+      "defval": "Raiff-Import-{ACCOUNT_NUMBER}",
+      "required": false,
+      "category": "Other"
+    },
+    "RBAPI_RATE_LIMIT_JSON_FILE": {
+      "type": "string",
+      "description": {
+        "en": "write API rate limit file using",
+        "cs": "Zápis souboru s limity přístupů API"
+      },
+      "defval": "{MULTIFLEXI_TMP}/rbczpremiumapi_rates.json",
+      "required": false,
+      "category": "API"
+    },
+    "EASE_LOGGER": {
+      "type": "string",
+      "description": {
+        "en": "write log messages using",
+        "cs": "Způsob zápisu logovacích zpráv"
+      },
+      "defval": "console|syslog",
+      "required": false,
+      "category": "Behavior"
     }
+  },
+  "artifacts": [
+    {
+      "name": {
+        "cs": "Report importu",
+        "en": "Import report"
+      },
+      "type": "file",
+      "path": "bank_import_report_{\\d+}.json$",
+      "description": {
+        "en": "Stauses of Statement: download from bank, import to Pohoda, upload to Shatepoint,  Attachment link in Pohoda",
+        "cs": "Stavy výpisu: stažení z banky, import do pohody, nahrátí do sharepointu, příloha linku do Pohody"
+      }
+    }
+  ],
+  "exitCodes": {
+    "0": {
+      "description": {
+        "en": "Success",
+        "cs": "Úspěšné dokončení"
+      },
+      "severity": "success",
+      "retry": false
+    },
+    "1": {
+      "description": {
+        "en": "General error",
+        "cs": "Obecná chyba"
+      },
+      "severity": "error",
+      "retry": true
+    },
+    "2": {
+      "description": {
+        "en": "Misuse of shell command",
+        "cs": "Nesprávné použití příkazu"
+      },
+      "severity": "error",
+      "retry": false
+    },
+    "3": {
+      "description": {
+        "en": "Application-specific error code 3",
+        "cs": "Aplikační chybový kód 3"
+      },
+      "severity": "error",
+      "retry": true
+    },
+    "4": {
+      "description": {
+        "en": "Application-specific error code 4",
+        "cs": "Aplikační chybový kód 4"
+      },
+      "severity": "error",
+      "retry": true
+    },
+    "401": {
+      "description": {
+        "en": "Unauthorized - authentication failed",
+        "cs": "Neautorizováno - ověření selhalo"
+      },
+      "severity": "error",
+      "retry": false
+    }
+  }
 }

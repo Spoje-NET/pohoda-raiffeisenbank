@@ -4,11 +4,11 @@
     "uuid": "10f24522-66af-460c-8dc1-e6454cfc9a55",
     "name": {
         "en": "Raiffeisenbank transactions for Pohoda",
-        "cs": "Raiffeisenbank transactions for Pohoda"
+        "cs": "Transakce Raiffeisenbank pro Pohodu"
     },
     "description": {
         "en": "Import Raiffeisenbank statements into Pohoda",
-        "cs": "Import Raiffeisenbank statements into Pohoda"
+        "cs": "Importujte výpisy Raiffeisenbank do Pohody"
     },
     "tags": [
         "Raiffeisen",
@@ -23,7 +23,7 @@
             "type": "text",
             "description": {
                 "en": "Bank Account Number",
-                "cs": "Bank Account Number"
+                "cs": "Číslo bankovního účtu"
             },
             "defval": "",
             "required": true,
@@ -33,7 +33,7 @@
             "type": "password",
             "description": {
                 "en": "Certificate password",
-                "cs": "Certificate password"
+                "cs": "Heslo certifikátu"
             },
             "defval": "",
             "required": true,
@@ -43,7 +43,7 @@
             "type": "string",
             "description": {
                 "en": "Path to RB Certificate file",
-                "cs": "Path to RB Certificate file"
+                "cs": "Cesta k souboru certifikátu RB"
             },
             "defval": "",
             "required": true,
@@ -53,7 +53,7 @@
             "type": "text",
             "description": {
                 "en": "Time scope of transactions downloaded",
-                "cs": "Time scope of transactions downloaded"
+                "cs": "Časový rozsah stahovaných transakcí"
             },
             "defval": "today",
             "required": true,
@@ -73,7 +73,7 @@
             "type": "integer",
             "description": {
                 "en": "Fixed rate for converting foreign currency transactions to CZK",
-                "cs": "Fixed rate for converting foreign currency transactions to CZK"
+                "cs": "Pevný kurz pro převod transakcí v cizí měně na CZK"
             },
             "defval": "",
             "required": false,
@@ -83,7 +83,7 @@
             "type": "integer",
             "description": {
                 "en": "Fixed rate amount for some currencies (e.g., 💴)",
-                "cs": "Fixed rate amount for some currencies (e.g., 💴)"
+                "cs": "Pevná částka kurzu pro některé měny (např. 💴)"
             },
             "defval": "100",
             "required": false,
@@ -93,7 +93,7 @@
             "type": "text",
             "description": {
                 "en": "Use CNB cache to get actual rate from CNB",
-                "cs": "Use CNB cache to get actual rate from CNB"
+                "cs": "Použijte CNB cache pro získání aktuálního kurzu z ČNB"
             },
             "defval": "http://localhost/cnb-cache",
             "required": false,
@@ -103,7 +103,7 @@
             "type": "text",
             "description": {
                 "en": "Rate offset to get rate for previous day",
-                "cs": "Rate offset to get rate for previous day"
+                "cs": "Posun kurzu pro získání kurzu předchozího dne"
             },
             "defval": "yesterday",
             "required": false,
@@ -113,7 +113,7 @@
             "type": "text",
             "description": {
                 "en": "Pohoda ICO",
-                "cs": "Pohoda ICO"
+                "cs": "Pohoda IČO"
             },
             "defval": "12345678",
             "required": true,
@@ -123,7 +123,7 @@
             "type": "text",
             "description": {
                 "en": "Pohoda URL",
-                "cs": "Pohoda URL"
+                "cs": "URL Pohody"
             },
             "defval": "http://127.0.0.1:10010",
             "required": true,
@@ -133,7 +133,7 @@
             "type": "text",
             "description": {
                 "en": "Pohoda Username",
-                "cs": "Pohoda Username"
+                "cs": "Uživatelské jméno Pohody"
             },
             "defval": "Admin",
             "required": true,
@@ -143,7 +143,7 @@
             "type": "password",
             "description": {
                 "en": "Pohoda Password",
-                "cs": "Pohoda Password"
+                "cs": "Heslo Pohody"
             },
             "defval": "xxxxxxxx",
             "required": true,
@@ -153,7 +153,7 @@
             "type": "integer",
             "description": {
                 "en": "Pohoda Timeout",
-                "cs": "Pohoda Timeout"
+                "cs": "Časový limit Pohody"
             },
             "defval": 60,
             "required": true,
@@ -163,7 +163,7 @@
             "type": "bool",
             "description": {
                 "en": "Pohoda Compress",
-                "cs": "Pohoda Compress"
+                "cs": "Komprese Pohody"
             },
             "defval": false,
             "required": true,
@@ -173,7 +173,7 @@
             "type": "bool",
             "description": {
                 "en": "Pohoda Debug",
-                "cs": "Pohoda Debug"
+                "cs": "Ladění Pohody"
             },
             "defval": true,
             "required": true,
@@ -183,17 +183,27 @@
             "type": "text",
             "description": {
                 "en": "Pohoda Bank IDs",
-                "cs": "Pohoda Bank IDs"
+                "cs": "ID banky v Pohodě"
             },
             "defval": "KB",
             "required": true,
             "category": "API"
         },
+    "RBAPI_RATE_LIMIT_JSON_FILE": {
+      "type": "string",
+      "description": {
+        "en": "write API rate limit file using",
+        "cs": "Zápis souboru s limity přístupů API"
+      },
+      "defval": "{MULTIFLEXI_TMP}/rbczpremiumapi_rates.json",
+      "required": false,
+      "category": "API"
+    },
         "EASE_LOGGER": {
             "type": "string",
             "description": {
                 "en": "write log messages using",
-                "cs": "write log messages using"
+                "cs": "Způsob zápisu logovacích zpráv"
             },
             "defval": "console|syslog",
             "required": false,
