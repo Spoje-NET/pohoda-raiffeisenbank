@@ -11,6 +11,7 @@
     "cs": "Zkontrolujte přítomnost výpisů Raiffeisenbank v Sharepointu"
   },
   "tags": ["Raiffeisen", "Bank", "Statements", "Check"],
+  "requirements": ["RaiffeisenBank", "Office365"],
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
   "executable": "raiffeisenbank-statements-sharepoint-checker",
   "environment": {

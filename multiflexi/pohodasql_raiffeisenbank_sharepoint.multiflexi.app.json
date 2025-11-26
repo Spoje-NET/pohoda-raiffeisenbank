@@ -11,6 +11,7 @@
     "cs": "Importujte výpisy Raiffeisenbank do PohodaSQL a uložte je do Sharepointu"
   },
   "tags": ["Raiffeisen", "Bank", "Statements", "Pohoda"],
+  "requirements": ["RaiffeisenBank", "SQLServer", "Office365", "mServer"],
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
   "executable": "pohodasql-raiffeisenbank-statements-sharepoint",
   "environment": {

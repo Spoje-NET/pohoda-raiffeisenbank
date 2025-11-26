@@ -11,6 +11,7 @@
     "cs": "Generování podrobných transakčních výkazů z výpisů Raiffeisenbank pro Pohodu"
   },
   "tags": ["Raiffeisen", "Bank", "Transaction", "Report", "Pohoda"],
+  "requirements": ["mServer"],
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
   "executable": "pohoda-bank-transaction-report",
   "environment": {

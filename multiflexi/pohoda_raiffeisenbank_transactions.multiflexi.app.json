@@ -16,6 +16,7 @@
         "Statements",
         "Pohoda"
     ],
+    "requirements": ["mServer", "RaiffeisenBank"],
     "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
     "executable": "pohoda-raiffeisenbank-transactions",
     "environment": {

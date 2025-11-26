@@ -17,6 +17,7 @@
         "Pohoda"
     ],
     "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
+    "requirements": ["mServer", "RaiffeisenBank"],
     "executable": "pohoda-raiffeisenbank-statements",
     "environment": {
         "FIXED_RATE": {
