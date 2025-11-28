@@ -13,7 +13,7 @@
     "require": {
         "vgrem/php-spo": "^3.2.0",
         "vitexsoftware/pohoda-connector": "^0.10.0",
-        "vitexsoftware/rbczpremiumapi": "^1.4",
+        "vitexsoftware/rbczpremiumapi": "^1.5",
         "spojenet/pohoda-sql": "^0.2"
     },
     "autoload": {
