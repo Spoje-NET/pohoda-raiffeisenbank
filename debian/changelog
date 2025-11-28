@@ -1,9 +1,22 @@
-pohoda-raiffeisenbank (1.4.2) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.4.3) UNRELEASED; urgency=medium
 
+  * Refactor PohodaBankClient and related classes for improved readability and consistency
+  * Added missing backslashes for global functions to ensure proper namespace resolution.
+  * Replaced array_key_exists checks with \array_key_exists for consistency.
+  * Cleaned up whitespace and formatting for better readability.
+  * Enhanced error handling and logging for certificate checks and file operations.
+  * Updated comments for clarity and consistency across methods.
+  * Improved handling of PDF and XML statement downloads, including error messages and exit codes.
+
+ -- vitex <info@vitexsoftware.cz>  Fri, 28 Nov 2025 15:53:40 +0100
+
+pohoda-raiffeisenbank (1.4.2) noble; urgency=medium
+
+  [ Vítězslav Vitex Dvořák ]
   * Better error handling in raiffeisenbank-statements-sharepoint-
     uploader
 
- -- Vítězslav Vitex Dvořák <info@vitexsoftware.cz>  Wed, 05 Nov 2025 12:50:50 +0100
+ -- vitex <info@vitexsoftware.cz>  Fri, 28 Nov 2025 15:53:15 +0100
 
 pohoda-raiffeisenbank (1.4.1) noble; urgency=medium
 

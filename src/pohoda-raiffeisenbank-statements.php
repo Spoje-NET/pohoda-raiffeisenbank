@@ -30,22 +30,25 @@ Shared::init(
         'POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO',
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
     ],
-    array_key_exists('environment', $options) ? $options['environment'] : '../.env',
+    \array_key_exists('environment', $options) ? $options['environment'] : '../.env',
 );
-$destination = array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
+$destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
 
 $certFile = Shared::cfg('CERT_FILE');
+
 if (!PohodaBankClient::checkCertificate($certFile, Shared::cfg('CERT_PASS'))) {
     $certInfo = [
         'path' => $certFile,
         'exists' => file_exists($certFile),
         'readable' => is_readable($certFile),
     ];
+
     if (file_exists($certFile)) {
         $certInfo['permissions'] = substr(sprintf('%o', fileperms($certFile)), -4);
         $certInfo['owner'] = posix_getpwuid(fileowner($certFile))['name'] ?? 'unknown';
         $certInfo['group'] = posix_getgrgid(filegroup($certFile))['name'] ?? 'unknown';
     }
+
     $report = [
         'sharepoint' => [],
         'pohoda' => [],
@@ -55,6 +58,7 @@ if (!PohodaBankClient::checkCertificate($certFile, Shared::cfg('CERT_PASS'))) {
         'exitcode' => 2,
     ];
     file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
+
     exit(2);
 }
 

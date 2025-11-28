@@ -1,183 +1,265 @@
 {
-  "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
-  "schemaVersion": "3.0.0",
-  "uuid": "47bd8f47-8372-4192-a5b5-72a2bb3987bc",
-  "name": {
-    "en": "Raiffeisenbank Transaction Report for Pohoda",
-    "cs": "Transakční výkaz Raiffeisenbank pro Pohodu"
-  },
-  "description": {
-    "en": "Generate detailed transaction reports from Raiffeisenbank statements for Pohoda",
-    "cs": "Generování podrobných transakčních výkazů z výpisů Raiffeisenbank pro Pohodu"
-  },
-  "tags": ["Raiffeisen", "Bank", "Transaction", "Report", "Pohoda"],
-  "requirements": ["mServer"],
-  "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
-  "executable": "pohoda-bank-transaction-report",
-  "environment": {
-    "ACCOUNT_NUMBER": {
-      "type": "text",
-      "description": {
-        "en": "Bank Account Number",
-        "cs": "Číslo bankovního účtu"
-      },
-      "defval": "",
-      "required": true,
-      "category": "Other"
+    "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+    "schemaVersion": "3.0.0",
+    "uuid": "47bd8f47-8372-4192-a5b5-72a2bb3987bc",
+    "name": {
+        "en": "Raiffeisenbank Transaction Report for Pohoda",
+        "cs": "Transakční výkaz Raiffeisenbank pro Pohodu"
     },
-    "REPORT_SCOPE": {
-      "type": "text",
-      "description": {
-        "en": "Time scope of transactions included in the report",
-        "cs": "Časový rozsah transakcí zahrnutých ve výkazu"
-      },
-      "defval": "auto",
-      "required": true,
-      "category": "Other"
+    "description": {
+        "en": "Generate detailed transaction reports from Raiffeisenbank statements for Pohoda",
+        "cs": "Generování podrobných transakčních výkazů z výpisů Raiffeisenbank pro Pohodu"
     },
-    "ACCOUNT_CURRENCY": {
-      "type": "text",
-      "description": {
-        "en": "For multicurrency accounts please specify one",
-        "cs": "U víceměnových účtů prosím zadejte měnu"
-      },
-      "defval": "CZK",
-      "required": false,
-      "category": "Other"
+    "tags": ["Raiffeisen", "Bank", "Transaction", "Report", "Pohoda"],
+    "requirements": ["mServer"],
+    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
+    "executable": "pohoda-bank-transaction-report",
+    "environment": {
+        "ACCOUNT_NUMBER": {
+            "type": "text",
+            "description": {
+                "en": "Bank Account Number",
+                "cs": "Číslo bankovního účtu"
+            },
+            "defval": "",
+            "required": true,
+            "category": "Other"
+        },
+        "REPORT_SCOPE": {
+            "type": "text",
+            "description": {
+                "en": "Time scope of transactions included in the report",
+                "cs": "Časový rozsah transakcí zahrnutých ve výkazu"
+            },
+            "defval": "auto",
+            "required": true,
+            "category": "Other"
+        },
+        "ACCOUNT_CURRENCY": {
+            "type": "text",
+            "description": {
+                "en": "For multicurrency accounts please specify one",
+                "cs": "U víceměnových účtů prosím zadejte měnu"
+            },
+            "defval": "CZK",
+            "required": false,
+            "category": "Other"
+        },
+        "POHODA_ICO": {
+            "type": "text",
+            "description": {
+                "en": "Pohoda ICO",
+                "cs": "IČO Pohody"
+            },
+            "defval": "12345678",
+            "required": true,
+            "category": "API"
+        },
+        "POHODA_URL": {
+            "type": "text",
+            "description": {
+                "en": "Pohoda URL",
+                "cs": "URL Pohody"
+            },
+            "defval": "http://127.0.0.1:10010",
+            "required": true,
+            "category": "API"
+        },
+        "POHODA_USERNAME": {
+            "type": "text",
+            "description": {
+                "en": "Pohoda Username",
+                "cs": "Uživatelské jméno Pohody"
+            },
+            "defval": "Admin",
+            "required": true,
+            "category": "API"
+        },
+        "POHODA_PASSWORD": {
+            "type": "password",
+            "description": {
+                "en": "Pohoda Password",
+                "cs": "Heslo Pohody"
+            },
+            "defval": "xxxxxxxx",
+            "required": true,
+            "category": "API"
+        },
+        "POHODA_TIMEOUT": {
+            "type": "integer",
+            "description": {
+                "en": "Pohoda Timeout",
+                "cs": "Časový limit Pohody"
+            },
+            "defval": 60,
+            "required": true,
+            "category": "API"
+        },
+        "POHODA_COMPRESS": {
+            "type": "bool",
+            "description": {
+                "en": "Pohoda Compress",
+                "cs": "Komprese Pohody"
+            },
+            "defval": false,
+            "required": true,
+            "category": "API"
+        },
+        "POHODA_DEBUG": {
+            "type": "bool",
+            "description": {
+                "en": "Pohoda Debug",
+                "cs": "Ladění Pohody"
+            },
+            "defval": true,
+            "required": true,
+            "category": "API"
+        },
+        "POHODA_BANK_IDS": {
+            "type": "text",
+            "description": {
+                "en": "Pohoda Bank IDs",
+                "cs": "ID banky Pohody"
+            },
+            "defval": "KB",
+            "required": true,
+            "category": "API"
+        },
+        "REPORT_SAVE_DIR": {
+            "type": "text",
+            "description": {
+                "en": "Directory to save generated reports (PDF/CSV)",
+                "cs": "Adresář pro ukládání generovaných výkazů (PDF/CSV)"
+            },
+            "defval": "",
+            "required": false,
+            "category": "Other"
+        },
+        "EASE_LOGGER": {
+            "type": "string",
+            "description": {
+                "en": "Write log messages using",
+                "cs": "Způsob zápisu logovacích zpráv"
+            },
+            "defval": "console|syslog",
+            "required": false,
+            "category": "Behavior"
+        },
+        "RBAPI_RATE_LIMIT_JSON_FILE": {
+            "type": "string",
+            "description": {
+                "en": "write API rate limit file using",
+                "cs": "Zápis souboru s limity přístupů API"
+            },
+            "defval": "{MULTIFLEXI_TMP}/rbczpremiumapi_rates.json",
+            "required": false,
+            "category": "API"
+        },
+        "RESULT_FILE": {
+            "type": "string",
+            "description": {
+                "en": "write output json data to",
+                "cs": "Zápis výstupních dat do JSON"
+            },
+            "defval": "bank_transaction_report_{ACCOUNT_NUMBER}.json",
+            "required": false,
+            "category": "Other"
+        }
     },
-    "POHODA_ICO": {
-      "type": "text",
-      "description": {
-        "en": "Pohoda ICO",
-        "cs": "IČO Pohody"
-      },
-      "defval": "12345678",
-      "required": true,
-      "category": "API"
-    },
-    "POHODA_URL": {
-      "type": "text",
-      "description": {
-        "en": "Pohoda URL",
-        "cs": "URL Pohody"
-      },
-      "defval": "http://127.0.0.1:10010",
-      "required": true,
-      "category": "API"
-    },
-    "POHODA_USERNAME": {
-      "type": "text",
-      "description": {
-        "en": "Pohoda Username",
-        "cs": "Uživatelské jméno Pohody"
-      },
-      "defval": "Admin",
-      "required": true,
-      "category": "API"
-    },
-    "POHODA_PASSWORD": {
-      "type": "password",
-      "description": {
-        "en": "Pohoda Password",
-        "cs": "Heslo Pohody"
-      },
-      "defval": "xxxxxxxx",
-      "required": true,
-      "category": "API"
-    },
-    "POHODA_TIMEOUT": {
-      "type": "integer",
-      "description": {
-        "en": "Pohoda Timeout",
-        "cs": "Časový limit Pohody"
-      },
-      "defval": 60,
-      "required": true,
-      "category": "API"
-    },
-    "POHODA_COMPRESS": {
-      "type": "bool",
-      "description": {
-        "en": "Pohoda Compress",
-        "cs": "Komprese Pohody"
-      },
-      "defval": false,
-      "required": true,
-      "category": "API"
-    },
-    "POHODA_DEBUG": {
-      "type": "bool",
-      "description": {
-        "en": "Pohoda Debug",
-        "cs": "Ladění Pohody"
-      },
-      "defval": true,
-      "required": true,
-      "category": "API"
-    },
-    "POHODA_BANK_IDS": {
-      "type": "text",
-      "description": {
-        "en": "Pohoda Bank IDs",
-        "cs": "ID banky Pohody"
-      },
-      "defval": "KB",
-      "required": true,
-      "category": "API"
-    },
-    "REPORT_SAVE_DIR": {
-      "type": "text",
-      "description": {
-        "en": "Directory to save generated reports (PDF/CSV)",
-        "cs": "Adresář pro ukládání generovaných výkazů (PDF/CSV)"
-      },
-      "defval": "",
-      "required": false,
-      "category": "Other"
-    },
-    "EASE_LOGGER": {
-      "type": "string",
-      "description": {
-        "en": "Write log messages using",
-        "cs": "Způsob zápisu logovacích zpráv"
-      },
-      "defval": "console|syslog",
-      "required": false,
-      "category": "Behavior"
-    },
-    "RBAPI_RATE_LIMIT_JSON_FILE": {
-      "type": "string",
-      "description": {
-        "en": "write API rate limit file using",
-        "cs": "Zápis souboru s limity přístupů API"
-      },
-      "defval": "{MULTIFLEXI_TMP}/rbczpremiumapi_rates.json",
-      "required": false,
-      "category": "API"
-    },
-    "RESULT_FILE": {
-      "type": "string",
-      "description": {
-        "en": "write output json data to",
-        "cs": "Zápis výstupních dat do JSON"
-      },
-      "defval": "bank_transaction_report_{ACCOUNT_NUMBER}.json",
-      "required": false,
-      "category": "Other"
+    "artifacts": [
+        {
+            "name": {
+                "cs": "Výkaz transakcí",
+                "en": "Transaction report"
+            },
+            "type": "file",
+            "path": "bank_transaction_report_{\\d+}.json$",
+            "description": {
+                "en": "Destiled bank statement",
+                "cs": "Zjednodušený bankovní výpis"
+            }
+        }
+    ],
+    "exitCodes": {
+        "0": {
+            "description": {
+                "en": "Success",
+                "cs": "Úspěšné dokončení"
+            },
+            "severity": "success",
+            "retry": false
+        },
+        "1": {
+            "description": {
+                "en": "General error",
+                "cs": "Obecná chyba"
+            },
+            "severity": "error",
+            "retry": true
+        },
+        "145": {
+            "description": {
+                "en": "Bad request, validation error.",
+                "cs": "Chybný požadavek, validační chyba."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "146": {
+            "description": {
+                "en": "Certificate is invalid.",
+                "cs": "Certifikát je neplatný."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "148": {
+            "description": {
+                "en": "No access rights to perform the operation.",
+                "cs": "Uživatel nemá práva k provedení operace."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "149": {
+            "description": {
+                "en": "Requested resource does not exist.",
+                "cs": "Požadovaný zdroj neexistuje."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "158": {
+            "description": {
+                "en": "Request payload too large.",
+                "cs": "Tělo požadavku je příliš velké."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "160": {
+            "description": {
+                "en": "Unsupported media type.",
+                "cs": "Nepodporovaný typ obsahu."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "174": {
+            "description": {
+                "en": "Too many requests. Rate limit exceeded.",
+                "cs": "Příliš mnoho požadavků. Limit překročen."
+            },
+            "severity": "warning",
+            "retry": true
+        },
+        "245": {
+            "description": {
+                "en": "Unexpected internal error.",
+                "cs": "Neočekávaná interní chyba."
+            },
+            "severity": "critical",
+            "retry": false
+        }
     }
-  },
-  "artifacts": [
-    {
-      "name": {
-        "cs": "Výkaz transakcí",
-        "en": "Transaction report"
-      },
-      "type": "file",
-      "path": "bank_transaction_report_{\\d+}.json$",
-      "description": {
-        "en": "Destiled bank statement",
-        "cs": "Zjednodušený bankovní výpis"
-      }
-    }
-  ]
 }

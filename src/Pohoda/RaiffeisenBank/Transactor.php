@@ -51,7 +51,7 @@ class Transactor extends PohodaBankClient
                     $result['lastPage'] = true;
                 }
 
-                if (array_key_exists('transactions', $result)) {
+                if (\array_key_exists('transactions', $result)) {
                     $transactions = array_merge($transactions, $result['transactions']);
                 }
             } while ($result['lastPage'] === false);
@@ -59,7 +59,7 @@ class Transactor extends PohodaBankClient
             $errorMessage = $e->getMessage();
             preg_match('/cURL error ([0-9]+)/', $errorMessage, $matches);
 
-            if (array_key_exists(1, $matches)) {
+            if (\array_key_exists(1, $matches)) {
                 $errorCode = $matches[1];
             } elseif (preg_match('/\[([0-9]+)\]/', $errorMessage, $matches)) {
                 $errorCode = $matches[1];

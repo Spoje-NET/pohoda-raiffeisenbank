@@ -35,9 +35,9 @@ Shared::init(
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
         'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
     ],
-    array_key_exists('environment', $options) ? $options['environment'] : (array_key_exists('e', $options) ? $options['e'] : '../.env'),
+    \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
 );
-$destination = array_key_exists('o', $options) ? $options['o'] : (array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout'));
+$destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout'));
 
 $certValid = PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
 $engine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
@@ -68,33 +68,36 @@ if (!$certValid) {
 
     try {
         $pdfStatements = $engine->downloadPDF();
-        
+
         if ($pdfStatements === null || $pdfStatements === false || empty($pdfStatements)) {
             // Check if there were errors in stderr/messages indicating auth failure
             $messages = $engine->getStatusMessages();
             $hasAuthError = false;
             $errorMessage = '';
+
             foreach ($messages as $msg) {
                 // Message objects have a body property
-                if (is_object($msg) && isset($msg->body)) {
+                if (\is_object($msg) && isset($msg->body)) {
                     $msgText = $msg->body;
-                } elseif (is_string($msg)) {
+                } elseif (\is_string($msg)) {
                     $msgText = $msg;
                 } else {
                     continue;
                 }
-                
-                if (stripos($msgText, '401') !== false || stripos($msgText, 'UNAUTHORISED') !== false || stripos($msgText, 'Certificate is blocked') !== false) {
+
+                if (str_contains(strtolower($msgText), strtolower('401')) || str_contains(strtolower($msgText), strtolower('UNAUTHORISED')) || str_contains(strtolower($msgText), strtolower('Certificate is blocked'))) {
                     $hasAuthError = true;
                     $errorMessage = $msgText;
+
                     break;
                 }
             }
-            
+
             if ($hasAuthError || $pdfStatements === null || $pdfStatements === false) {
                 $report['raiffeisenbank']['pdf'] = 'download failed';
                 $report['message'] = $errorMessage ?: 'PDF download failed - authentication or certificate error';
                 $pdfStatements = [];
+
                 if ($exitcode === 0) {
                     $exitcode = 401; // Certificate or auth issue
                 }
@@ -108,8 +111,9 @@ if (!$certValid) {
         $report['message'] = $exc->getMessage();
         $report['raiffeisenbank']['pdf'] = 'download failed';
         $pdfStatements = [];
-        
+
         $apiExitCode = $exc->getCode();
+
         if (!$apiExitCode) {
             if (preg_match('/cURL error ([0-9]*):/', $report['message'], $codeRaw)) {
                 $apiExitCode = (int) $codeRaw[1];
@@ -117,7 +121,7 @@ if (!$certValid) {
                 $apiExitCode = 1;
             }
         }
-        
+
         // Only update exit code if not already set or if new error is more severe
         if ($exitcode === 0 || $apiExitCode > 0) {
             $exitcode = $apiExitCode;
@@ -162,6 +166,7 @@ if (!$certValid) {
             } catch (\Exception $exc) {
                 $report['sharepoint'][$uploadAs] = $exc->getMessage();
                 $engine->addStatusMessage($exc->getMessage());
+
                 if ($exitcode === 0) {
                     $exitcode = 1;
                 }
@@ -170,6 +175,7 @@ if (!$certValid) {
     } else {
         if (null === $pdfStatements) {
             $engine->addStatusMessage(_('Error obtaining PDF statements'), 'error');
+
             if ($exitcode === 0) {
                 $exitcode = 2;
             }
@@ -183,33 +189,36 @@ if (!$certValid) {
     try {
         $engine->addStatusMessage('stage 3/6: Download XML Statements from Raiffeisen Bank account '.$engine->getAccount(), 'debug');
         $xmlStatements = $engine->downloadXML();
-        
+
         if ($xmlStatements === null || $xmlStatements === false || empty($xmlStatements)) {
             // Check if there were errors in stderr/messages indicating auth failure
             $messages = $engine->getStatusMessages();
             $hasAuthError = false;
             $xmlErrorMessage = '';
+
             foreach ($messages as $msg) {
                 // Message objects have a body property
-                if (is_object($msg) && isset($msg->body)) {
+                if (\is_object($msg) && isset($msg->body)) {
                     $msgText = $msg->body;
-                } elseif (is_string($msg)) {
+                } elseif (\is_string($msg)) {
                     $msgText = $msg;
                 } else {
                     continue;
                 }
-                
-                if (stripos($msgText, '401') !== false || stripos($msgText, 'UNAUTHORISED') !== false || stripos($msgText, 'Certificate is blocked') !== false) {
+
+                if (str_contains(strtolower($msgText), strtolower('401')) || str_contains(strtolower($msgText), strtolower('UNAUTHORISED')) || str_contains(strtolower($msgText), strtolower('Certificate is blocked'))) {
                     $hasAuthError = true;
                     $xmlErrorMessage = $msgText;
+
                     break;
                 }
             }
-            
+
             if ($hasAuthError || $xmlStatements === null || $xmlStatements === false) {
                 $report['raiffeisenbank']['xml'] = 'download failed';
                 $report['message'] = $xmlErrorMessage ?: 'XML download failed - authentication or certificate error';
                 $xmlStatements = false;
+
                 if ($exitcode === 0) {
                     $exitcode = 401; // Certificate or auth issue
                 }
@@ -223,8 +232,9 @@ if (!$certValid) {
         $engine->addStatusMessage($exc->getMessage(), 'error');
         $report['raiffeisenbank']['xml'] = 'download failed';
         $report['message'] = $exc->getMessage();
-        
+
         $apiExitCode = $exc->getCode();
+
         if (!$apiExitCode) {
             if (preg_match('/cURL error ([0-9]*):/', $report['message'], $codeRaw)) {
                 $apiExitCode = (int) $codeRaw[1];
@@ -232,12 +242,12 @@ if (!$certValid) {
                 $apiExitCode = 1;
             }
         }
-        
+
         // Only update exit code if not already set or if new error is more severe
         if ($exitcode === 0 || $apiExitCode > 0) {
             $exitcode = $apiExitCode;
         }
-        
+
         $xmlStatements = false;
     }
 
@@ -264,15 +274,16 @@ if (!$certValid) {
                     $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
 
                     foreach ($inserted as $refId => $importInfo) {
-                        if (!isset($importInfo['details']) || !is_array($importInfo['details'])) {
+                        if (!isset($importInfo['details']) || !\is_array($importInfo['details'])) {
                             $engine->addStatusMessage(sprintf(_('Skipping import %s: missing details'), $refId), 'warning');
+
                             continue;
                         }
-                        
+
                         $pohodaId = $importInfo['details']['id'];
                         $dateStatement = $importInfo['details']['date'];
 
-                        if (array_key_exists($dateStatement, $dayUrls)) {
+                        if (\array_key_exists($dateStatement, $dayUrls)) {
                             $filename = key($dayUrls[$dateStatement]);
                             $sharepointUri = current($dayUrls[$dateStatement]);
 
@@ -285,6 +296,7 @@ if (!$certValid) {
                                 $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
                                 $report['pohodaSQL'][$pohodaId]['status'] = 'failed';
                                 $report['pohodaSQL'][$pohodaId]['message'] = $ex->getMessage();
+
                                 if ($exitcode === 0) {
                                     $exitcode = 4;
                                 }
@@ -301,6 +313,7 @@ if (!$certValid) {
             }
         } else {
             $engine->addStatusMessage('mServer error: '.$engine->lastCurlResponse, 'error');
+
             if ($exitcode === 0) {
                 $exitcode = 3;
             }
@@ -310,6 +323,7 @@ if (!$certValid) {
             $engine->addStatusMessage(_('No XML statements obtained'), 'info');
         } else {
             $engine->addStatusMessage(_('Error Obtaining XML statements'), 'error');
+
             if ($exitcode === 0) {
                 $exitcode = 3;
             }

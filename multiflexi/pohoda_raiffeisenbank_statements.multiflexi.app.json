@@ -286,6 +286,70 @@
             },
             "severity": "error",
             "retry": false
+        },
+        "145": {
+            "description": {
+                "en": "Bad request, validation error.",
+                "cs": "Chybný požadavek, validační chyba."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "146": {
+            "description": {
+                "en": "Certificate is invalid.",
+                "cs": "Certifikát je neplatný."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "148": {
+            "description": {
+                "en": "No access rights to perform the operation.",
+                "cs": "Uživatel nemá práva k provedení operace."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "149": {
+            "description": {
+                "en": "Requested resource does not exist.",
+                "cs": "Požadovaný zdroj neexistuje."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "158": {
+            "description": {
+                "en": "Request payload too large.",
+                "cs": "Tělo požadavku je příliš velké."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "160": {
+            "description": {
+                "en": "Unsupported media type.",
+                "cs": "Nepodporovaný typ obsahu."
+            },
+            "severity": "error",
+            "retry": false
+        },
+        "174": {
+            "description": {
+                "en": "Too many requests. Rate limit exceeded.",
+                "cs": "Příliš mnoho požadavků. Limit překročen."
+            },
+            "severity": "warning",
+            "retry": true
+        },
+        "245": {
+            "description": {
+                "en": "Unexpected internal error.",
+                "cs": "Neočekávaná interní chyba."
+            },
+            "severity": "critical",
+            "retry": false
         }
     }
 }

@@ -28,6 +28,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      * Exit code for authentication / certificate related issues.
      */
     public const EXIT_AUTH = 145; // 401 % 256
+
     /**
      * DateTime Formating eg. 2021-08-01T10:00:00.0Z.
      */
@@ -88,18 +89,20 @@ abstract class PohodaBankClient extends \mServer\Bank
     {
         if ((file_exists($certFile) === false) || (is_readable($certFile) === false)) {
             fwrite(\STDERR, 'Cannot read specified certificate file: '.$certFile.\PHP_EOL);
-            
+
             // Detailed diagnostics
             if (!file_exists($certFile)) {
                 fwrite(\STDERR, 'Error: File does not exist'.\PHP_EOL);
-                
+
                 // Check if parent directory exists
-                $dirname = dirname($certFile);
+                $dirname = \dirname($certFile);
+
                 if (file_exists($dirname)) {
                     fwrite(\STDERR, 'Parent directory exists: '.$dirname.\PHP_EOL);
-                    
+
                     // List similar files in the directory
                     $files = glob($dirname.'/*.{p12,pfx,pem,crt}', \GLOB_BRACE);
+
                     if ($files) {
                         fwrite(\STDERR, 'Certificate files found in directory: '.implode(', ', array_map('basename', $files)).\PHP_EOL);
                     }
@@ -108,20 +111,20 @@ abstract class PohodaBankClient extends \mServer\Bank
                 }
             } else {
                 fwrite(\STDERR, 'File exists but is not readable'.\PHP_EOL);
-                
+
                 // Show file permissions
                 $perms = fileperms($certFile);
                 fwrite(\STDERR, 'File permissions: '.substr(sprintf('%o', $perms), -4).\PHP_EOL);
-                
+
                 // Show owner and group (POSIX extension may be missing)
-                if (function_exists('posix_getpwuid') && function_exists('posix_getgrgid')) {
+                if (\function_exists('posix_getpwuid') && \function_exists('posix_getgrgid')) {
                     $ownerInfo = posix_getpwuid(fileowner($certFile));
                     $groupInfo = posix_getgrgid(filegroup($certFile));
                     fwrite(\STDERR, 'Owner: '.($ownerInfo['name'] ?? 'unknown').' Group: '.($groupInfo['name'] ?? 'unknown').\PHP_EOL);
                 }
 
                 // Show current user
-                if (function_exists('posix_geteuid') && function_exists('posix_getpwuid')) {
+                if (\function_exists('posix_geteuid') && \function_exists('posix_getpwuid')) {
                     $euid = posix_geteuid();
                     $currentUserInfo = posix_getpwuid($euid);
                     fwrite(\STDERR, 'Current user: '.($currentUserInfo['name'] ?? 'unknown').' (UID: '.$euid.')'.\PHP_EOL);
@@ -143,22 +146,24 @@ abstract class PohodaBankClient extends \mServer\Bank
     {
         $certContent = file_get_contents($certFile);
         $certs = [];
+
         if (openssl_pkcs12_read($certContent, $certs, $password) === false) {
             $opensslError = openssl_error_string();
             fwrite(\STDERR, 'Cannot read PKCS12 certificate file: '.$certFile.\PHP_EOL);
-            fwrite(\STDERR, 'File size: '.strlen($certContent).' bytes'.\PHP_EOL);
-            
+            fwrite(\STDERR, 'File size: '.\strlen($certContent).' bytes'.\PHP_EOL);
+
             if ($opensslError) {
                 fwrite(\STDERR, 'OpenSSL error: '.$opensslError.\PHP_EOL);
             }
-            
+
             // Check if password might be empty
             if (empty($password)) {
                 fwrite(\STDERR, 'Warning: Certificate password is empty'.\PHP_EOL);
             }
-            
+
             // Check if it's actually a PKCS12 file
             $fileInfo = finfo_open(\FILEINFO_MIME_TYPE);
+
             if ($fileInfo) {
                 $mimeType = finfo_buffer($fileInfo, $certContent);
                 fwrite(\STDERR, 'File MIME type: '.$mimeType.\PHP_EOL);
@@ -240,7 +245,7 @@ abstract class PohodaBankClient extends \mServer\Bank
             case 'auto':
                 $latestRecord = $this->getColumnsFromPohoda(['id', 'lastUpdate'], ['limit' => 1, 'order' => 'lastUpdate@A', 'source' => $this->sourceString(), 'bank' => $this->bankIDS]);
 
-                if (array_key_exists(0, $latestRecord) && array_key_exists('lastUpdate', $latestRecord[0])) {
+                if (\array_key_exists(0, $latestRecord) && \array_key_exists('lastUpdate', $latestRecord[0])) {
                     $this->since = $latestRecord[0]['lastUpdate'];
                 } else {
                     $this->addStatusMessage('Previous record for "auto since" not found. Defaulting to today\'s 00:00', 'warning');
@@ -275,8 +280,8 @@ abstract class PohodaBankClient extends \mServer\Bank
             $this->until = $this->until->setTime(23, 59, 59, 999);
         }
 
-    // DatePeriod signature: DatePeriod(DateTimeInterface $start, DateInterval $interval, DateTimeInterface $end)
-    return new \DatePeriod($this->since, new \DateInterval('P1D'), $this->until);
+        // DatePeriod signature: DatePeriod(DateTimeInterface $start, DateInterval $interval, DateTimeInterface $end)
+        return new \DatePeriod($this->since, new \DateInterval('P1D'), $this->until);
     }
 
     /**
@@ -378,7 +383,7 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $result['success'] = false;
                 $resultMessages = $this->messages;
 
-                if (array_key_exists('error', $resultMessages) && \count($resultMessages['error'])) {
+                if (\array_key_exists('error', $resultMessages) && \count($resultMessages['error'])) {
                     foreach ($resultMessages['error'] as $errMsg) {
                         $result['messages'][] = 'error: '.$errMsg;
                     }
@@ -528,11 +533,13 @@ EOD;
             '/Certificate is blocked/i',
             '/invalid certificate/i',
         ];
+
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $text)) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -541,21 +548,24 @@ EOD;
      *
      * @param array<int, mixed> $messages Status messages from engine
      *
-     * @return string|null Auth error message if found
+     * @return null|string Auth error message if found
      */
     public static function detectAuthError(array $messages): ?string
     {
         foreach ($messages as $msg) {
             $text = null;
-            if (is_object($msg) && isset($msg->body)) {
+
+            if (\is_object($msg) && isset($msg->body)) {
                 $text = (string) $msg->body;
-            } elseif (is_string($msg)) {
+            } elseif (\is_string($msg)) {
                 $text = $msg;
             }
+
             if ($text && self::isAuthError($text)) {
                 return $text;
             }
         }
+
         return null;
     }
 }
