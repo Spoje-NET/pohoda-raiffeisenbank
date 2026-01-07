@@ -199,7 +199,7 @@
                 "cs": "Zobrazit ladicí zprávy"
             },
             "defval": "False",
-            "required": true,
+            "required": false,
             "category": "Behavior"
         },
         "ZABBIX_KEY": {

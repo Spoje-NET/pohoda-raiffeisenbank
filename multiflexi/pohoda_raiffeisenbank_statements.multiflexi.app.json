@@ -203,8 +203,8 @@
                 "en": "Pohoda Debug",
                 "cs": "Pohoda Debug"
             },
-            "defval": true,
-            "required": true,
+            "defval": false,
+            "required": false,
             "category": "API"
         },
         "POHODA_BANK_IDS": {
@@ -234,6 +234,16 @@
                 "cs": "write log messages using"
             },
             "defval": "console|syslog",
+            "required": false,
+            "category": "Behavior"
+        },
+        "APP_DEBUG": {
+            "type": "bool",
+            "description": {
+                "en": "Show debug messages",
+                "cs": "Zobrazit ladicí zprávy"
+            },
+            "defval": "False",
             "required": false,
             "category": "Behavior"
         },

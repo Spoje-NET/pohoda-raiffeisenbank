@@ -212,6 +212,16 @@
             "required": false,
             "category": "API"
         },
+        "APP_DEBUG": {
+            "type": "bool",
+            "description": {
+                "en": "Show debug messages",
+                "cs": "Zobrazit ladicí zprávy"
+            },
+            "defval": "False",
+            "required": false,
+            "category": "Behavior"
+        },
         "EASE_LOGGER": {
             "type": "string",
             "description": {

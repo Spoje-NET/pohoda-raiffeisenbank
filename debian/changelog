@@ -1,4 +1,10 @@
-pohoda-raiffeisenbank (1.4.3) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.4.4) UNRELEASED; urgency=medium
+
+  * APP_DEBUG is optional everywhere
+
+ -- vitex <info@vitexsoftware.cz>  Wed, 07 Jan 2026 17:20:39 +0100
+
+pohoda-raiffeisenbank (1.4.3) noble; urgency=medium
 
   * Refactor PohodaBankClient and related classes for improved readability and consistency
   * Added missing backslashes for global functions to ensure proper namespace resolution.
@@ -8,7 +14,7 @@ pohoda-raiffeisenbank (1.4.3) UNRELEASED; urgency=medium
   * Updated comments for clarity and consistency across methods.
   * Improved handling of PDF and XML statement downloads, including error messages and exit codes.
 
- -- vitex <info@vitexsoftware.cz>  Fri, 28 Nov 2025 15:53:40 +0100
+ -- vitex <info@vitexsoftware.cz>  Wed, 07 Jan 2026 17:20:35 +0100
 
 pohoda-raiffeisenbank (1.4.2) noble; urgency=medium
 

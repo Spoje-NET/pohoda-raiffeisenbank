@@ -163,7 +163,7 @@
                 "cs": "Ladění Pohody"
             },
             "defval": false,
-            "required": true,
+            "required": false,
             "category": "API"
         },
         "POHODA_BANK_IDS": {
@@ -383,7 +383,7 @@
                 "cs": "Zobrazit ladicí zprávy"
             },
             "defval": "False",
-            "required": true,
+            "required": false,
             "category": "Behavior"
         },
         "RESULT_FILE": {

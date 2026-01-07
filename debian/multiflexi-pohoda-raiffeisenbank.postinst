@@ -6,7 +6,7 @@ set -e
 
 for file in `ls /usr/lib/pohoda-raiffeisenbank/multiflexi/*.json`
 do
-	multiflexi-json2app $file
+	multiflexi-cli application json-import --file $file
 done
 
 #DEBHELPER#

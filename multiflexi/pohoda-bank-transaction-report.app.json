@@ -111,8 +111,8 @@
                 "en": "Pohoda Debug",
                 "cs": "Ladění Pohody"
             },
-            "defval": true,
-            "required": true,
+            "defval": false,
+            "required": false,
             "category": "API"
         },
         "POHODA_BANK_IDS": {
@@ -154,6 +154,16 @@
             "defval": "{MULTIFLEXI_TMP}/rbczpremiumapi_rates.json",
             "required": false,
             "category": "API"
+        },
+        "APP_DEBUG": {
+            "type": "bool",
+            "description": {
+                "en": "Show debug messages",
+                "cs": "Zobrazit ladicí zprávy"
+            },
+            "defval": "False",
+            "required": false,
+            "category": "Behavior"
         },
         "RESULT_FILE": {
             "type": "string",
