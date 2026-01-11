@@ -102,7 +102,7 @@
                 "cs": "Komprese Pohody"
             },
             "defval": false,
-            "required": true,
+            "required": false,
             "category": "API"
         },
         "POHODA_DEBUG": {

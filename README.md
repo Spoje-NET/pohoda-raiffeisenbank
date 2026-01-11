@@ -160,8 +160,8 @@ All scripts perform certificate validation before attempting API calls. If the c
 * `254` - Another exception without numeric code occurred
 
 **Note on Exit Codes:** Unix/Linux exit codes are limited to 0-255. When an HTTP error code like 401 (Unauthorized) is used as an exit code, it may be truncated by the shell to its modulo 256 value. For example:
-- HTTP 401 → Unix exit code 145 (401 % 256 = 145)
-- The full HTTP status code and error details are always available in the JSON report's `message` field
+* HTTP 401 → Unix exit code 145 (401 % 256 = 145)
+* The full HTTP status code and error details are always available in the JSON report's `message` field
 
 **Important:** Exit code `0` is only returned when the entire script completes successfully. Any error during execution (API failures, certificate issues, etc.) will result in a non-zero exit code.
 
@@ -251,9 +251,9 @@ Example output:
 
 Applications in this package use the following exit codes:
 
-- `0`: Success
-- `1`: General error
-- `2`: Misuse of shell command
-- `3`: Application-specific error
-- `4`: Application-specific error
-- `401`: Unauthorized - authentication failed
+* `0`: Success
+* `1`: General error
+* `2`: Misuse of shell command
+* `3`: Application-specific error
+* `4`: Application-specific error
+* `401`: Unauthorized - authentication failed

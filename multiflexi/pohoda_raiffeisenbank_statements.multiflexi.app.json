@@ -194,7 +194,7 @@
                 "cs": "Pohoda Compress"
             },
             "defval": false,
-            "required": true,
+            "required": false,
             "category": "API"
         },
         "POHODA_DEBUG": {
