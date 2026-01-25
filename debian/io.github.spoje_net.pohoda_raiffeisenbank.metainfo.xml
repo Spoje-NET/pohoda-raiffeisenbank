@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.spoje_net.pohoda_raiffeisenbank</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>pohoda-raiffeisenbank</name>
+  <summary>Import Raiffeisenbank statements into Pohoda</summary>
+  <description>
+    <p>
+      See your Bank Account Statements in Pohoda Allow use of Raiffeisen Bank statement tools in MultiFlexi environment
+    </p>
+  </description>
+  <categories>
+    <category>Utility</category>
+  </categories>
+  <url type="homepage">https://github.com/Spoje-NET/pohoda-raiffeisenbank</url>
+  <url type="bugtracker">https://github.com/Spoje-NET/pohoda-raiffeisenbank/issues</url>
+  <developer id="io.github.spoje_net">
+    <name>Spoje.Net</name>
+  </developer>
+  <content_rating type="oars-1.1"/>
+</component>
