@@ -1,5 +1,6 @@
 {
     "name": "spojenet/pohoda-raiffeisenbank",
+    "type": "project",
     "description": "raiffeisenbank bank statement downloader for Stormware Pohoda",
     "license": "MIT",
     "authors": [
