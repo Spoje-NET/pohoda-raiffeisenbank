@@ -346,6 +346,41 @@ abstract class PohodaBankClient extends \mServer\Bank
     }
 
     /**
+     * Attach a URL (e.g. SharePoint link) to an existing Pohoda Bank record via mServer XML.
+     *
+     * @param int    $pohodaId Pohoda internal document ID (from producedDetails)
+     * @param string $url      URL to attach
+     * @param string $name     Display name for the attachment
+     */
+    public function attachSharepointUrl(int $pohodaId, string $url, string $name): bool
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'
+            . '<dat:dataPack id="1" ico="' . $this->ico . '" application="pohoda-raiffeisenbank" version="2.0" note="sharepoint url"'
+            . ' xmlns:dat="http://www.stormware.cz/schema/version_2/data.xsd"'
+            . ' xmlns:bnk="http://www.stormware.cz/schema/version_2/bank.xsd"'
+            . ' xmlns:typ="http://www.stormware.cz/schema/version_2/type.xsd"'
+            . ' xmlns:ftr="http://www.stormware.cz/schema/version_2/filter.xsd">'
+            . '<dat:dataPackItem id="1" version="2.0">'
+            . '<bnk:bank version="2.0">'
+            . '<bnk:bankHeader>'
+            . '<bnk:actionType><bnk:update>'
+            . '<ftr:filter><ftr:selectedIDs><ftr:id>' . $pohodaId . '</ftr:id></ftr:selectedIDs></ftr:filter>'
+            . '</bnk:update></bnk:actionType>'
+            . '</bnk:bankHeader>'
+            . '<bnk:attachments>'
+            . '<typ:urlAddress>'
+            . '<typ:name>' . htmlspecialchars($name, \ENT_XML1, 'UTF-8') . '</typ:name>'
+            . '<typ:url>' . htmlspecialchars($url, \ENT_XML1, 'UTF-8') . '</typ:url>'
+            . '</typ:urlAddress>'
+            . '</bnk:attachments>'
+            . '</bnk:bank>'
+            . '</dat:dataPackItem>'
+            . '</dat:dataPack>';
+
+        return !empty($this->sendRequest($xml));
+    }
+
+    /**
      * Insert Transaction to Pohoda.
      *
      * @return array<string, mixed> Imported transaction result details

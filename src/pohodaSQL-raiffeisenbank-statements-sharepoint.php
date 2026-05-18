@@ -33,7 +33,6 @@ Shared::init(
         'OFFICE365_TENANT', 'OFFICE365_PATH', 'OFFICE365_SITE',
         'POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO',
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
-        'DB_CONNECTION', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
     ],
     \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
 );
@@ -268,10 +267,7 @@ if (!$certValid) {
                 $engine->addStatusMessage('stage 5/6: Add Sharepoint links to Pohoda', 'debug');
 
                 if ($fileUrls) {
-                    $engine->addStatusMessage(sprintf(_('Updating PohodaSQL to attach statements in sharepoint links to invoice for %d'), \count($inserted)), 'debug');
-
-                    $doc = new \SpojeNet\PohodaSQL\DOC();
-                    $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK); // Bank
+                    $engine->addStatusMessage(sprintf(_('Attaching sharepoint links to %d Pohoda bank records via mServer'), \count($inserted)), 'debug');
 
                     foreach ($inserted as $refId => $importInfo) {
                         if (!isset($importInfo['details']) || !\is_array($importInfo['details'])) {
@@ -287,26 +283,20 @@ if (!$certValid) {
                             $filename = key($dayUrls[$dateStatement]);
                             $sharepointUri = current($dayUrls[$dateStatement]);
 
-                            try {
-                                $result = $doc->urlAttachment((int) $pohodaId, $sharepointUri, basename($filename));
-                                $doc->addStatusMessage(sprintf('#%d: %s 👉 %s', $refId, $pohodaId, $sharepointUri), $result ? 'success' : 'error');
-                                $report['pohodaSQL'][$refId]['status'] = 'success';
-                                $report['pohodaSQL'][$refId]['linkedTo'] = $pohodaId;
-                            } catch (\Exception $ex) {
-                                $engine->addStatusMessage(_('Cannot Update PohodaSQL to attach statements in sharepoint links to invoice'), 'error');
-                                $report['pohodaSQL'][$pohodaId]['status'] = 'failed';
-                                $report['pohodaSQL'][$pohodaId]['message'] = $ex->getMessage();
+                            $result = $engine->attachSharepointUrl((int) $pohodaId, $sharepointUri, basename($filename));
+                            $engine->addStatusMessage(sprintf('#%d: %s 👉 %s', $refId, $pohodaId, $sharepointUri), $result ? 'success' : 'error');
+                            $report['pohodaSQL'][$refId]['status'] = $result ? 'success' : 'failed';
+                            $report['pohodaSQL'][$refId]['linkedTo'] = $pohodaId;
 
-                                if ($exitcode === 0) {
-                                    $exitcode = 4;
-                                }
+                            if (!$result && $exitcode === 0) {
+                                $exitcode = 4;
                             }
                         } else {
-                            $engine->addStatusMessage(sprintf(_('No fresh statement for %s was uploaded to Sharepoint; Skipping PohodaSQL update'), $dateStatement), 'warning');
+                            $engine->addStatusMessage(sprintf(_('No fresh statement for %s was uploaded to Sharepoint; Skipping attachment'), $dateStatement), 'warning');
                         }
                     }
                 } else {
-                    $engine->addStatusMessage(_('No statements uploaded to Sharepoint; Skipping PohodaSQL update'), 'warning');
+                    $engine->addStatusMessage(_('No statements uploaded to Sharepoint; Skipping attachment'), 'warning');
                 }
             } else {
                 $engine->addStatusMessage(_('Empty statement(s)'), 'warning');

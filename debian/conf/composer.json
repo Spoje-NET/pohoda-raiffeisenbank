@@ -12,7 +12,6 @@
         "vgrem/php-spo": "^3",
         "deb/ease-core": "*",
         "deb/rbczpremiumapi": "*",
-        "deb/pohoda-sql": "*",
         "deb/pohoda-connector": "*"
     },
     "autoload": {
@@ -36,10 +35,6 @@
         {
             "type": "path",
             "url": "/usr/share/php/EaseFluentPDO/"
-        },
-        {
-            "type": "path",
-            "url": "/usr/share/php/PohodaSQL"
         },
         {
             "type": "path",
