@@ -19,7 +19,7 @@ foreach ($autoloaders as $autoloader) {
 
 spl_autoload_register(function (string $class): void {
     $prefixes = [
-        'Pohoda\\RaiffeisenBank\\' => '/usr/lib/pohoda-raiffeisenbank/src/Pohoda/RaiffeisenBank/',
+        'Pohoda\\RaiffeisenBank\\' => '/usr/lib/pohoda-raiffeisenbank/Pohoda/RaiffeisenBank/',
         'SpojeNet\\PohodaSQL\\'    => '/usr/share/php/PohodaSQL/'
     ];
 

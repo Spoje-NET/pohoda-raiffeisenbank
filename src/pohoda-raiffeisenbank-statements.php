@@ -17,9 +17,9 @@ namespace Pohoda\RaiffeisenBank;
 
 use Ease\Shared;
 
-require_once '../vendor/autoload.php';
-
 \define('APP_NAME', 'Pohoda RaiffeisenBank Statements');
+
+require_once '../vendor/autoload.php';
 $exitcode = 0;
 /**
  * Get today's Statements list.

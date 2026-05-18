@@ -22,11 +22,11 @@ override_dh_install:
 	dh_install
 	
 	install -m 644 debian/autoload.php debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/autoload.php
-	sed -i "1a defined('APP_NAME') || define('APP_NAME', '$(PKG_SOURCE)');" debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/autoload.php
+	sed -i "3a defined('APP_NAME') || define('APP_NAME', '$(PKG_SOURCE)');" debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/autoload.php
 	sed -i "s|'unknown'|'$(PKG_SOURCE)'|" debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/autoload.php
 	sed -i "s|'0.0.0'|'$(PKG_VERSION)'|" debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/autoload.php
 	sed -i "s|'library'|'$(PKG_TYPE)'|g" debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/autoload.php
-	sed -i "2a defined('APP_VERSION') || define('APP_VERSION', '$(PKG_VERSION)');" debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/autoload.php
+	sed -i "4a defined('APP_VERSION') || define('APP_VERSION', '$(PKG_VERSION)');" debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/autoload.php
 	
 	sed -i -e "s/..\/vendor\/autoload.php/autoload.php/g" debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/*.php
 	sed -i -e 's/\.\.\/.env//g' debian/pohoda-raiffeisenbank/usr/lib/pohoda-raiffeisenbank/*.php

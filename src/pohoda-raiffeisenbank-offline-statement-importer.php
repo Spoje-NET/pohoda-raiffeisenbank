@@ -17,9 +17,9 @@ namespace Pohoda\RaiffeisenBank;
 
 use Ease\Shared;
 
-require_once '../vendor/autoload.php';
-
 \define('APP_NAME', 'Pohoda RaiffeisenBank Offline Statements');
+
+require_once '../vendor/autoload.php';
 
 $options = getopt('i::e::o::', ['input::environment::output::']);
 $statementFile = \array_key_exists('i', $options) ? $options['i'] : (\array_key_exists('input', $options) ? $options['input'] : Shared::cfg('STATEMENT_FILE', 'php://stdin'));

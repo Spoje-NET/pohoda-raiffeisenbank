@@ -17,14 +17,14 @@ namespace Pohoda\RaiffeisenBank;
 
 use Ease\Shared;
 
+\define('APP_NAME', 'Pohoda Bank Statement Reporter');
+
 require_once '../vendor/autoload.php';
 
 class BankProbe extends \mServer\Bank
 {
     use \Ease\datescope;
 }
-
-\define('APP_NAME', 'Pohoda Bank Statement Reporter');
 
 $options = getopt('o::e::', ['output::environment::', 'scope::']);
 Shared::init([

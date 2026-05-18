@@ -20,9 +20,9 @@ use Office365\Runtime\Auth\ClientCredential;
 use Office365\Runtime\Auth\UserCredentials;
 use Office365\SharePoint\ClientContext;
 
-require_once '../vendor/autoload.php';
-
 \define('APP_NAME', 'Pohoda RaiffeisenBank Statements');
+
+require_once '../vendor/autoload.php';
 
 /**
  * Get today's Statements list.
