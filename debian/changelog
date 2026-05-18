@@ -1,8 +1,12 @@
-pohoda-raiffeisenbank (1.4.4) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.5.0) UNRELEASED; urgency=medium
 
   * APP_DEBUG is optional everywhere
+  * Replace PohodaSQL direct DB attachment with Pohoda mServer XML
+  * Add PohodaBankClient::attachSharepointUrl() using bnk:attachments XML update
+  * Remove spojenet/pohoda-sql dependency; add php-vgrem-php-spo dependency
+  * Remove DB_* env vars from sharepoint script and multiflexi app definition
 
- -- vitex <info@vitexsoftware.cz>  Wed, 07 Jan 2026 17:20:39 +0100
+ -- vitex <info@vitexsoftware.cz>  Mon, 18 May 2026 10:00:00 +0200
 
 pohoda-raiffeisenbank (1.4.3) noble; urgency=medium
 

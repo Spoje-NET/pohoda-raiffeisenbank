@@ -7,11 +7,20 @@
         "cs": "Výpisy Raiffeisenbank pro PohodaSQL a Sharepoint"
     },
     "description": {
-        "en": "Import Raiffeisenbank statements into PohodaSQL and store in Sharepoint",
-        "cs": "Importujte výpisy Raiffeisenbank do PohodaSQL a uložte je do Sharepointu"
+        "en": "Import Raiffeisenbank statements into Pohoda via mServer and store in Sharepoint",
+        "cs": "Importujte výpisy Raiffeisenbank do Pohody přes mServer a uložte je do Sharepointu"
     },
-    "tags": ["Raiffeisen", "Bank", "Statements", "Pohoda"],
-    "requirements": ["RaiffeisenBank", "SQLServer", "Office365", "mServer"],
+    "tags": [
+        "Raiffeisen",
+        "Bank",
+        "Statements",
+        "Pohoda"
+    ],
+    "requirements": [
+        "RaiffeisenBank",
+        "Office365",
+        "mServer"
+    ],
     "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
     "executable": "pohodasql-raiffeisenbank-statements-sharepoint",
     "environment": {
@@ -215,76 +224,6 @@
             "defval": "yesterday",
             "required": false,
             "category": "Other"
-        },
-        "DB_CONNECTION": {
-            "type": "text",
-            "description": {
-                "en": "Database Connection",
-                "cs": "Připojení k databázi"
-            },
-            "defval": "sqlsrv",
-            "required": true,
-            "category": "Database"
-        },
-        "DB_HOST": {
-            "type": "text",
-            "description": {
-                "en": "Database Host",
-                "cs": "Hostitel databáze"
-            },
-            "defval": "127.0.0.1",
-            "required": true,
-            "category": "Database"
-        },
-        "DB_PORT": {
-            "type": "integer",
-            "description": {
-                "en": "Database Port",
-                "cs": "Port databáze"
-            },
-            "defval": 1433,
-            "required": true,
-            "category": "Database"
-        },
-        "DB_DATABASE": {
-            "type": "text",
-            "description": {
-                "en": "Database Name",
-                "cs": "Název databáze"
-            },
-            "defval": "StwPh_12345678_2023",
-            "required": true,
-            "category": "Database"
-        },
-        "DB_USERNAME": {
-            "type": "text",
-            "description": {
-                "en": "Database Username",
-                "cs": "Uživatelské jméno databáze"
-            },
-            "defval": "sa",
-            "required": true,
-            "category": "Database"
-        },
-        "DB_PASSWORD": {
-            "type": "password",
-            "description": {
-                "en": "Database Password",
-                "cs": "Heslo databáze"
-            },
-            "defval": "pohodaSQLpassword",
-            "required": true,
-            "category": "Database"
-        },
-        "DB_SETTINGS": {
-            "type": "text",
-            "description": {
-                "en": "Database Settings like encrypt=false",
-                "cs": "Nastavení databáze, například encrypt=false"
-            },
-            "defval": "",
-            "required": false,
-            "category": "Database"
         },
         "OFFICE365_USERNAME": {
             "type": "text",

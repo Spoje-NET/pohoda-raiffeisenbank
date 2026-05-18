@@ -128,4 +128,16 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::attachSharepointUrl
+     *
+     * @todo   Implement testAttachSharepointUrl().
+     */
+    public function testAttachSharepointUrl(): void
+    {
+        $this->assertIsBool($this->object->attachSharepointUrl(0, 'https://example.com/statement.pdf', 'statement.pdf'));
+        // Remove the following lines when you implement this test.
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
 }

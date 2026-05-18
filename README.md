@@ -8,17 +8,15 @@ It downloads the corresponding XML statements and parses them. It imports the ba
 
 After importing all items, document liquidation is initiated and they are automatically matched.
 
-When using PohodaSQL, links to PDF statements are attached to all movements.
+After uploading to Sharepoint, links to PDF statements are attached to all bank movements in Pohoda via mServer.
 
 [![wakatime](https://wakatime.com/badge/user/5abba9ca-813e-43ac-9b5f-b1cfdf3dc1c7/project/018b7d35-a10b-4f4b-ba78-241d1c79b4e6.svg)](https://wakatime.com/badge/user/5abba9ca-813e-43ac-9b5f-b1cfdf3dc1c7/project/018b7d35-a10b-4f4b-ba78-241d1c79b4e6)
 
 ## Requirements
 
 * php 8.1+
-* Pohoda (Pohoda SQL for full functionality) + [mServer](https://www.stormware.cz/pohoda/xml/mserver/)
+* Pohoda + [mServer](https://www.stormware.cz/pohoda/xml/mserver/)
 * Sharepoint User or Application Account
-* MSSQL login and password
-* [php-sqlsrv](https://learn.microsoft.com/en-us/sql/connect/php/microsoft-php-driver-for-sql-server?view=sql-server-ver16)
 
 ## Setup command
 
@@ -66,14 +64,6 @@ POHODA_TIMEOUT=60
 POHODA_COMPRESS=false
 POHODA_DEBUG=true
 POHODA_BANK_IDS=RB
-
-DB_CONNECTION=sqlsrv
-DB_HOST=192.168.25.23
-DB_PORT=1433
-DB_DATABASE=StwPh_12345678_2023
-DB_USERNAME=pohodaSQLuser
-DB_PASSWORD=pohodaSQLpassword
-DB_SETTINGS=encrypt=false
 ```
 
 ## Import Scopes
@@ -168,7 +158,6 @@ All scripts perform certificate validation before attempting API calls. If the c
 ## Powered by
 
 * <https://github.com/VitexSoftware/php-vitexsoftware-rbczpremiumapi>
-* <https://github.com/Spoje-NET/PohodaSQL>
 * <https://github.com/VitexSoftware/PHP-Pohoda-Connector>
 
 ## See also
