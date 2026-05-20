@@ -188,7 +188,7 @@
                 "en": "write output json data to",
                 "cs": "Zápis výstupních dat do JSON"
             },
-            "defval": "bank_statement_upoad_{ACCOUNT_NUMBER}.json",
+            "defval": "bank_statement_upload_{ACCOUNT_NUMBER}.json",
             "required": false,
             "category": "Other"
         },

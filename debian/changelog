@@ -1,4 +1,4 @@
-pohoda-raiffeisenbank (1.5.0) UNRELEASED; urgency=medium
+pohoda-raiffeisenbank (1.5.0) noble; urgency=medium
 
   * APP_DEBUG is optional everywhere
   * Replace PohodaSQL direct DB attachment with Pohoda mServer XML

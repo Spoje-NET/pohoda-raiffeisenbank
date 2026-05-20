@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
-    "schemaVersion": "3.0.0",
+    "schemaVersion": "3.1.0",
     "uuid": "10f24522-66af-460c-8dc1-e6454cfc9a55",
     "name": {
         "en": "Raiffeisenbank transactions for Pohoda",
@@ -237,6 +237,14 @@
             },
             "severity": "error",
             "retry": true
+        },
+        "2": {
+            "description": {
+                "en": "Misuse of shell command",
+                "cs": "Nesprávné použití příkazu"
+            },
+            "severity": "error",
+            "retry": false
         },
         "145": {
             "description": {
