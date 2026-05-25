@@ -346,7 +346,11 @@ abstract class PohodaBankClient extends \mServer\Bank
     }
 
     /**
-     * Attach a URL (e.g. SharePoint link) to an existing Pohoda Bank record via mServer XML.
+     * Attach a URL (e.g. SharePoint link) to an existing Pohoda Bank record via direct SQL insert.
+     *
+     * POHODA mServer XML does not support updating bank records (the bank schema has no actionType
+     * and the id field is export-only). Direct SQL insert into the DOC table is the only reliable
+     * approach. Uses POHODA_DB_* env vars to avoid conflict with MultiFlexi-injected DB_* vars.
      *
      * @param int    $pohodaId Pohoda internal document ID (from producedDetails)
      * @param string $url      URL to attach
@@ -354,30 +358,17 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function attachSharepointUrl(int $pohodaId, string $url, string $name): bool
     {
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>'
-            . '<dat:dataPack id="1" ico="' . $this->ico . '" application="pohoda-raiffeisenbank" version="2.0" note="sharepoint url"'
-            . ' xmlns:dat="http://www.stormware.cz/schema/version_2/data.xsd"'
-            . ' xmlns:bnk="http://www.stormware.cz/schema/version_2/bank.xsd"'
-            . ' xmlns:typ="http://www.stormware.cz/schema/version_2/type.xsd"'
-            . ' xmlns:ftr="http://www.stormware.cz/schema/version_2/filter.xsd">'
-            . '<dat:dataPackItem id="1" version="2.0">'
-            . '<bnk:bank version="2.0">'
-            . '<bnk:bankHeader>'
-            . '<bnk:actionType><bnk:update>'
-            . '<ftr:filter><ftr:selectedIDs><ftr:id>' . $pohodaId . '</ftr:id></ftr:selectedIDs></ftr:filter>'
-            . '</bnk:update></bnk:actionType>'
-            . '</bnk:bankHeader>'
-            . '<bnk:attachments>'
-            . '<typ:urlAddress>'
-            . '<typ:name>' . htmlspecialchars($name, \ENT_XML1, 'UTF-8') . '</typ:name>'
-            . '<typ:url>' . htmlspecialchars($url, \ENT_XML1, 'UTF-8') . '</typ:url>'
-            . '</typ:urlAddress>'
-            . '</bnk:attachments>'
-            . '</bnk:bank>'
-            . '</dat:dataPackItem>'
-            . '</dat:dataPack>';
+        $doc = new \SpojeNet\PohodaSQL\DOC(null, [
+            'dbType'   => Shared::cfg('POHODA_DB_CONNECTION', 'sqlsrv'),
+            'server'   => Shared::cfg('POHODA_DB_HOST'),
+            'dbLogin'  => Shared::cfg('POHODA_DB_USERNAME'),
+            'dbPass'   => Shared::cfg('POHODA_DB_PASSWORD'),
+            'database' => Shared::cfg('POHODA_DB_DATABASE'),
+            'port'     => Shared::cfg('POHODA_DB_PORT', '1433'),
+        ]);
+        $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK);
 
-        return !empty($this->sendRequest($xml));
+        return (bool) $doc->urlAttachment($pohodaId, $url, $name);
     }
 
     /**

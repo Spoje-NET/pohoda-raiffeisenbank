@@ -7,7 +7,8 @@ require_once '/usr/share/php/Composer/InstalledVersions.php';
 $autoloaders = [
     '/usr/share/php/Raiffeisenbank/autoload.php',
     '/usr/share/php/mServer/autoload.php',
-    '/usr/share/php/Office365/autoload.php'
+    '/usr/share/php/Office365/autoload.php',
+    '/usr/share/php/PohodaSQL/autoload.php',
 ];
 
 foreach ($autoloaders as $autoloader) {
@@ -19,6 +20,7 @@ foreach ($autoloaders as $autoloader) {
 spl_autoload_register(function (string $class): void {
     $prefixes = [
         'Pohoda\\RaiffeisenBank\\' => '/usr/lib/pohoda-raiffeisenbank/Pohoda/RaiffeisenBank/',
+        'SpojeNet\\PohodaSQL\\'    => '/usr/share/php/PohodaSQL/',
     ];
 
     foreach ($prefixes as $prefix => $baseDir) {

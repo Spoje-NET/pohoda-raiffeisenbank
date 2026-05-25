@@ -1,0 +1,266 @@
+{
+    "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+    "schemaVersion": "3.1.0",
+    "uuid": "4b2e7f91-3c58-4a0d-9e16-8d5a1c3f072b",
+    "name": {
+        "en": "Pohoda SharePoint link fixer",
+        "cs": "Oprava chybějících odkazů na výpisy v SharePointu v Pohodě"
+    },
+    "description": {
+        "en": "Retroactively attach missing SharePoint statement PDF links to Pohoda bank records. Use when records were imported into Pohoda but the SharePoint URL attachment was not written (e.g. after a period when MSSQL support was temporarily broken).",
+        "cs": "Zpětně přiloží chybějící odkazy na PDF výpisy v SharePointu k bankovním záznamům v Pohodě. Použijte pokud byly záznamy importovány do Pohody bez odkazu na SharePoint (např. po období kdy MSSQL podpora dočasně nefungovala)."
+    },
+    "tags": [
+        "Raiffeisen",
+        "Bank",
+        "Statements",
+        "Pohoda",
+        "Fix"
+    ],
+    "requirements": [
+        "Office365",
+        "PohodaSQL"
+    ],
+    "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
+    "executable": "pohoda-sharepoint-link-fixer",
+    "environment": {
+        "ACCOUNT_NUMBER": {
+            "type": "text",
+            "description": {
+                "en": "Bank Account Number",
+                "cs": "Číslo bankovního účtu"
+            },
+            "defval": "",
+            "required": true,
+            "category": "Other"
+        },
+        "DATE_FROM": {
+            "type": "text",
+            "description": {
+                "en": "Start of the period to fix (YYYY-MM-DD or PHP date expression)",
+                "cs": "Začátek opravovaného období (YYYY-MM-DD nebo PHP výraz data)"
+            },
+            "defval": "first day of last month",
+            "required": true,
+            "category": "Other"
+        },
+        "DATE_TO": {
+            "type": "text",
+            "description": {
+                "en": "End of the period to fix (YYYY-MM-DD or PHP date expression)",
+                "cs": "Konec opravovaného období (YYYY-MM-DD nebo PHP výraz data)"
+            },
+            "defval": "last day of last month",
+            "required": true,
+            "category": "Other"
+        },
+        "POHODA_DB_CONNECTION": {
+            "type": "text",
+            "description": {
+                "en": "Pohoda DB connection type (sqlsrv)",
+                "cs": "Typ připojení k Pohoda DB (sqlsrv)"
+            },
+            "defval": "sqlsrv",
+            "required": false,
+            "category": "Database"
+        },
+        "POHODA_DB_HOST": {
+            "type": "text",
+            "description": {
+                "en": "Pohoda MSSQL server host",
+                "cs": "Host MSSQL serveru Pohody"
+            },
+            "defval": "",
+            "required": true,
+            "category": "Database"
+        },
+        "POHODA_DB_PORT": {
+            "type": "text",
+            "description": {
+                "en": "Pohoda MSSQL server port",
+                "cs": "Port MSSQL serveru Pohody"
+            },
+            "defval": "1433",
+            "required": false,
+            "category": "Database"
+        },
+        "POHODA_DB_DATABASE": {
+            "type": "text",
+            "description": {
+                "en": "Pohoda MSSQL database name",
+                "cs": "Název databáze MSSQL Pohody"
+            },
+            "defval": "",
+            "required": true,
+            "category": "Database"
+        },
+        "POHODA_DB_USERNAME": {
+            "type": "text",
+            "description": {
+                "en": "Pohoda MSSQL database username",
+                "cs": "Uživatelské jméno MSSQL Pohody"
+            },
+            "defval": "",
+            "required": true,
+            "category": "Database"
+        },
+        "POHODA_DB_PASSWORD": {
+            "type": "password",
+            "description": {
+                "en": "Pohoda MSSQL database password",
+                "cs": "Heslo MSSQL databáze Pohody"
+            },
+            "defval": "",
+            "required": true,
+            "category": "Database"
+        },
+        "OFFICE365_USERNAME": {
+            "type": "text",
+            "description": {
+                "en": "Office 365 Username",
+                "cs": "Uživatelské jméno Office 365"
+            },
+            "defval": "",
+            "required": false,
+            "category": "Office365"
+        },
+        "OFFICE365_PASSWORD": {
+            "type": "password",
+            "description": {
+                "en": "Office 365 Password",
+                "cs": "Heslo Office 365"
+            },
+            "defval": "",
+            "required": false,
+            "category": "Office365"
+        },
+        "OFFICE365_CLIENTID": {
+            "type": "text",
+            "description": {
+                "en": "Office 365 Client ID",
+                "cs": "Client ID Office 365"
+            },
+            "defval": "",
+            "required": false,
+            "category": "Office365"
+        },
+        "OFFICE365_CLSECRET": {
+            "type": "text",
+            "description": {
+                "en": "Office 365 Client Secret",
+                "cs": "Client Secret Office 365"
+            },
+            "defval": "",
+            "required": false,
+            "category": "Office365"
+        },
+        "OFFICE365_TENANT": {
+            "type": "text",
+            "description": {
+                "en": "Office 365 Tenant",
+                "cs": "Tenant Office 365"
+            },
+            "defval": "",
+            "required": true,
+            "category": "Office365"
+        },
+        "OFFICE365_SITE": {
+            "type": "text",
+            "description": {
+                "en": "Office 365 SharePoint Site",
+                "cs": "SharePoint Site Office 365"
+            },
+            "defval": "",
+            "required": true,
+            "category": "Office365"
+        },
+        "OFFICE365_PATH": {
+            "type": "text",
+            "description": {
+                "en": "SharePoint folder path for statement PDFs",
+                "cs": "Cesta ke složce se soubory PDF výpisů v SharePointu"
+            },
+            "defval": "",
+            "required": true,
+            "category": "Office365"
+        },
+        "APP_DEBUG": {
+            "type": "bool",
+            "description": {
+                "en": "Show debug messages",
+                "cs": "Zobrazit ladicí zprávy"
+            },
+            "defval": "False",
+            "required": false,
+            "category": "Behavior"
+        },
+        "RESULT_FILE": {
+            "type": "string",
+            "description": {
+                "en": "Write output JSON data to",
+                "cs": "Zápis výstupních dat do JSON"
+            },
+            "defval": "sharepoint_link_fixer_{ACCOUNT_NUMBER}.json",
+            "required": false,
+            "category": "Other"
+        },
+        "EASE_LOGGER": {
+            "type": "string",
+            "description": {
+                "en": "Write log messages using",
+                "cs": "Způsob zápisu logovacích zpráv"
+            },
+            "defval": "console|syslog",
+            "required": false,
+            "category": "Behavior"
+        }
+    },
+    "artifacts": [
+        {
+            "name": {
+                "cs": "Report opravy odkazů",
+                "en": "Link fixer report"
+            },
+            "type": "file",
+            "path": "sharepoint_link_fixer_{\\d+}.json$",
+            "description": {
+                "en": "Report listing fixed, skipped and errored Pohoda bank records",
+                "cs": "Report se seznamem opravených, přeskočených a chybných bankovních záznamů Pohody"
+            }
+        }
+    ],
+    "exitCodes": {
+        "0": {
+            "description": {
+                "en": "Success",
+                "cs": "Úspěšné dokončení"
+            },
+            "severity": "success",
+            "retry": false
+        },
+        "1": {
+            "description": {
+                "en": "SharePoint listing failed",
+                "cs": "Chyba při výpisu souborů ze SharePointu"
+            },
+            "severity": "error",
+            "retry": true
+        },
+        "2": {
+            "description": {
+                "en": "MSSQL query failed",
+                "cs": "Chyba dotazu MSSQL"
+            },
+            "severity": "error",
+            "retry": true
+        },
+        "3": {
+            "description": {
+                "en": "One or more link attachments failed",
+                "cs": "Jeden nebo více odkazů se nepodařilo přiložit"
+            },
+            "severity": "warning",
+            "retry": true
+        }
+    }
+}

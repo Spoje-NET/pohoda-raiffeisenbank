@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+
+  <!-- Background -->
+  <rect width="128" height="128" rx="14" fill="#F5F5F5"/>
+
+  <!-- Left chain link – grey (was broken/disconnected) -->
+  <rect x="4" y="34" width="54" height="38" rx="19"
+        fill="none" stroke="#B0BEC5" stroke-width="7"/>
+
+  <!-- Right chain link – blue (now connected) -->
+  <rect x="70" y="34" width="54" height="38" rx="19"
+        fill="none" stroke="#1565C0" stroke-width="7"/>
+
+  <!-- Green fix badge at the join point -->
+  <circle cx="64" cy="53" r="16" fill="#388E3C"/>
+  <!-- White checkmark inside fix badge -->
+  <polyline points="56,53 61,60 73,44"
+            stroke="white" stroke-width="3.5" fill="none"
+            stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- SharePoint folder – bottom left -->
+  <path d="M8,94 L8,88 L32,88 L36,94 L56,94 L56,122 L8,122 Z"
+        fill="#E3F2FD" stroke="#1976D2" stroke-width="2"/>
+  <text x="32" y="112" text-anchor="middle"
+        font-family="Arial,sans-serif" font-size="12" font-weight="bold" fill="#1565C0">SP</text>
+
+  <!-- Pohoda P badge – bottom right -->
+  <circle cx="96" cy="108" r="18" fill="#FFD54F" stroke="#FBC02D" stroke-width="2"/>
+  <text x="96" y="115" text-anchor="middle"
+        font-family="Arial,sans-serif" font-size="18" font-weight="bold" fill="#4E342E">P</text>
+
+</svg>
