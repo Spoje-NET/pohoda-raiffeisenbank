@@ -350,7 +350,7 @@ abstract class PohodaBankClient extends \mServer\Bank
      *
      * POHODA mServer XML does not support updating bank records (the bank schema has no actionType
      * and the id field is export-only). Direct SQL insert into the DOC table is the only reliable
-     * approach. Uses POHODA_DB_* env vars to avoid conflict with MultiFlexi-injected DB_* vars.
+     * approach.
      *
      * @param int    $pohodaId Pohoda internal document ID (from producedDetails)
      * @param string $url      URL to attach
@@ -359,12 +359,12 @@ abstract class PohodaBankClient extends \mServer\Bank
     public function attachSharepointUrl(int $pohodaId, string $url, string $name): bool
     {
         $doc = new \SpojeNet\PohodaSQL\DOC(null, [
-            'dbType'   => Shared::cfg('POHODA_DB_CONNECTION', 'sqlsrv'),
-            'server'   => Shared::cfg('POHODA_DB_HOST'),
-            'dbLogin'  => Shared::cfg('POHODA_DB_USERNAME'),
-            'dbPass'   => Shared::cfg('POHODA_DB_PASSWORD'),
-            'database' => Shared::cfg('POHODA_DB_DATABASE'),
-            'port'     => Shared::cfg('POHODA_DB_PORT', '1433'),
+            'dbType'   => Shared::cfg('DB_CONNECTION', 'sqlsrv'),
+            'server'   => Shared::cfg('DB_HOST'),
+            'dbLogin'  => Shared::cfg('DB_USERNAME'),
+            'dbPass'   => Shared::cfg('DB_PASSWORD'),
+            'database' => Shared::cfg('DB_DATABASE'),
+            'port'     => Shared::cfg('DB_PORT', '1433'),
         ]);
         $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK);
 

@@ -32,13 +32,13 @@ require_once '../vendor/autoload.php';
  * the corresponding URL links were not written into Pohoda's DOC table.
  * This tool finds those bank records and attaches the missing links.
  */
-$options = getopt('o::e::', ['output::environment::']);
+$options = getopt('o::e:', ['output::environment:']);
 Shared::init(
     [
         'OFFICE365_TENANT', 'OFFICE365_PATH', 'OFFICE365_SITE',
         'ACCOUNT_NUMBER',
-        'POHODA_DB_CONNECTION', 'POHODA_DB_HOST', 'POHODA_DB_PORT',
-        'POHODA_DB_DATABASE', 'POHODA_DB_USERNAME', 'POHODA_DB_PASSWORD',
+        'DB_CONNECTION', 'DB_HOST', 'DB_PORT',
+        'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
     ],
     \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
 );
@@ -128,12 +128,13 @@ if (empty($dateToSharepoint)) {
 $logger->addStatusMessage('stage 2/3: Querying MSSQL for bank records without SharePoint links', 'debug');
 
 $doc = new \SpojeNet\PohodaSQL\DOC(null, [
-    'dbType'   => Shared::cfg('POHODA_DB_CONNECTION', 'sqlsrv'),
-    'server'   => Shared::cfg('POHODA_DB_HOST'),
-    'dbLogin'  => Shared::cfg('POHODA_DB_USERNAME'),
-    'dbPass'   => Shared::cfg('POHODA_DB_PASSWORD'),
-    'database' => Shared::cfg('POHODA_DB_DATABASE'),
-    'port'     => Shared::cfg('POHODA_DB_PORT', '1433'),
+    'dbType'     => Shared::cfg('DB_CONNECTION', 'sqlsrv'),
+    'server'     => Shared::cfg('DB_HOST'),
+    'dbLogin'    => Shared::cfg('DB_USERNAME'),
+    'dbPass'     => Shared::cfg('DB_PASSWORD'),
+    'database'   => Shared::cfg('DB_DATABASE'),
+    'port'       => Shared::cfg('DB_PORT', '1433'),
+    'dbSettings' => Shared::cfg('DB_SETTINGS', ''),
 ]);
 $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK);
 
@@ -143,6 +144,7 @@ try {
     $fpdo = $doc->getFluentPDO(true);
     $bankRecords = $fpdo
         ->from('BV')
+        ->disableSmartJoin()
         ->select('BV.ID, BV.Datum, BV.Cislo, BV.Vypis')
         ->where('BV.Datum >= ?', $since->format('Y-m-d H:i:s'))
         ->where('BV.Datum <= ?', $until->format('Y-m-d H:i:s'))

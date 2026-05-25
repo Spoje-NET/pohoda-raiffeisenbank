@@ -54,7 +54,7 @@
             "required": true,
             "category": "Other"
         },
-        "POHODA_DB_CONNECTION": {
+        "DB_CONNECTION": {
             "type": "text",
             "description": {
                 "en": "Pohoda DB connection type (sqlsrv)",
@@ -64,7 +64,7 @@
             "required": false,
             "category": "Database"
         },
-        "POHODA_DB_HOST": {
+        "DB_HOST": {
             "type": "text",
             "description": {
                 "en": "Pohoda MSSQL server host",
@@ -74,7 +74,7 @@
             "required": true,
             "category": "Database"
         },
-        "POHODA_DB_PORT": {
+        "DB_PORT": {
             "type": "text",
             "description": {
                 "en": "Pohoda MSSQL server port",
@@ -84,7 +84,7 @@
             "required": false,
             "category": "Database"
         },
-        "POHODA_DB_DATABASE": {
+        "DB_DATABASE": {
             "type": "text",
             "description": {
                 "en": "Pohoda MSSQL database name",
@@ -94,7 +94,7 @@
             "required": true,
             "category": "Database"
         },
-        "POHODA_DB_USERNAME": {
+        "DB_USERNAME": {
             "type": "text",
             "description": {
                 "en": "Pohoda MSSQL database username",
@@ -104,7 +104,17 @@
             "required": true,
             "category": "Database"
         },
-        "POHODA_DB_PASSWORD": {
+        "DB_SETTINGS": {
+            "type": "text",
+            "description": {
+                "en": "Additional MSSQL DSN settings (e.g. ;TrustServerCertificate=true)",
+                "cs": "Další nastavení DSN pro MSSQL (např. ;TrustServerCertificate=true)"
+            },
+            "defval": "",
+            "required": false,
+            "category": "Database"
+        },
+        "DB_PASSWORD": {
             "type": "password",
             "description": {
                 "en": "Pohoda MSSQL database password",

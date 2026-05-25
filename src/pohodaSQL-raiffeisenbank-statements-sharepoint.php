@@ -33,8 +33,8 @@ Shared::init(
         'OFFICE365_TENANT', 'OFFICE365_PATH', 'OFFICE365_SITE',
         'POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO',
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
-        'POHODA_DB_CONNECTION', 'POHODA_DB_HOST', 'POHODA_DB_PORT',
-        'POHODA_DB_DATABASE', 'POHODA_DB_USERNAME', 'POHODA_DB_PASSWORD',
+        'DB_CONNECTION', 'DB_HOST', 'DB_PORT',
+        'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
     ],
     \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
 );
