@@ -1,3 +1,15 @@
+pohoda-raiffeisenbank (1.6.0) noble; urgency=medium
+
+  * Add pohoda-sharepoint-link-fixer tool to retroactively attach missing SharePoint PDF links to Pohoda bank records
+  * Add MultiFlexi app definition for pohoda-sharepoint-link-fixer (UUID 4b2e7f91-3c58-4a0d-9e16-8d5a1c3f072b)
+  * Revert POHODA_DB_* env vars back to DB_* — SQLServer credential provides DB_* directly
+  * Add DB_SETTINGS pass-through to DOC constructor for per-environment SSL settings
+  * Fix FluentPDO smart-join crash when NOT EXISTS subquery references DOC table (disableSmartJoin)
+  * Fix Transactor::setScope() signature incompatibility with PohodaBankClient::setScope()
+  * Restore spojenet/pohoda-sql dependency; add to debian/autoload.php and debian/control
+
+ -- vitex <info@vitexsoftware.cz>  Sun, 25 May 2026 15:30:00 +0200
+
 pohoda-raiffeisenbank (1.5.0) noble; urgency=medium
 
   * APP_DEBUG is optional everywhere
