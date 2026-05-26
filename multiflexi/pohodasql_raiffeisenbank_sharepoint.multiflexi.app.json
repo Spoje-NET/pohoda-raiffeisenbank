@@ -18,6 +18,7 @@
     ],
     "requirements": [
         "RaiffeisenBank",
+        "DatabaseConnection",
         "Office365",
         "mServer"
     ],
@@ -104,46 +105,6 @@
                 "ADDITIONAL": "Additional statement line"
             },
             "category": "Other"
-        },
-        "POHODA_ICO": {
-            "type": "text",
-            "description": {
-                "en": "Pohoda ICO",
-                "cs": "Pohoda IČO"
-            },
-            "defval": "12345678",
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_URL": {
-            "type": "text",
-            "description": {
-                "en": "Pohoda URL",
-                "cs": "URL Pohody"
-            },
-            "defval": "http://127.0.0.1:10010",
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_USERNAME": {
-            "type": "text",
-            "description": {
-                "en": "Pohoda Username",
-                "cs": "Uživatelské jméno Pohody"
-            },
-            "defval": "Admin",
-            "required": true,
-            "category": "API"
-        },
-        "POHODA_PASSWORD": {
-            "type": "password",
-            "description": {
-                "en": "Pohoda Password",
-                "cs": "Heslo Pohody"
-            },
-            "defval": "xxxxxxxx",
-            "required": true,
-            "category": "API"
         },
         "POHODA_TIMEOUT": {
             "type": "integer",
