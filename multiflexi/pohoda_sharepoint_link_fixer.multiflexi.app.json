@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
-    "schemaVersion": "3.1.0",
+    "schemaVersion": "3.3.0",
     "uuid": "4b2e7f91-3c58-4a0d-9e16-8d5a1c3f072b",
     "name": {
         "en": "Pohoda SharePoint link fixer",
@@ -132,7 +132,7 @@
             },
             "defval": "",
             "required": false,
-            "category": "Office365"
+            "category": "API"
         },
         "OFFICE365_PASSWORD": {
             "type": "password",
@@ -142,7 +142,7 @@
             },
             "defval": "",
             "required": false,
-            "category": "Office365"
+            "category": "API"
         },
         "OFFICE365_CLIENTID": {
             "type": "text",
@@ -152,7 +152,7 @@
             },
             "defval": "",
             "required": false,
-            "category": "Office365"
+            "category": "API"
         },
         "OFFICE365_CLSECRET": {
             "type": "text",
@@ -162,7 +162,7 @@
             },
             "defval": "",
             "required": false,
-            "category": "Office365"
+            "category": "API"
         },
         "OFFICE365_TENANT": {
             "type": "text",
@@ -172,7 +172,7 @@
             },
             "defval": "",
             "required": true,
-            "category": "Office365"
+            "category": "API"
         },
         "OFFICE365_SITE": {
             "type": "text",
@@ -182,7 +182,7 @@
             },
             "defval": "",
             "required": true,
-            "category": "Office365"
+            "category": "API"
         },
         "OFFICE365_PATH": {
             "type": "text",
@@ -192,7 +192,7 @@
             },
             "defval": "",
             "required": true,
-            "category": "Office365"
+            "category": "API"
         },
         "APP_DEBUG": {
             "type": "bool",
