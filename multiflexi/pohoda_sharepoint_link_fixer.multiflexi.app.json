@@ -19,7 +19,8 @@
   ],
   "requirements": [
     "Office365",
-    "PohodaSQL"
+    "PohodaSQL",
+    "mserver"
   ],
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
   "executable": "pohoda-sharepoint-link-fixer",
