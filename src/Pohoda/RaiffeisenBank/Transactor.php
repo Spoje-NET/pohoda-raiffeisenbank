@@ -203,8 +203,6 @@ class Transactor extends PohodaBankClient
     /**
      * Prepare processing interval.
      *
-     * @param string $scope
-     *
      * @throws \Exception
      */
     public function setScope(string $scope): \DatePeriod

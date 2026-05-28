@@ -121,6 +121,7 @@ if (empty($dateToSharepoint)) {
     $logger->addStatusMessage('No SharePoint files found for the specified period — nothing to fix.', 'warning');
     $report['exitcode'] = $exitcode;
     file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE : 0));
+
     exit($exitcode);
 }
 
@@ -128,12 +129,12 @@ if (empty($dateToSharepoint)) {
 $logger->addStatusMessage('stage 2/3: Querying MSSQL for bank records without SharePoint links', 'debug');
 
 $doc = new \SpojeNet\PohodaSQL\DOC(null, [
-    'dbType'     => Shared::cfg('DB_CONNECTION', 'sqlsrv'),
-    'server'     => Shared::cfg('DB_HOST'),
-    'dbLogin'    => Shared::cfg('DB_USERNAME'),
-    'dbPass'     => Shared::cfg('DB_PASSWORD'),
-    'database'   => Shared::cfg('DB_DATABASE'),
-    'port'       => Shared::cfg('DB_PORT', '1433'),
+    'dbType' => Shared::cfg('DB_CONNECTION', 'sqlsrv'),
+    'server' => Shared::cfg('DB_HOST'),
+    'dbLogin' => Shared::cfg('DB_USERNAME'),
+    'dbPass' => Shared::cfg('DB_PASSWORD'),
+    'database' => Shared::cfg('DB_DATABASE'),
+    'port' => Shared::cfg('DB_PORT', '1433'),
     'dbSettings' => Shared::cfg('DB_SETTINGS', ''),
 ]);
 $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK);
