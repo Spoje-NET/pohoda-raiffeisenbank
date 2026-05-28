@@ -129,66 +129,8 @@ if (!$certValid) {
         }
     }
 
-    $engine->addStatusMessage('stage 2/6: Upload PDF Statements to SharePoint', 'debug');
-
-    if ($pdfStatements) {
-        sleep(5);
-        $pdfStatements = $engine->getPdfStatements();
-
-        if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
-            $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
-            $engine->addStatusMessage('Using OFFICE365_USERNAME '.Shared::cfg('OFFICE365_USERNAME').' and OFFICE365_PASSWORD', 'debug');
-        } else {
-            $credentials = new ClientCredential(Shared::cfg('OFFICE365_CLIENTID'), Shared::cfg('OFFICE365_CLSECRET'));
-            $engine->addStatusMessage('Using OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID').' and OFFICE365_CLSECRET', 'debug');
-        }
-
-        $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
-        $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
-
-        $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
-
-        foreach ($pdfStatements as $filename) {
-            $uploadAs = Statementor::statementFilename($filename);
-
-            // Extract the date from the filename
-            preg_match('/\d{4}-\d{2}-\d{2}/', $uploadAs, $dateMatches);
-            $statementDate = $dateMatches[0] ?? '';
-
-            $uploadFile = $targetFolder->uploadFile($uploadAs, file_get_contents($filename));
-
-            try {
-                $ctx->executeQuery();
-                $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
-                $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
-                $report['sharepoint'][$uploadAs] = $uploaded;
-                $fileUrls[$uploadAs] = $uploaded;
-                $dayUrls[$statementDate][$uploadAs] = $uploaded;
-            } catch (\Exception $exc) {
-                $report['sharepoint'][$uploadAs] = $exc->getMessage();
-                $engine->addStatusMessage($exc->getMessage());
-
-                if ($exitcode === 0) {
-                    $exitcode = 1;
-                }
-            }
-        }
-    } else {
-        if (null === $pdfStatements) {
-            $engine->addStatusMessage(_('Error obtaining PDF statements'), 'error');
-
-            if ($exitcode === 0) {
-                $exitcode = 2;
-            }
-        } else {
-            $engine->addStatusMessage(_('No PDF statements obtained'), 'info');
-        }
-    }
-
-    sleep(5);
-
     try {
-        $engine->addStatusMessage('stage 3/6: Download XML Statements from Raiffeisen Bank account '.$engine->getAccount(), 'debug');
+        $engine->addStatusMessage('stage 2/6: Download XML Statements from Raiffeisen Bank account '.$engine->getAccount(), 'debug');
         $xmlStatements = $engine->downloadXML();
 
         if ($xmlStatements === null || $xmlStatements === false || empty($xmlStatements)) {
@@ -252,9 +194,84 @@ if (!$certValid) {
         $xmlStatements = false;
     }
 
+    $engine->addStatusMessage('stage 3/6: Upload PDF and XML Statements to SharePoint', 'debug');
+
+    if ($pdfStatements || $xmlStatements) {
+        sleep(5);
+        $pdfStatements = $engine->getPdfStatements();
+
+        if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
+            $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
+            $engine->addStatusMessage('Using OFFICE365_USERNAME '.Shared::cfg('OFFICE365_USERNAME').' and OFFICE365_PASSWORD', 'debug');
+        } else {
+            $credentials = new ClientCredential(Shared::cfg('OFFICE365_CLIENTID'), Shared::cfg('OFFICE365_CLSECRET'));
+            $engine->addStatusMessage('Using OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID').' and OFFICE365_CLSECRET', 'debug');
+        }
+
+        $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
+        $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
+
+        $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
+
+        foreach ($pdfStatements as $filename) {
+            $uploadAs = Statementor::statementFilename($filename);
+
+            // Extract the date from the filename
+            preg_match('/\d{4}-\d{2}-\d{2}/', $uploadAs, $dateMatches);
+            $statementDate = $dateMatches[0] ?? '';
+
+            $uploadFile = $targetFolder->uploadFile($uploadAs, file_get_contents($filename));
+
+            try {
+                $ctx->executeQuery();
+                $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+                $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
+                $report['sharepoint'][$uploadAs] = $uploaded;
+                $fileUrls[$uploadAs] = $uploaded;
+                $dayUrls[$statementDate][$uploadAs] = $uploaded;
+            } catch (\Exception $exc) {
+                $report['sharepoint'][$uploadAs] = $exc->getMessage();
+                $engine->addStatusMessage($exc->getMessage());
+
+                if ($exitcode === 0) {
+                    $exitcode = 1;
+                }
+            }
+        }
+
+        foreach ($xmlStatements ?: [] as $filename) {
+            $uploadAs = Statementor::statementFilename($filename);
+            $uploadFile = $targetFolder->uploadFile($uploadAs, file_get_contents($filename));
+
+            try {
+                $ctx->executeQuery();
+                $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+                $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
+                $report['sharepoint'][$uploadAs] = $uploaded;
+            } catch (\Exception $exc) {
+                $report['sharepoint'][$uploadAs] = $exc->getMessage();
+                $engine->addStatusMessage($exc->getMessage());
+
+                if ($exitcode === 0) {
+                    $exitcode = 1;
+                }
+            }
+        }
+    } else {
+        if (null === $pdfStatements) {
+            $engine->addStatusMessage(_('Error obtaining PDF statements'), 'error');
+
+            if ($exitcode === 0) {
+                $exitcode = 2;
+            }
+        } else {
+            $engine->addStatusMessage(_('No PDF statements obtained'), 'info');
+        }
+    }
+
     if ($xmlStatements) {
         if ($engine->isOnline()) {
-            $engine->addStatusMessage('stage 4/6: Import XML Statements to Pohoda', 'debug');
+            $engine->addStatusMessage('stage 4/6: Import XML Statements to Pohoda via mServer', 'debug');
             $inserted = $engine->import(Shared::cfg('POHODA_BANK_IDS', ''));
 
             $report['pohoda'] = $inserted;
@@ -266,7 +283,7 @@ if (!$certValid) {
             }
 
             if ($inserted) {
-                $engine->addStatusMessage('stage 5/6: Add Sharepoint links to Pohoda', 'debug');
+                $engine->addStatusMessage('stage 5/6: Attach SharePoint PDF link to imported Pohoda bank records', 'debug');
 
                 if ($fileUrls) {
                     $engine->addStatusMessage(sprintf(_('Attaching sharepoint links to %d Pohoda bank records via mServer'), \count($inserted)), 'debug');
