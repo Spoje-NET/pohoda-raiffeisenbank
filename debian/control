@@ -16,6 +16,7 @@ Description: Import Raiffeisenbank statements into Pohoda
 
 Package: multiflexi-pohoda-raiffeisenbank
 Architecture: all
-Depends: ${misc:Depends}, pohoda-raiffeisenbank, multiflexi-raiffeisenbank
+Depends: ${misc:Depends}, pohoda-raiffeisenbank, multiflexi-raiffeisenbank, multiflexi-database-connection, multiflexi-mserver, 
+
 Description: Raiffeisen Bank statement tools to MultiFlexi
  Allow use of Raiffeisen Bank statement tools in MultiFlexi environment
