@@ -55,10 +55,12 @@ if (Shared::cfg('APP_DEBUG', false)) {
 $exitcode = $certValid ? 0 : 1;
 $fileUrls = [];
 $report = [
-    'sharepoint' => [],
+    'certificate_valid' => $certValid,
+    'raiffeisenbank' => ['pdf' => [], 'xml' => []],
+    'sharepoint' => ['pdf' => [], 'xml' => []],
     'pohoda' => [],
     'pohodaSQL' => [],
-    'certificate_valid' => $certValid,
+    'messages' => [],
 ];
 
 if (!$certValid) {
@@ -226,11 +228,11 @@ if (!$certValid) {
                 $ctx->executeQuery();
                 $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
                 $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
-                $report['sharepoint'][$uploadAs] = $uploaded;
+                $report['sharepoint']['pdf'][$uploadAs] = $uploaded;
                 $fileUrls[$uploadAs] = $uploaded;
                 $dayUrls[$statementDate][$uploadAs] = $uploaded;
             } catch (\Exception $exc) {
-                $report['sharepoint'][$uploadAs] = $exc->getMessage();
+                $report['sharepoint']['pdf'][$uploadAs] = ['error' => $exc->getMessage()];
                 $engine->addStatusMessage($exc->getMessage());
 
                 if ($exitcode === 0) {
@@ -247,9 +249,9 @@ if (!$certValid) {
                 $ctx->executeQuery();
                 $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
                 $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
-                $report['sharepoint'][$uploadAs] = $uploaded;
+                $report['sharepoint']['xml'][$uploadAs] = $uploaded;
             } catch (\Exception $exc) {
-                $report['sharepoint'][$uploadAs] = $exc->getMessage();
+                $report['sharepoint']['xml'][$uploadAs] = ['error' => $exc->getMessage()];
                 $engine->addStatusMessage($exc->getMessage());
 
                 if ($exitcode === 0) {
@@ -276,7 +278,7 @@ if (!$certValid) {
 
             $report['pohoda'] = $inserted;
 
-            $report['messages'] = $engine->getMessages();
+            $report['messages'] = array_merge($report['messages'], $engine->getMessages());
 
             if ($engine->getExitCode() && $exitcode === 0) {
                 $exitcode = $engine->getExitCode();

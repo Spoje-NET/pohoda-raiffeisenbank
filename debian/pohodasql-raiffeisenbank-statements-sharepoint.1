@@ -1,14 +1,102 @@
-.TH pohodasql-raiffeisenbank-statements-sharepoint 1 "" "version" "User Commands"
+.TH pohodasql-raiffeisenbank-statements-sharepoint 1 "" "version 1.7.0" "User Commands"
 .SH NAME
-pohodasql-raiffeisenbank-statements-sharepoint \- raiffeisenbank bank statement downloader for Stormware Pohoda
+pohodasql-raiffeisenbank-statements-sharepoint \- download Raiffeisenbank statements, upload to SharePoint, import into Pohoda and link records via direct SQL
 .SH SYNOPSIS
 .B pohodasql-raiffeisenbank-statements-sharepoint
 [\fIOPTIONS\fR]
 .SH DESCRIPTION
-raiffeisenbank bank statement downloader for Stormware Pohoda.
+Downloads PDF and XML bank statements from the Raiffeisen Premium API, uploads both to SharePoint, imports the XML into Pohoda via mServer, and attaches the SharePoint PDF link to each imported bank record using a direct SQL insert into the Pohoda DOC table.
+.PP
+Operations are performed in the following order:
+.IP "1." 4
+Download PDF statements from Raiffeisen Bank
+.IP "2." 4
+Download XML statements from Raiffeisen Bank
+.IP "3." 4
+Upload PDF and XML statements to SharePoint
+.IP "4." 4
+Import XML statements into Pohoda via mServer
+.IP "5." 4
+Attach SharePoint PDF link to each imported Pohoda bank record (direct SQL into DOC table)
+.IP "6." 4
+Write JSON report to RESULT_FILE
 .SH OPTIONS
+.TP
+.B \-o, \-\-output=FILE
+Write JSON report to FILE instead of RESULT_FILE env var (default: php://stdout).
+.TP
+.B \-e, \-\-environment=FILE
+Path to .env configuration file (default: ../.env).
 .TP
 .B \-h, \-\-help
 Show help and exit.
+.SH REPORT FORMAT
+The JSON report written to RESULT_FILE contains:
+.IP \(bu 4
+.B certificate_valid
+\- boolean, whether the API certificate passed validation
+.IP \(bu 4
+.B raiffeisenbank.pdf
+\- list of downloaded PDF file paths, or "download failed"
+.IP \(bu 4
+.B raiffeisenbank.xml
+\- list of downloaded XML file paths, or "download failed"
+.IP \(bu 4
+.B sharepoint.pdf
+\- map of PDF filename to SharePoint URL, or {error: message} on failure
+.IP \(bu 4
+.B sharepoint.xml
+\- map of XML filename to SharePoint URL, or {error: message} on failure
+.IP \(bu 4
+.B pohoda
+\- per-transaction import result map
+.IP \(bu 4
+.B pohodaSQL
+\- per-record DOC link attachment result (status, linkedTo Pohoda ID)
+.IP \(bu 4
+.B messages
+\- accumulated status messages from mServer import
+.IP \(bu 4
+.B exitcode
+\- final exit code
+.SH EXIT CODES
+.TP
+.B 0
+Success \- all operations completed without errors.
+.TP
+.B 1
+SharePoint upload error.
+.TP
+.B 2
+PDF statement download failed.
+.TP
+.B 3
+Pohoda mServer error.
+.TP
+.B 4
+SharePoint link attachment to Pohoda record failed.
+.TP
+.B 145
+API authentication error (HTTP 401 \- certificate blocked or invalid).
+.SH ENVIRONMENT
+See .env.example for the full list of configuration variables. Key variables:
+.TP
+.B ACCOUNT_NUMBER
+Bank account number.
+.TP
+.B CERT_FILE, CERT_PASS
+Path and password for the Raiffeisen API certificate.
+.TP
+.B DB_CONNECTION, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
+SQL Server connection for direct DOC table inserts (credential type: SQLServer).
+.TP
+.B POHODA_URL, POHODA_USERNAME, POHODA_PASSWORD, POHODA_ICO
+Pohoda mServer connection.
+.TP
+.B OFFICE365_TENANT, OFFICE365_SITE, OFFICE365_PATH
+SharePoint destination.
+.TP
+.B RESULT_FILE
+Output path for the JSON report (default: bank_import_report_{ACCOUNT_NUMBER}.json).
 .SH AUTHOR
 Vítězslav Dvořák <info@vitexsoftware.cz>

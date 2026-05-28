@@ -142,4 +142,27 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\Statementor::statementFilename
+     */
+    public function testStatementFilename(): void
+    {
+        $this->assertSame(
+            '194_2024_630804003_3780381_CZK_2024-11-06.pdf',
+            Statementor::statementFilename('/tmp/194_2024_630804003_3780381_CZK_2024-11-06.pdf'),
+        );
+        $this->assertSame(
+            '194_2024_630804003_3780381_CZK_2024-11-06.xml',
+            Statementor::statementFilename('/tmp/194_2024_630804003_3780381_CZK_2024-11-06.xml'),
+        );
+        $this->assertSame(
+            '007_2026_5230011111_4243005_CZK_2026-05-28.pdf',
+            Statementor::statementFilename('/tmp/7_2026_5230011111_4243005_CZK_2026-05-28.pdf'),
+        );
+        $this->assertSame(
+            '007_2026_5230011111_4243005_CZK_2026-05-28.xml',
+            Statementor::statementFilename('/tmp/7_2026_5230011111_4243005_CZK_2026-05-28.xml'),
+        );
+    }
 }

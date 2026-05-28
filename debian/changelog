@@ -1,3 +1,12 @@
+pohoda-raiffeisenbank (1.7.0) noble; urgency=medium
+
+  * Reorder operations: download PDF and XML first, then upload both to SharePoint, then import to Pohoda, then attach links
+  * Upload XML statements to SharePoint alongside PDF statements
+  * Extend report protocol: split sharepoint section into pdf/xml sub-keys; pre-initialize raiffeisenbank/messages fields; record errors per-file instead of discarding them
+  * Add statementFilename test for PDF and XML extensions
+
+ -- vitex <info@vitexsoftware.cz>  Wed, 28 May 2026 17:00:00 +0200
+
 pohoda-raiffeisenbank (1.6.0) noble; urgency=medium
 
   * Add pohoda-sharepoint-link-fixer tool to retroactively attach missing SharePoint PDF links to Pohoda bank records

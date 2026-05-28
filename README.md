@@ -2,13 +2,13 @@
 
 ![](pohoda-raiffeisenbank.svg?raw=true)
 
-It downloads PDF statements from Raiffeisen Premium API for a specified period and uploads them to Sharepoint.
+It downloads PDF and XML statements from the Raiffeisen Premium API for a specified period and uploads both to SharePoint.
 
-It downloads the corresponding XML statements and parses them. It imports the bank movements obtained in this way via mServer into Stormware Pohoda.
+It parses the XML statements and imports the bank movements into Stormware Pohoda via mServer.
 
 After importing all items, document liquidation is initiated and they are automatically matched.
 
-After uploading to Sharepoint, links to PDF statements are attached to all bank movements in Pohoda via mServer.
+After uploading to SharePoint, links to the PDF statements are attached to all imported bank movements in Pohoda via a direct SQL insert into the DOC table (requires a SQLServer credential with access to the Pohoda database).
 
 [![wakatime](https://wakatime.com/badge/user/5abba9ca-813e-43ac-9b5f-b1cfdf3dc1c7/project/018b7d35-a10b-4f4b-ba78-241d1c79b4e6.svg)](https://wakatime.com/badge/user/5abba9ca-813e-43ac-9b5f-b1cfdf3dc1c7/project/018b7d35-a10b-4f4b-ba78-241d1c79b4e6)
 
@@ -190,9 +190,50 @@ Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
 * **pohoda-raiffeisenbank-statements**    - Import transactions from Account Statements.
 * **pohoda-raiffeisenbank-offline-statement-importer** - Import transactions from XML Statements file.
 * **pohoda-raiffeisenbank-xml-statement** - Import transactions from XML Statements file.
-* **pohodasql-raiffeisenbank-statements-sharepoint** - Import transactions from Account Statements with link to Sharepoint
+* **pohodasql-raiffeisenbank-statements-sharepoint** - Download PDF+XML statements, upload both to SharePoint, import into Pohoda via mServer, attach SharePoint PDF link to each bank record via direct SQL (DOC table)
 
 * **pohoda-bank-transaction-report** - Generate a JSON report of Pohoda bank transactions for a specified period. The output format matches the RaiffeisenBank statement reporter, including totals and transaction breakdowns.
+
+### pohodasql-raiffeisenbank-statements-sharepoint
+
+Executes the following pipeline in order:
+
+1. Download PDF statements from Raiffeisen Bank
+2. Download XML statements from Raiffeisen Bank
+3. Upload PDF and XML statements to SharePoint
+4. Import XML statements into Pohoda via mServer
+5. Attach SharePoint PDF link to each imported bank record (direct SQL — DOC table, requires SQLServer credential)
+6. Write JSON report to `RESULT_FILE`
+
+The JSON report contains the result of every stage:
+
+```json
+{
+  "certificate_valid": true,
+  "raiffeisenbank": {
+    "pdf": ["/tmp/147_2026_5230011111_4243005_CZK_2026-05-27.pdf"],
+    "xml": ["/tmp/147_2026_5230011111_4243005_CZK_2026-05-27.xml"]
+  },
+  "sharepoint": {
+    "pdf": {
+      "147_2026_5230011111_4243005_CZK_2026-05-27.pdf": "https://tenant.sharepoint.com/..."
+    },
+    "xml": {
+      "147_2026_5230011111_4243005_CZK_2026-05-27.xml": "https://tenant.sharepoint.com/..."
+    }
+  },
+  "pohoda": {
+    "1779931074_9022160411": {"success": true, "message": "..."}
+  },
+  "pohodaSQL": {
+    "30850": {"status": "success", "linkedTo": 12345}
+  },
+  "messages": [],
+  "exitcode": 0
+}
+```
+
+On upload failure, the value is `{"error": "exception message"}` instead of the URL.
 
 ### pohoda-bank-transaction-report
 
