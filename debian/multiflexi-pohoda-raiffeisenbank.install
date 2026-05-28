@@ -1,3 +1,5 @@
 multiflexi/*.json  usr/lib/pohoda-raiffeisenbank/multiflexi
 multiflexi/*.svg   usr/share/multiflexi/images
+multiflexi-pohoda-raiffeisenbank.svg  usr/share/icons/hicolor/scalable/apps/
+debian/io.github.spoje_net.multiflexi_pohoda_raiffeisenbank.metainfo.xml  usr/share/metainfo/
 

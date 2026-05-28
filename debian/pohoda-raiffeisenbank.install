@@ -2,5 +2,5 @@
 src/*			        usr/lib/pohoda-raiffeisenbank/
 bin/*                           usr/bin/
 .env.example                    usr/share/doc/pohoda-raiffeisenbank
-#io.github.spoje_net.pohoda_raiffeisenbank.metainfo.xml /usr/share/metainfo/
+debian/io.github.spoje_net.pohoda_raiffeisenbank.metainfo.xml usr/share/metainfo/
 pohoda-raiffeisenbank.svg       usr/share/icons/hicolor/scalable/apps/

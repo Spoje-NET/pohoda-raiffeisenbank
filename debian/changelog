@@ -1,3 +1,11 @@
+pohoda-raiffeisenbank (1.7.1) noble; urgency=medium
+
+  * Add AppStream stock icon for pohoda-raiffeisenbank and multiflexi-pohoda-raiffeisenbank packages
+  * Enable metainfo installation for pohoda-raiffeisenbank package
+  * Add metainfo for multiflexi-pohoda-raiffeisenbank package
+
+ -- vitex <info@vitexsoftware.cz>  Wed, 28 May 2026 18:00:00 +0200
+
 pohoda-raiffeisenbank (1.7.0) noble; urgency=medium
 
   * Reorder operations: download PDF and XML first, then upload both to SharePoint, then import to Pohoda, then attach links
