@@ -20,7 +20,7 @@
     "RaiffeisenBank",
     "DatabaseConnection",
     "Office365",
-    "mserver"
+    "MServer"
   ],
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
   "executable": "pohodasql-raiffeisenbank-statements-sharepoint",

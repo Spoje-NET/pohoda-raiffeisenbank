@@ -17,7 +17,7 @@
     "Pohoda"
   ],
   "requirements": [
-    "mserver",
+    "MServer",
     "RaiffeisenBank"
   ],
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",

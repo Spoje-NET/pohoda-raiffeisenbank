@@ -19,7 +19,7 @@
   "requirements": [
     "RaiffeisenBank",
     "Office365",
-    "mserver"
+    "MServer"
   ],
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
   "executable": "raiffeisenbank-statements-sharepoint-uploader",

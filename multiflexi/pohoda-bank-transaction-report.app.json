@@ -18,7 +18,7 @@
     "Pohoda"
   ],
   "requirements": [
-    "mserver"
+    "MServer"
   ],
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
   "executable": "pohoda-bank-transaction-report",
