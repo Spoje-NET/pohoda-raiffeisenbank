@@ -19,7 +19,7 @@
   ],
   "requirements": [
     "Office365",
-    "PohodaSQL",
+    "SQLServer",
     "MServer"
   ],
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
@@ -62,7 +62,7 @@
         "cs": "Typ připojení k Pohoda DB (sqlsrv)"
       },
       "defval": "sqlsrv",
-      "required": false,
+      "required": true,
       "category": "Database"
     },
     "DB_HOST": {
@@ -71,17 +71,17 @@
         "en": "Pohoda MSSQL server host",
         "cs": "Host MSSQL serveru Pohody"
       },
-      "defval": "",
+      "defval": "127.0.0.1",
       "required": true,
       "category": "Database"
     },
     "DB_PORT": {
-      "type": "text",
+      "type": "integer",
       "description": {
         "en": "Pohoda MSSQL server port",
         "cs": "Port MSSQL serveru Pohody"
       },
-      "defval": "1433",
+      "defval": 1433,
       "required": false,
       "category": "Database"
     },
@@ -105,16 +105,6 @@
       "required": true,
       "category": "Database"
     },
-    "DB_SETTINGS": {
-      "type": "text",
-      "description": {
-        "en": "Additional MSSQL DSN settings (e.g. ;TrustServerCertificate=true)",
-        "cs": "Další nastavení DSN pro MSSQL (např. ;TrustServerCertificate=true)"
-      },
-      "defval": "",
-      "required": false,
-      "category": "Database"
-    },
     "DB_PASSWORD": {
       "type": "password",
       "description": {
@@ -123,6 +113,16 @@
       },
       "defval": "",
       "required": true,
+      "category": "Database"
+    },
+    "DB_SETTINGS": {
+      "type": "text",
+      "description": {
+        "en": "Additional MSSQL DSN settings (e.g. ;TrustServerCertificate=true)",
+        "cs": "Další nastavení DSN pro MSSQL (např. ;TrustServerCertificate=true)"
+      },
+      "defval": "",
+      "required": false,
       "category": "Database"
     },
     "OFFICE365_USERNAME": {
