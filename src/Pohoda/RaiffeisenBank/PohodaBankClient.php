@@ -358,17 +358,23 @@ abstract class PohodaBankClient extends \mServer\Bank
      */
     public function attachSharepointUrl(int $pohodaId, string $url, string $name): bool
     {
-        $doc = new \SpojeNet\PohodaSQL\DOC(null, [
-            'dbType' => Shared::cfg('DB_CONNECTION', 'sqlsrv'),
-            'server' => Shared::cfg('DB_HOST'),
-            'dbLogin' => Shared::cfg('DB_USERNAME'),
-            'dbPass' => Shared::cfg('DB_PASSWORD'),
-            'database' => Shared::cfg('DB_DATABASE'),
-            'port' => Shared::cfg('DB_PORT', '1433'),
-        ]);
-        $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK);
+        try {
+            $doc = new \SpojeNet\PohodaSQL\DOC(null, [
+                'dbType' => Shared::cfg('DB_CONNECTION', 'sqlsrv'),
+                'server' => Shared::cfg('DB_HOST'),
+                'dbLogin' => Shared::cfg('DB_USERNAME'),
+                'dbPass' => Shared::cfg('DB_PASSWORD'),
+                'database' => Shared::cfg('DB_DATABASE'),
+                'port' => Shared::cfg('DB_PORT', '1433'),
+            ]);
+            $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK);
 
-        return (bool) $doc->urlAttachment($pohodaId, $url, $name);
+            return (bool) $doc->urlAttachment($pohodaId, $url, $name);
+        } catch (\Exception $e) {
+            $this->addStatusMessage('attachSharepointUrl failed: '.$e->getMessage(), 'error');
+
+            return false;
+        }
     }
 
     /**
