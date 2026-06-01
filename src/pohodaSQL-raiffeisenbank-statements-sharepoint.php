@@ -73,32 +73,11 @@ if (!$certValid) {
         $pdfStatements = $engine->downloadPDF();
 
         if ($pdfStatements === null || $pdfStatements === false || empty($pdfStatements)) {
-            // Check if there were errors in stderr/messages indicating auth failure
-            $messages = $engine->getStatusMessages();
-            $hasAuthError = false;
-            $errorMessage = '';
+            $errorMessage = PohodaBankClient::detectAuthError($engine->getStatusMessages());
 
-            foreach ($messages as $msg) {
-                // Message objects have a body property
-                if (\is_object($msg) && isset($msg->body)) {
-                    $msgText = $msg->body;
-                } elseif (\is_string($msg)) {
-                    $msgText = $msg;
-                } else {
-                    continue;
-                }
-
-                if (str_contains(strtolower($msgText), strtolower('401')) || str_contains(strtolower($msgText), strtolower('UNAUTHORISED')) || str_contains(strtolower($msgText), strtolower('Certificate is blocked'))) {
-                    $hasAuthError = true;
-                    $errorMessage = $msgText;
-
-                    break;
-                }
-            }
-
-            if ($hasAuthError || $pdfStatements === null || $pdfStatements === false) {
+            if ($errorMessage !== null || $pdfStatements === null || $pdfStatements === false) {
                 $report['raiffeisenbank']['pdf'] = 'download failed';
-                $report['message'] = $errorMessage ?: 'PDF download failed - authentication or certificate error';
+                $report['message'] = $errorMessage ?? 'PDF download failed - authentication or certificate error';
                 $pdfStatements = [];
 
                 if ($exitcode === 0) {
@@ -136,32 +115,11 @@ if (!$certValid) {
         $xmlStatements = $engine->downloadXML();
 
         if ($xmlStatements === null || $xmlStatements === false || empty($xmlStatements)) {
-            // Check if there were errors in stderr/messages indicating auth failure
-            $messages = $engine->getStatusMessages();
-            $hasAuthError = false;
-            $xmlErrorMessage = '';
+            $xmlErrorMessage = PohodaBankClient::detectAuthError($engine->getStatusMessages());
 
-            foreach ($messages as $msg) {
-                // Message objects have a body property
-                if (\is_object($msg) && isset($msg->body)) {
-                    $msgText = $msg->body;
-                } elseif (\is_string($msg)) {
-                    $msgText = $msg;
-                } else {
-                    continue;
-                }
-
-                if (str_contains(strtolower($msgText), strtolower('401')) || str_contains(strtolower($msgText), strtolower('UNAUTHORISED')) || str_contains(strtolower($msgText), strtolower('Certificate is blocked'))) {
-                    $hasAuthError = true;
-                    $xmlErrorMessage = $msgText;
-
-                    break;
-                }
-            }
-
-            if ($hasAuthError || $xmlStatements === null || $xmlStatements === false) {
+            if ($xmlErrorMessage !== null || $xmlStatements === null || $xmlStatements === false) {
                 $report['raiffeisenbank']['xml'] = 'download failed';
-                $report['message'] = $xmlErrorMessage ?: 'XML download failed - authentication or certificate error';
+                $report['message'] = $xmlErrorMessage ?? 'XML download failed - authentication or certificate error';
                 $xmlStatements = false;
 
                 if ($exitcode === 0) {
