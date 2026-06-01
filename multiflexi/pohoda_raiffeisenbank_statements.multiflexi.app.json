@@ -254,8 +254,8 @@
     },
     "2": {
       "description": {
-        "en": "Misuse of shell command",
-        "cs": "Nesprávné použití příkazu"
+        "en": "Certificate validation failed",
+        "cs": "Ověření certifikátu selhalo"
       },
       "severity": "error",
       "retry": false
@@ -270,8 +270,8 @@
     },
     "145": {
       "description": {
-        "en": "Bad request, validation error.",
-        "cs": "Chybný požadavek, validační chyba."
+        "en": "Raiffeisen Bank API authentication or certificate error (HTTP 401 Unauthorized).",
+        "cs": "Chyba autentizace nebo certifikátu Raiffeisen Bank API (HTTP 401 Unauthorized)."
       },
       "severity": "error",
       "retry": false

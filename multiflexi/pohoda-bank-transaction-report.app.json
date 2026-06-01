@@ -177,16 +177,16 @@
     },
     "2": {
       "description": {
-        "en": "Misuse of shell command",
-        "cs": "Nesprávné použití příkazu"
+        "en": "Failed to write output report file",
+        "cs": "Nepodařilo se zapsat výstupní soubor reportu"
       },
       "severity": "error",
-      "retry": false
+      "retry": true
     },
     "145": {
       "description": {
-        "en": "Bad request, validation error.",
-        "cs": "Chybný požadavek, validační chyba."
+        "en": "Raiffeisen Bank API authentication or certificate error (HTTP 401 Unauthorized).",
+        "cs": "Chyba autentizace nebo certifikátu Raiffeisen Bank API (HTTP 401 Unauthorized)."
       },
       "severity": "error",
       "retry": false

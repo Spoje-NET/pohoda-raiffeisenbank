@@ -253,16 +253,16 @@
     },
     "1": {
       "description": {
-        "en": "General error",
-        "cs": "Obecná chyba"
+        "en": "Certificate validation failed or Raiffeisen API error",
+        "cs": "Ověření certifikátu selhalo nebo chyba Raiffeisen API"
       },
       "severity": "error",
       "retry": true
     },
     "145": {
       "description": {
-        "en": "Bad request, validation error.",
-        "cs": "Chybný požadavek, validační chyba."
+        "en": "Raiffeisen Bank API authentication or certificate error (HTTP 401 Unauthorized).",
+        "cs": "Chyba autentizace nebo certifikátu Raiffeisen Bank API (HTTP 401 Unauthorized)."
       },
       "severity": "error",
       "retry": false

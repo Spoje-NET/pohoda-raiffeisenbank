@@ -430,32 +430,32 @@
     },
     "2": {
       "description": {
-        "en": "Misuse of shell command",
-        "cs": "Nesprávné použití příkazu"
+        "en": "Error obtaining PDF statements from Raiffeisen Bank",
+        "cs": "Chyba při získávání PDF výpisů z Raiffeisen Bank"
       },
       "severity": "error",
-      "retry": false
+      "retry": true
     },
     "3": {
       "description": {
-        "en": "Application-specific error code 3",
-        "cs": "Aplikační chybový kód 3"
+        "en": "Error accessing Pohoda mServer or obtaining XML statements",
+        "cs": "Chyba přístupu k Pohoda mServer nebo získávání XML výpisů"
       },
       "severity": "error",
       "retry": true
     },
     "4": {
       "description": {
-        "en": "Application-specific error code 4",
-        "cs": "Aplikační chybový kód 4"
+        "en": "Failed to attach SharePoint URL to Pohoda bank record via SQL",
+        "cs": "Nepodařilo se připojit odkaz SharePoint k záznamu banky v Pohodě přes SQL"
       },
       "severity": "error",
       "retry": true
     },
     "145": {
       "description": {
-        "en": "Bad request, validation error.",
-        "cs": "Chybný požadavek, validační chyba."
+        "en": "Raiffeisen Bank API authentication or certificate error (HTTP 401 Unauthorized).",
+        "cs": "Chyba autentizace nebo certifikátu Raiffeisen Bank API (HTTP 401 Unauthorized)."
       },
       "severity": "error",
       "retry": false
