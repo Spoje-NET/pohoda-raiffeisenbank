@@ -322,9 +322,12 @@ abstract class PohodaBankClient extends \mServer\Bank
 
         $found = $checker->getListing($lrq);
 
-        // If fetch failed (null) treat as error
+        // null means the export query failed (e.g. user lacks export rights — error 101).
+        // Fall through to import attempt; extId on the bankHeader acts as a secondary guard.
         if ($found === null) {
-            throw new \RuntimeException('Error fetching records for transaction check.');
+            $this->addStatusMessage('Cannot verify transaction presence (export rights missing?), attempting import anyway: '.$transactionId, 'warning');
+
+            return false;
         }
 
         return !empty($found);
