@@ -412,15 +412,23 @@ abstract class PohodaBankClient extends \mServer\Bank
                 $this->addStatusMessage('Bank #'.$producedId.' '.$producedAction.' '.$producedNumber, 'success'); // TODO: Parse response for docID
                 $result['success'] = true;
             } else {
-                $result['success'] = false;
                 $resultMessages = $this->messages;
 
-                if (\array_key_exists('error', $resultMessages) && \count($resultMessages['error'])) {
-                    foreach ($resultMessages['error'] as $errMsg) {
-                        $result['messages'][] = 'error: '.$errMsg;
-                    }
+                if ($this->isExtIdDuplicateError($resultMessages)) {
+                    $result['success'] = true;
+                    $result['duplicate'] = true;
+                    $result['message'] = 'Already imported (ExtID duplicate): '.($transactionId ?? 'unknown');
+                    $this->addStatusMessage('Skipped duplicate transaction (ExtID 121): '.$transactionId, 'warning');
+                } else {
+                    $result['success'] = false;
 
-                    $this->exitCode = 401;
+                    if (\array_key_exists('error', $resultMessages) && \count($resultMessages['error'])) {
+                        foreach ($resultMessages['error'] as $errMsg) {
+                            $result['messages'][] = 'error: '.$errMsg;
+                        }
+
+                        $this->exitCode = 401;
+                    }
                 }
             }
         } catch (\Exception $exc) {
@@ -537,6 +545,26 @@ EOD;
         $ruleOfPairing->addChild('id', '1', 'http://www.stormware.cz/schema/version_2/type.xsd');
 
         return $xml->asXML();
+    }
+
+    /**
+     * Check whether Pohoda response messages indicate an ExtID duplicate (error code 121).
+     *
+     * @param array<string, array<string>> $messages
+     */
+    private function isExtIdDuplicateError(array $messages): bool
+    {
+        $candidates = array_merge($messages['error'] ?? [], $messages['warning'] ?? []);
+
+        foreach ($candidates as $msg) {
+            $text = (string) $msg;
+
+            if (str_contains($text, '121') || stripos($text, 'extid') !== false || stripos($text, 'duplicit') !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getExitCode(): int

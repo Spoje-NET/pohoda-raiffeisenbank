@@ -275,6 +275,10 @@ class Statementor extends PohodaBankClient
     public function entryToPohoda(\SimpleXMLElement $entry, int $ntryPrefix = 0): array
     {
         $data['intNote'] = sprintf(_('%s %s Job: %s Trans: #%s#'), \Ease\Shared::AppName(), \Ease\Shared::AppVersion(), \Ease\Shared::cfg('MULTIFLEXI_JOB_ID', \Ease\Shared::cfg('JOB_ID', 'n/a')), (string) $ntryPrefix.'_'.current((array) $entry->NtryRef));
+        $data['extId'] = [
+            'ids' => $ntryPrefix.'_'.current((array) $entry->NtryRef),
+            'exSystemName' => \Ease\Shared::AppName(),
+        ];
         $data['note'] = '';
         $data['datePayment'] = current((array) $entry->BookgDt->DtTm); // current((array) $entry->ValDt->DtTm);
         $data['dateStatement'] = current((array) $entry->BookgDt->DtTm);
