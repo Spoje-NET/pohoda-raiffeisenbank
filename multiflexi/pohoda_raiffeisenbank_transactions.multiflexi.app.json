@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
-  "schemaVersion": "3.1.0",
+  "schemaVersion": "3.4.0",
   "uuid": "10f24522-66af-460c-8dc1-e6454cfc9a55",
   "name": {
     "en": "Raiffeisenbank transactions for Pohoda",
@@ -22,6 +22,19 @@
   ],
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
   "executable": "pohoda-raiffeisenbank-transactions",
+  "events": {
+    "consumes": {
+      "bank.statement.downloaded": {
+        "description": "A bank statement file was downloaded",
+        "format": "file"
+      }
+    },
+    "emits": {
+      "bank.transaction.imported": {
+        "description": "Bank transactions were imported"
+      }
+    }
+  },
   "environment": {
     "ACCOUNT_NUMBER": {
       "type": "text",

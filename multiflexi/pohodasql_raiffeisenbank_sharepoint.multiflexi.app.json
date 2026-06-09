@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
-  "schemaVersion": "3.1.0",
+  "schemaVersion": "3.4.0",
   "uuid": "e9893573-24aa-4518-bf05-66fae9ad153c",
   "name": {
     "en": "Raiffeisenbank statements for PohodaSQL+Sharepoint",
@@ -24,6 +24,21 @@
   ],
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
   "executable": "pohodasql-raiffeisenbank-statements-sharepoint",
+  "events": {
+    "consumes": {
+      "bank.statement.downloaded": {
+        "description": "A bank statement file was downloaded",
+        "format": "file"
+      }
+    },
+    "emits": {
+      "bank.statement.imported": {
+        "description": "A bank statement was imported into the accounting system",
+        "evidence": "banka",
+        "operation": "create"
+      }
+    }
+  },
   "environment": {
     "ACCOUNT_NUMBER": {
       "type": "text",
