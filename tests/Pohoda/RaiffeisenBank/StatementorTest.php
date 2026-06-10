@@ -109,14 +109,21 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @covers \Pohoda\RaiffeisenBank\Statementor::setScope
-     *
-     * @todo   Implement testsetScope().
      */
     public function testsetScope(): void
     {
-        $this->assertEquals('', $this->object->setScope());
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $period = $this->object->setScope('last_month');
+        $this->assertInstanceOf(\DatePeriod::class, $period);
+
+        $since = \DateTime::createFromInterface($period->getStartDate());
+        $until = \DateTime::createFromInterface($period->getEndDate());
+
+        $this->assertSame((new \DateTime('first day of last month'))->format('Y-m-d'), $since->format('Y-m-d'));
+        $this->assertSame((new \DateTime('last day of last month'))->format('Y-m-d'), $until->format('Y-m-d'));
+
+        $period2 = $this->object->setScope('this_month');
+        $since2 = \DateTime::createFromInterface($period2->getStartDate());
+        $this->assertSame((new \DateTime('first day of this month'))->format('Y-m-d'), $since2->format('Y-m-d'));
     }
 
     /**

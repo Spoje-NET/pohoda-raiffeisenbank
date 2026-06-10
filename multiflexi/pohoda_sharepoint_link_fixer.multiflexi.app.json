@@ -42,24 +42,44 @@
       "required": true,
       "category": "Other"
     },
+    "POHODA_BANK_IDS": {
+      "type": "text",
+      "description": {
+        "en": "Pohoda bank account abbreviation (sUcet.IDS, e.g. RB). When set, only records for this bank are processed.",
+        "cs": "Zkratka bankovního účtu v Pohodě (sUcet.IDS, např. RB). Pokud je zadáno, zpracují se pouze záznamy této banky."
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
+    "IMPORT_SCOPE": {
+      "type": "text",
+      "description": {
+        "en": "Time scope of records to fix (e.g. last_month, this_month, yesterday, 2024-01-01>2024-01-31). Overridden by DATE_FROM/DATE_TO when set.",
+        "cs": "Časový rozsah opravovaných záznamů (např. last_month, this_month, yesterday, 2024-01-01>2024-01-31). Přebito hodnotami DATE_FROM/DATE_TO pokud jsou nastaveny."
+      },
+      "defval": "last_month",
+      "required": false,
+      "category": "Other"
+    },
     "DATE_FROM": {
       "type": "text",
       "description": {
-        "en": "Start of the period to fix (YYYY-MM-DD or PHP date expression)",
-        "cs": "Začátek opravovaného období (YYYY-MM-DD nebo PHP výraz data)"
+        "en": "Start of the period to fix (YYYY-MM-DD or PHP date expression). Overrides IMPORT_SCOPE when set.",
+        "cs": "Začátek opravovaného období (YYYY-MM-DD nebo PHP výraz data). Přebíjí IMPORT_SCOPE pokud je nastaveno."
       },
-      "defval": "first day of last month",
-      "required": true,
+      "defval": "",
+      "required": false,
       "category": "Other"
     },
     "DATE_TO": {
       "type": "text",
       "description": {
-        "en": "End of the period to fix (YYYY-MM-DD or PHP date expression)",
-        "cs": "Konec opravovaného období (YYYY-MM-DD nebo PHP výraz data)"
+        "en": "End of the period to fix (YYYY-MM-DD or PHP date expression). Overrides IMPORT_SCOPE when set.",
+        "cs": "Konec opravovaného období (YYYY-MM-DD nebo PHP výraz data). Přebíjí IMPORT_SCOPE pokud je nastaveno."
       },
-      "defval": "last day of last month",
-      "required": true,
+      "defval": "",
+      "required": false,
       "category": "Other"
     },
     "DB_CONNECTION": {

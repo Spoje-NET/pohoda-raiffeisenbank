@@ -192,6 +192,8 @@ Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
 * **pohoda-raiffeisenbank-xml-statement** - Import transactions from XML Statements file.
 * **pohodasql-raiffeisenbank-statements-sharepoint** - Download PDF+XML statements, upload both to SharePoint, import into Pohoda via mServer, attach SharePoint PDF link to each bank record via direct SQL (DOC table)
 
+* **pohoda-sharepoint-link-fixer** - Retroactively attach missing SharePoint PDF links to Pohoda bank records for a given period. Scoped to the configured bank account; supports IMPORT_SCOPE.
+
 * **pohoda-bank-transaction-report** - Generate a JSON report of Pohoda bank transactions for a specified period. The output format matches the RaiffeisenBank statement reporter, including totals and transaction breakdowns.
 
 ### pohodasql-raiffeisenbank-statements-sharepoint
@@ -234,6 +236,40 @@ The JSON report contains the result of every stage:
 ```
 
 On upload failure, the value is `{"error": "exception message"}` instead of the URL.
+
+### pohoda-sharepoint-link-fixer
+
+Retroactively attaches missing SharePoint PDF links to Pohoda bank records.
+Use when records were imported into Pohoda but the SharePoint URL attachment was not written (e.g. after a period when MSSQL support was temporarily broken).
+
+Executes the following pipeline in order:
+
+1. List PDF statement files in SharePoint for the configured period, filtered by `ACCOUNT_NUMBER`
+2. Query Pohoda MSSQL for bank records (`BV`) in the period that have no URL attachment, filtered by `POHODA_BANK_IDS` when set
+3. Attach the matching SharePoint link to each record and write a JSON report
+
+**Date range** is resolved by `IMPORT_SCOPE` (default: `last_month`). `DATE_FROM` / `DATE_TO` override `IMPORT_SCOPE` when explicitly set.
+
+**Multi-bank behaviour**: When `POHODA_BANK_IDS` is set (e.g. `RB`), only records belonging to that bank account are processed. When unset, all bank records are considered. SharePoint files are always filtered by `ACCOUNT_NUMBER` embedded in the filename to prevent cross-account link attachment.
+
+Example JSON report:
+
+```json
+{
+  "account": "1234567890/0100",
+  "bank_ids": "RB",
+  "since": "2026-05-01",
+  "until": "2026-05-31",
+  "sharepoint_files": ["2026-05-31"],
+  "bank_records_checked": 3,
+  "fixed": [
+    {"pohodaId": 12345, "cislo": "VBÚ001", "date": "2026-05-31", "filename": "001_1234567890_0100_4243005_CZK_2026-05-31.pdf", "url": "https://tenant.sharepoint.com/..."}
+  ],
+  "skipped": [],
+  "errors": [],
+  "exitcode": 0
+}
+```
 
 ### pohoda-bank-transaction-report
 

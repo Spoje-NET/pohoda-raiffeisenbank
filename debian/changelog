@@ -1,3 +1,11 @@
+pohoda-raiffeisenbank (1.7.2) noble; urgency=medium
+
+  * Fix sharepoint link fixer: scope SharePoint files by ACCOUNT_NUMBER in filename to prevent cross-bank mismatches
+  * Fix sharepoint link fixer: filter BV records by POHODA_BANK_IDS (via sUcet JOIN) when set; all banks when unset
+  * Add IMPORT_SCOPE support to pohoda-sharepoint-link-fixer; DATE_FROM/DATE_TO still override when set
+
+ -- vitex <info@vitexsoftware.cz>  Tue, 10 Jun 2026 13:00:00 +0200
+
 pohoda-raiffeisenbank (1.7.1) noble; urgency=medium
 
   * Add AppStream stock icon for pohoda-raiffeisenbank and multiflexi-pohoda-raiffeisenbank packages
