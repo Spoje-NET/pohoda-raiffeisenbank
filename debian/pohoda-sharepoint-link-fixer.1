@@ -1,0 +1,108 @@
+.TH pohoda-sharepoint-link-fixer 1 "" "version 1.7.2" "User Commands"
+.SH NAME
+pohoda-sharepoint-link-fixer \- retroactively attach missing SharePoint PDF links to Pohoda bank records
+.SH SYNOPSIS
+.B pohoda-sharepoint-link-fixer
+[\fIOPTIONS\fR]
+.SH DESCRIPTION
+Retroactively attaches missing SharePoint statement PDF links to Pohoda bank records for a given period.
+Use when bank records were imported into Pohoda but the SharePoint URL attachment was not written \(em for example after a period when MSSQL support was temporarily unavailable.
+.PP
+The tool performs three stages:
+.IP "1." 4
+Connect to SharePoint and list PDF statement files for the configured period, filtered by ACCOUNT_NUMBER embedded in the filename.
+.IP "2." 4
+Query Pohoda MSSQL for bank records (BV table) in the period that have no URL attachment. When POHODA_BANK_IDS is set, only records belonging to that bank account (matched via sUcet.IDS) are considered.
+.IP "3." 4
+Attach the matching SharePoint link to each bank record and write a JSON report.
+.SH OPTIONS
+.TP
+.B \-o, \-\-output=FILE
+Write JSON report to FILE instead of RESULT_FILE env var (default: php://stdout).
+.TP
+.B \-e, \-\-environment=FILE
+Path to .env configuration file (default: ../.env).
+.SH REPORT FORMAT
+The JSON report written to RESULT_FILE contains:
+.IP \(bu 4
+.B account
+\- the configured ACCOUNT_NUMBER
+.IP \(bu 4
+.B bank_ids
+\- value of POHODA_BANK_IDS (null when unset)
+.IP \(bu 4
+.B since, until
+\- resolved date range
+.IP \(bu 4
+.B sharepoint_files
+\- list of statement dates found in SharePoint for the period
+.IP \(bu 4
+.B bank_records_checked
+\- number of BV records without URL attachment found in MSSQL
+.IP \(bu 4
+.B fixed
+\- array of successfully linked records (pohodaId, cislo, date, filename, url)
+.IP \(bu 4
+.B skipped
+\- records for which no matching SharePoint file was found
+.IP \(bu 4
+.B errors
+\- error messages for failed attachment attempts
+.IP \(bu 4
+.B exitcode
+\- final exit code
+.SH EXIT CODES
+.TP
+.B 0
+Success.
+.TP
+.B 1
+SharePoint listing failed.
+.TP
+.B 2
+MSSQL query failed.
+.TP
+.B 3
+One or more link attachments failed.
+.SH ENVIRONMENT
+.TP
+.B ACCOUNT_NUMBER
+Bank account number. Used to filter SharePoint files by matching the account number embedded in the PDF filename.
+.TP
+.B POHODA_BANK_IDS
+Pohoda bank account abbreviation (sUcet.IDS, e.g.\& RB). When set, only BV records belonging to this bank account are processed. When unset, all bank records are considered.
+.TP
+.B IMPORT_SCOPE
+Time scope of records to fix (e.g.\& last_month, this_month, yesterday, 2024-01-01>2024-01-31). Default: last_month. Overridden by DATE_FROM/DATE_TO when explicitly set.
+.TP
+.B DATE_FROM
+Explicit start date for the period (YYYY-MM-DD or PHP date expression). Overrides IMPORT_SCOPE when set.
+.TP
+.B DATE_TO
+Explicit end date for the period (YYYY-MM-DD or PHP date expression). Overrides IMPORT_SCOPE when set.
+.TP
+.B DB_CONNECTION, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
+SQL Server connection parameters for accessing the Pohoda database.
+.TP
+.B DB_SETTINGS
+Additional DSN settings (e.g.\& ;TrustServerCertificate=true).
+.TP
+.B OFFICE365_TENANT, OFFICE365_SITE, OFFICE365_PATH
+SharePoint location to list statement PDFs from.
+.TP
+.B OFFICE365_CLIENTID, OFFICE365_CLSECRET
+Application credentials for SharePoint (used when OFFICE365_USERNAME/PASSWORD are not set).
+.TP
+.B OFFICE365_USERNAME, OFFICE365_PASSWORD
+User credentials for SharePoint.
+.TP
+.B RESULT_FILE
+Output path for the JSON report (default: php://stdout).
+.TP
+.B APP_DEBUG
+Set to true to enable verbose debug logging.
+.TP
+.B EASE_LOGGER
+Log output target (default: console|syslog).
+.SH AUTHOR
+Vítězslav Dvořák <info@vitexsoftware.cz>

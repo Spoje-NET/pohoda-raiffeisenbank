@@ -1,5 +1,6 @@
 debian/pohoda-bank-transaction-report.1
 debian/pohoda-raiffeisenbank-offline-statement-importer.1
+debian/pohoda-sharepoint-link-fixer.1
 debian/pohoda-raiffeisenbank-setup.1
 debian/pohoda-raiffeisenbank-statements.1
 debian/pohoda-raiffeisenbank-transactions.1
