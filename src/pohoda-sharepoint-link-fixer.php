@@ -44,8 +44,19 @@ Shared::init(
 );
 $destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout'));
 
-$since = new \DateTime(Shared::cfg('DATE_FROM', 'first day of last month'));
-$until = new \DateTime(Shared::cfg('DATE_TO', 'last day of last month'));
+$scopeEngine = new Statementor(Shared::cfg('ACCOUNT_NUMBER'));
+$period = $scopeEngine->setScope(Shared::cfg('IMPORT_SCOPE', 'last_month'));
+$since = \DateTime::createFromInterface($period->getStartDate());
+$until = \DateTime::createFromInterface($period->getEndDate());
+
+if (Shared::cfg('DATE_FROM', false)) {
+    $since = new \DateTime(Shared::cfg('DATE_FROM'));
+}
+
+if (Shared::cfg('DATE_TO', false)) {
+    $until = new \DateTime(Shared::cfg('DATE_TO'));
+}
+
 $until->setTime(23, 59, 59);
 
 $exitcode = 0;
