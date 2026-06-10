@@ -51,6 +51,7 @@ $until->setTime(23, 59, 59);
 $exitcode = 0;
 $report = [
     'account' => Shared::cfg('ACCOUNT_NUMBER'),
+    'bank_ids' => Shared::cfg('POHODA_BANK_IDS', null),
     'since' => $since->format('Y-m-d'),
     'until' => $until->format('Y-m-d'),
     'sharepoint_files' => [],
@@ -93,6 +94,12 @@ try {
         $name = $spFile->getName();
 
         if (!preg_match('/\.pdf$/i', $name)) {
+            continue;
+        }
+
+        $accountInFilename = str_replace('/', '_', Shared::cfg('ACCOUNT_NUMBER'));
+
+        if (!str_contains($name, '_'.$accountInFilename.'_')) {
             continue;
         }
 
@@ -143,7 +150,7 @@ $bankRecords = [];
 
 try {
     $fpdo = $doc->getFluentPDO(true);
-    $bankRecords = $fpdo
+    $query = $fpdo
         ->from('BV')
         ->disableSmartJoin()
         ->select('BV.ID, BV.Datum, BV.Cislo, BV.Vypis')
@@ -152,8 +159,16 @@ try {
         ->where(sprintf(
             'NOT EXISTS (SELECT 1 FROM DOC WHERE DOC.RelAgID = %d AND DOC.RelID = BV.ID AND DOC.RelDocType = 3)',
             \SpojeNet\PohodaSQL\Agenda::BANK,
-        ))
-        ->fetchAll();
+        ));
+
+    if (Shared::cfg('POHODA_BANK_IDS', false)) {
+        $bankIds = array_map('trim', explode(',', Shared::cfg('POHODA_BANK_IDS')));
+        $query = $query
+            ->join('sUcet ON BV.RefUcet = sUcet.ID')
+            ->where('sUcet.IDS IN ?', $bankIds);
+    }
+
+    $bankRecords = $query->fetchAll();
 
     $report['bank_records_checked'] = \count($bankRecords);
     $logger->addStatusMessage(sprintf('Found %d bank records without URL attachment', \count($bankRecords)), 'info');
