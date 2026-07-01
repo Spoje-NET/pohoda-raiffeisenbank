@@ -663,4 +663,25 @@ class Statementor extends PohodaBankClient
             return str_pad($matches[1], 3, '0', \STR_PAD_LEFT).'_';
         }, basename($filenameRaw));
     }
+
+    /**
+     * Does a statement filename belong to the given bank account?
+     *
+     * Statement filenames embed the account number between underscores, e.g.
+     * 151_2026_1000000001_9999999_CZK_2026-05-31.pdf. This is used both to pick
+     * an account's SharePoint PDFs and to detect links attached to the wrong
+     * account. Slashes in the account number are normalised to underscores to
+     * match the on-disk/SharePoint naming.
+     *
+     * @param string $filename statement filename (or attached DOC.Name)
+     * @param string $account  bank account number (ACCOUNT_NUMBER)
+     */
+    public static function filenameMatchesAccount(string $filename, string $account): bool
+    {
+        if ($filename === '' || $account === '') {
+            return false;
+        }
+
+        return str_contains($filename, '_'.str_replace('/', '_', $account).'_');
+    }
 }

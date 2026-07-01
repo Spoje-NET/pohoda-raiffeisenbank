@@ -1,3 +1,13 @@
+pohoda-raiffeisenbank (1.8.0) noble; urgency=medium
+
+  * sharepoint link fixer: validate and repair ALL links, not just missing ones — detect links whose attached PDF belongs to another bank account (cross-attached within a multi-account Pohoda company) and repoint them to the record's own statement, or remove them when no correct PDF exists
+  * sharepoint link fixer: add LINK_FIX_APPLY flag (default false = dry-run) that reports intended fixed/corrected/removed changes without writing to Pohoda
+  * sharepoint link fixer: report now includes ok, corrected and removed alongside fixed/skipped/errors
+  * Fix latent FluentPDO "sUcet.IDS IN ?" binding on SQL Server
+  * Add Statementor::filenameMatchesAccount() helper (with test) for account-in-filename matching
+
+ -- vitex <info@vitexsoftware.cz>  Wed, 01 Jul 2026 12:00:00 +0200
+
 pohoda-raiffeisenbank (1.7.2) noble; urgency=medium
 
   * Fix sharepoint link fixer: scope SharePoint files by ACCOUNT_NUMBER in filename to prevent cross-bank mismatches

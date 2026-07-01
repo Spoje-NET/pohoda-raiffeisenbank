@@ -192,7 +192,7 @@ Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
 * **pohoda-raiffeisenbank-xml-statement** - Import transactions from XML Statements file.
 * **pohodasql-raiffeisenbank-statements-sharepoint** - Download PDF+XML statements, upload both to SharePoint, import into Pohoda via mServer, attach SharePoint PDF link to each bank record via direct SQL (DOC table)
 
-* **pohoda-sharepoint-link-fixer** - Retroactively attach missing SharePoint PDF links to Pohoda bank records for a given period. Scoped to the configured bank account; supports IMPORT_SCOPE.
+* **pohoda-sharepoint-link-fixer** - Validate and repair SharePoint PDF links on Pohoda bank records for a given period: attach missing links and repoint links that were cross-attached to another bank account's statement. Scoped to the configured bank account; supports IMPORT_SCOPE; dry-run by default (LINK_FIX_APPLY).
 
 * **pohoda-bank-transaction-report** - Generate a JSON report of Pohoda bank transactions for a specified period. The output format matches the RaiffeisenBank statement reporter, including totals and transaction breakdowns.
 
@@ -239,20 +239,26 @@ On upload failure, the value is `{"error": "exception message"}` instead of the 
 
 ### pohoda-sharepoint-link-fixer
 
-Retroactively attaches missing SharePoint PDF links to Pohoda bank records.
-Use when records were imported into Pohoda but the SharePoint URL attachment was not written (e.g. after a period when MSSQL support was temporarily broken).
+Validates and repairs the SharePoint PDF links on Pohoda bank records.
+Use when records were imported without the SharePoint URL attachment, or when an earlier un-scoped import **cross-attached** statements between the several bank accounts of one Pohoda company (so a record for one account links to another account's statement).
 
 Executes the following pipeline in order:
 
 1. List PDF statement files in SharePoint for the configured period, filtered by `ACCOUNT_NUMBER`
-2. Query Pohoda MSSQL for bank records (`BV`) in the period that have no URL attachment, filtered by `POHODA_BANK_IDS` when set
-3. Attach the matching SharePoint link to each record and write a JSON report
+2. Query Pohoda MSSQL for bank records (`BV`) in the period **together with their current URL attachment**, filtered by `POHODA_BANK_IDS` when set
+3. For each record decide and (when applying) perform:
+   * **missing** link → attach the account's statement PDF (`fixed`)
+   * link pointing to **another account** → repoint to the correct PDF (`corrected`), or remove it when no correct PDF exists (`removed`)
+   * already-**correct** link → leave untouched (`ok`)
+   * missing link with **no PDF** for that date → leave (`skipped`)
+
+**Dry-run by default**: with `LINK_FIX_APPLY` unset/`false` the tool only reports what it would change and writes nothing. Set `LINK_FIX_APPLY=true` to apply. Always dry-run and review first.
 
 **Date range** is resolved by `IMPORT_SCOPE` (default: `last_month`). `DATE_FROM` / `DATE_TO` override `IMPORT_SCOPE` when explicitly set.
 
-**Multi-bank behaviour**: When `POHODA_BANK_IDS` is set (e.g. `RB`), only records belonging to that bank account are processed. When unset, all bank records are considered. SharePoint files are always filtered by `ACCOUNT_NUMBER` embedded in the filename to prevent cross-account link attachment.
+**Multi-bank behaviour**: When `POHODA_BANK_IDS` is set (e.g. `RB`), only records belonging to that bank account are processed. Because one Pohoda company can hold several bank accounts, run the tool once per account (each with its own `ACCOUNT_NUMBER` + `POHODA_BANK_IDS` + SharePoint folder). SharePoint files and existing links are matched by `ACCOUNT_NUMBER` embedded in the filename to detect and prevent cross-account attachment.
 
-Example JSON report:
+Example JSON report (account numbers below are fictional):
 
 ```json
 {
@@ -260,11 +266,17 @@ Example JSON report:
   "bank_ids": "RB",
   "since": "2026-05-01",
   "until": "2026-05-31",
+  "apply": false,
   "sharepoint_files": ["2026-05-31"],
   "bank_records_checked": 3,
+  "ok": 1,
   "fixed": [
-    {"pohodaId": 12345, "cislo": "VBÚ001", "date": "2026-05-31", "filename": "001_1234567890_0100_4243005_CZK_2026-05-31.pdf", "url": "https://tenant.sharepoint.com/..."}
+    {"pohodaId": 12345, "cislo": "VBÚ001", "date": "2026-05-31", "filename": "001_1234567890_0100_9999999_CZK_2026-05-31.pdf", "url": "https://tenant.sharepoint.com/..."}
   ],
+  "corrected": [
+    {"pohodaId": 12346, "docId": 555, "date": "2026-05-31", "from": "001_9999999999_0100_9999999_CZK_2026-05-31.pdf", "to": "001_1234567890_0100_9999999_CZK_2026-05-31.pdf", "url": "https://tenant.sharepoint.com/..."}
+  ],
+  "removed": [],
   "skipped": [],
   "errors": [],
   "exitcode": 0

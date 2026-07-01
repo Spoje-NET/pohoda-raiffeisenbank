@@ -59,16 +59,24 @@ if (Shared::cfg('DATE_TO', false)) {
 
 $until->setTime(23, 59, 59);
 
+// When false (default) the tool only reports what it WOULD change and writes
+// nothing to Pohoda — run once in this dry-run mode, review, then set true.
+$apply = filter_var(Shared::cfg('LINK_FIX_APPLY', false), \FILTER_VALIDATE_BOOLEAN);
+
 $exitcode = 0;
 $report = [
     'account' => Shared::cfg('ACCOUNT_NUMBER'),
     'bank_ids' => Shared::cfg('POHODA_BANK_IDS', null),
     'since' => $since->format('Y-m-d'),
     'until' => $until->format('Y-m-d'),
+    'apply' => $apply,
     'sharepoint_files' => [],
     'bank_records_checked' => 0,
-    'fixed' => [],
-    'skipped' => [],
+    'ok' => 0,        // records whose link is already correct — left untouched
+    'fixed' => [],    // missing link → newly attached
+    'corrected' => [], // wrong-account link → repointed to the correct PDF
+    'removed' => [],  // wrong-account link with no correct PDF → deleted
+    'skipped' => [],  // missing link but no SharePoint PDF for that date
     'errors' => [],
 ];
 
@@ -76,7 +84,7 @@ $logger = new \Ease\Sand();
 $logger->setObjectName('PohodaSharepointLinkFixer');
 
 if (Shared::cfg('APP_DEBUG', false)) {
-    $logger->logBanner(APP_NAME, sprintf('Period: %s → %s | Account: %s', $since->format('Y-m-d'), $until->format('Y-m-d'), Shared::cfg('ACCOUNT_NUMBER')));
+    $logger->logBanner(APP_NAME, sprintf('Period: %s → %s | Account: %s | %s', $since->format('Y-m-d'), $until->format('Y-m-d'), Shared::cfg('ACCOUNT_NUMBER'), $apply ? 'APPLY' : 'DRY-RUN'));
 }
 
 // Stage 1: Connect to SharePoint and list all PDF statement files
@@ -108,9 +116,7 @@ try {
             continue;
         }
 
-        $accountInFilename = str_replace('/', '_', Shared::cfg('ACCOUNT_NUMBER'));
-
-        if (!str_contains($name, '_'.$accountInFilename.'_')) {
+        if (!Statementor::filenameMatchesAccount($name, (string) Shared::cfg('ACCOUNT_NUMBER'))) {
             continue;
         }
 
@@ -143,8 +149,10 @@ if (empty($dateToSharepoint)) {
     exit($exitcode);
 }
 
-// Stage 2: Query Pohoda MSSQL for bank records in the date range that are missing URL attachments
-$logger->addStatusMessage('stage 2/3: Querying MSSQL for bank records without SharePoint links', 'debug');
+// Stage 2: Query Pohoda MSSQL for bank records in the date range together with
+// their current SharePoint URL attachment (if any), so Stage 3 can attach missing
+// links AND repair links pointing to another account's statement.
+$logger->addStatusMessage('stage 2/3: Querying MSSQL for bank records and their current SharePoint links', 'debug');
 
 $doc = new \SpojeNet\PohodaSQL\DOC(null, [
     'dbType' => Shared::cfg('DB_CONNECTION', 'sqlsrv'),
@@ -158,6 +166,7 @@ $doc = new \SpojeNet\PohodaSQL\DOC(null, [
 $doc->setDataValue('RelAgID', \SpojeNet\PohodaSQL\Agenda::BANK);
 
 $bankRecords = [];
+$fpdo = null;
 
 try {
     $fpdo = $doc->getFluentPDO(true);
@@ -165,78 +174,116 @@ try {
         ->from('BV')
         ->disableSmartJoin()
         ->select('BV.ID, BV.Datum, BV.Cislo, BV.Vypis')
+        ->select(sprintf('(SELECT TOP 1 d.ID FROM DOC d WHERE d.RelAgID = %d AND d.RelID = BV.ID AND d.RelDocType = 3 ORDER BY d.ID DESC) AS docId', \SpojeNet\PohodaSQL\Agenda::BANK))
+        ->select(sprintf('(SELECT TOP 1 d.Name FROM DOC d WHERE d.RelAgID = %d AND d.RelID = BV.ID AND d.RelDocType = 3 ORDER BY d.ID DESC) AS docName', \SpojeNet\PohodaSQL\Agenda::BANK))
         ->where('BV.Datum >= ?', $since->format('Y-m-d H:i:s'))
-        ->where('BV.Datum <= ?', $until->format('Y-m-d H:i:s'))
-        ->where(sprintf(
-            'NOT EXISTS (SELECT 1 FROM DOC WHERE DOC.RelAgID = %d AND DOC.RelID = BV.ID AND DOC.RelDocType = 3)',
-            \SpojeNet\PohodaSQL\Agenda::BANK,
-        ));
+        ->where('BV.Datum <= ?', $until->format('Y-m-d H:i:s'));
 
     if (Shared::cfg('POHODA_BANK_IDS', false)) {
         $bankIds = array_map('trim', explode(',', Shared::cfg('POHODA_BANK_IDS')));
         $query = $query
             ->join('sUcet ON BV.RefUcet = sUcet.ID')
-            ->where('sUcet.IDS IN ?', $bankIds);
+            ->where('sUcet.IDS', $bankIds);
     }
 
     $bankRecords = $query->fetchAll();
 
     $report['bank_records_checked'] = \count($bankRecords);
-    $logger->addStatusMessage(sprintf('Found %d bank records without URL attachment', \count($bankRecords)), 'info');
+    $logger->addStatusMessage(sprintf('Found %d bank records in period', \count($bankRecords)), 'info');
 } catch (\Exception $exc) {
     $logger->addStatusMessage('MSSQL query failed: '.$exc->getMessage(), 'error');
     $report['errors'][] = 'MSSQL query failed: '.$exc->getMessage();
     $exitcode = 2;
 }
 
-// Stage 3: Attach the missing SharePoint links
-$logger->addStatusMessage('stage 3/3: Attaching missing SharePoint links to Pohoda bank records', 'debug');
+// Stage 3: Attach missing links and repair wrong (cross-attached) ones.
+// A link is "correct" when the account number is present in the attached
+// filename — the same convention Stage 1 used to pick this account's PDFs.
+$logger->addStatusMessage(sprintf('stage 3/3: %s SharePoint links on Pohoda bank records', $apply ? 'Repairing' : 'Evaluating (dry-run)'), 'debug');
+
+$accountNumber = (string) Shared::cfg('ACCOUNT_NUMBER');
 
 foreach ($bankRecords as $record) {
+    $recordId = (int) $record['ID'];
     $recordDate = (new \DateTime($record['Datum']))->format('Y-m-d');
+    $desired = $dateToSharepoint[$recordDate] ?? null;
+    $docId = $record['docId'] ?? null;
+    $docName = (string) ($record['docName'] ?? '');
+    $hasLink = !empty($docId);
+    $linkCorrect = $hasLink && Statementor::filenameMatchesAccount($docName, $accountNumber);
 
-    if (\array_key_exists($recordDate, $dateToSharepoint)) {
-        $sp = $dateToSharepoint[$recordDate];
+    try {
+        if ($linkCorrect) {
+            ++$report['ok'];
 
-        try {
-            $result = $doc->urlAttachment((int) $record['ID'], $sp['url'], $sp['filename']);
-
-            if ($result) {
-                $logger->addStatusMessage(sprintf('#%d (%s) → %s', $record['ID'], $recordDate, $sp['filename']), 'success');
-                $report['fixed'][] = [
-                    'pohodaId' => (int) $record['ID'],
-                    'cislo' => $record['Cislo'],
-                    'date' => $recordDate,
-                    'filename' => $sp['filename'],
-                    'url' => $sp['url'],
-                ];
-            } else {
-                $logger->addStatusMessage(sprintf('Failed to attach link to record #%d (%s)', $record['ID'], $recordDate), 'error');
-                $report['errors'][] = sprintf('Attachment insert failed for record #%d (%s)', $record['ID'], $recordDate);
-
-                if ($exitcode === 0) {
-                    $exitcode = 3;
-                }
-            }
-        } catch (\Exception $exc) {
-            $logger->addStatusMessage(sprintf('Error attaching to record #%d: %s', $record['ID'], $exc->getMessage()), 'error');
-            $report['errors'][] = sprintf('Error for record #%d: %s', $record['ID'], $exc->getMessage());
-
-            if ($exitcode === 0) {
-                $exitcode = 3;
-            }
+            continue;
         }
-    } else {
-        $logger->addStatusMessage(sprintf('No SharePoint statement found for date %s (record #%d)', $recordDate, $record['ID']), 'warning');
-        $report['skipped'][] = [
-            'pohodaId' => (int) $record['ID'],
-            'date' => $recordDate,
-            'reason' => 'No SharePoint PDF found for this date',
-        ];
+
+        if (!$hasLink) {
+            // Missing link: attach this account's statement PDF for that date.
+            if ($desired === null) {
+                $report['skipped'][] = [
+                    'pohodaId' => $recordId,
+                    'date' => $recordDate,
+                    'reason' => 'No SharePoint PDF found for this date',
+                ];
+
+                continue;
+            }
+
+            if ($apply && !$doc->urlAttachment($recordId, $desired['url'], $desired['filename'])) {
+                throw new \RuntimeException('urlAttachment insert returned false');
+            }
+
+            $logger->addStatusMessage(sprintf('%s #%d (%s) → %s', $apply ? 'attached' : 'would attach', $recordId, $recordDate, $desired['filename']), 'success');
+            $report['fixed'][] = [
+                'pohodaId' => $recordId,
+                'cislo' => $record['Cislo'],
+                'date' => $recordDate,
+                'filename' => $desired['filename'],
+                'url' => $desired['url'],
+            ];
+        } elseif ($desired !== null) {
+            // Wrong link, correct statement exists: repoint the existing DOC row.
+            if ($apply) {
+                $fpdo->update('DOC')->set(['Name' => $desired['filename'], 'Url' => $desired['url']])->where('ID', (int) $docId)->execute();
+            }
+
+            $logger->addStatusMessage(sprintf('%s #%d (%s) %s → %s', $apply ? 'corrected' : 'would correct', $recordId, $recordDate, $docName, $desired['filename']), 'warning');
+            $report['corrected'][] = [
+                'pohodaId' => $recordId,
+                'docId' => (int) $docId,
+                'date' => $recordDate,
+                'from' => $docName,
+                'to' => $desired['filename'],
+                'url' => $desired['url'],
+            ];
+        } else {
+            // Wrong link, no correct statement to point at: remove the misleading link.
+            if ($apply) {
+                $fpdo->deleteFrom('DOC')->where('ID', (int) $docId)->execute();
+            }
+
+            $logger->addStatusMessage(sprintf('%s #%d (%s) wrong link %s (no correct PDF)', $apply ? 'removed' : 'would remove', $recordId, $recordDate, $docName), 'warning');
+            $report['removed'][] = [
+                'pohodaId' => $recordId,
+                'docId' => (int) $docId,
+                'date' => $recordDate,
+                'was' => $docName,
+                'reason' => 'Wrong-account link with no SharePoint PDF for this date',
+            ];
+        }
+    } catch (\Exception $exc) {
+        $logger->addStatusMessage(sprintf('Error on record #%d: %s', $recordId, $exc->getMessage()), 'error');
+        $report['errors'][] = sprintf('Error for record #%d: %s', $recordId, $exc->getMessage());
+
+        if ($exitcode === 0) {
+            $exitcode = 3;
+        }
     }
 }
 
-$logger->addStatusMessage(sprintf('Done: %d fixed, %d skipped, %d errors', \count($report['fixed']), \count($report['skipped']), \count($report['errors'])), $exitcode === 0 ? 'success' : 'warning');
+$logger->addStatusMessage(sprintf('Done (%s): %d fixed, %d corrected, %d removed, %d ok, %d skipped, %d errors', $apply ? 'applied' : 'dry-run', \count($report['fixed']), \count($report['corrected']), \count($report['removed']), $report['ok'], \count($report['skipped']), \count($report['errors'])), $exitcode === 0 ? 'success' : 'warning');
 
 $report['exitcode'] = $exitcode;
 $written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE : 0));

@@ -1,20 +1,22 @@
-.TH pohoda-sharepoint-link-fixer 1 "" "version 1.7.2" "User Commands"
+.TH pohoda-sharepoint-link-fixer 1 "" "version 1.8.0" "User Commands"
 .SH NAME
-pohoda-sharepoint-link-fixer \- retroactively attach missing SharePoint PDF links to Pohoda bank records
+pohoda-sharepoint-link-fixer \- attach missing and repair wrong SharePoint PDF links on Pohoda bank records
 .SH SYNOPSIS
 .B pohoda-sharepoint-link-fixer
 [\fIOPTIONS\fR]
 .SH DESCRIPTION
-Retroactively attaches missing SharePoint statement PDF links to Pohoda bank records for a given period.
-Use when bank records were imported into Pohoda but the SharePoint URL attachment was not written \(em for example after a period when MSSQL support was temporarily unavailable.
+Validates and repairs the SharePoint statement PDF links on Pohoda bank records for a given period.
+Use when bank records were imported without the SharePoint URL attachment, or when an earlier un-scoped import cross-attached statements between the several bank accounts of one Pohoda company (so a record for one account links to another account's statement).
+.PP
+By default the tool runs in \fBdry-run\fR mode (LINK_FIX_APPLY=false): it reports what it would change without writing anything. Set LINK_FIX_APPLY=true to apply.
 .PP
 The tool performs three stages:
 .IP "1." 4
 Connect to SharePoint and list PDF statement files for the configured period, filtered by ACCOUNT_NUMBER embedded in the filename.
 .IP "2." 4
-Query Pohoda MSSQL for bank records (BV table) in the period that have no URL attachment. When POHODA_BANK_IDS is set, only records belonging to that bank account (matched via sUcet.IDS) are considered.
+Query Pohoda MSSQL for bank records (BV table) in the period together with their current URL attachment. When POHODA_BANK_IDS is set, only records belonging to that bank account (matched via sUcet.IDS) are considered.
 .IP "3." 4
-Attach the matching SharePoint link to each bank record and write a JSON report.
+For each record: attach the statement link when missing; when the existing link points to another account's statement, repoint it to the correct PDF (or remove it when no correct PDF exists); leave already-correct links untouched. Write a JSON report.
 .SH OPTIONS
 .TP
 .B \-o, \-\-output=FILE
@@ -37,17 +39,29 @@ The JSON report written to RESULT_FILE contains:
 .B sharepoint_files
 \- list of statement dates found in SharePoint for the period
 .IP \(bu 4
+.B apply
+\- true when changes were written, false for a dry-run
+.IP \(bu 4
 .B bank_records_checked
-\- number of BV records without URL attachment found in MSSQL
+\- number of BV records inspected in the period
+.IP \(bu 4
+.B ok
+\- count of records whose link was already correct (left untouched)
 .IP \(bu 4
 .B fixed
-\- array of successfully linked records (pohodaId, cislo, date, filename, url)
+\- array of records that had a missing link now attached (pohodaId, cislo, date, filename, url)
+.IP \(bu 4
+.B corrected
+\- array of wrong-account links repointed to the correct PDF (pohodaId, docId, date, from, to, url)
+.IP \(bu 4
+.B removed
+\- array of wrong-account links deleted because no correct PDF exists (pohodaId, docId, date, was)
 .IP \(bu 4
 .B skipped
-\- records for which no matching SharePoint file was found
+\- records with a missing link for which no matching SharePoint file was found
 .IP \(bu 4
 .B errors
-\- error messages for failed attachment attempts
+\- error messages for failed attachment/repair attempts
 .IP \(bu 4
 .B exitcode
 \- final exit code
@@ -63,7 +77,7 @@ SharePoint listing failed.
 MSSQL query failed.
 .TP
 .B 3
-One or more link attachments failed.
+One or more link attach/correct/remove operations failed.
 .SH ENVIRONMENT
 .TP
 .B ACCOUNT_NUMBER
@@ -80,6 +94,9 @@ Explicit start date for the period (YYYY-MM-DD or PHP date expression). Override
 .TP
 .B DATE_TO
 Explicit end date for the period (YYYY-MM-DD or PHP date expression). Overrides IMPORT_SCOPE when set.
+.TP
+.B LINK_FIX_APPLY
+When true, apply changes to Pohoda (attach/correct/remove links). When false or unset (default), run in dry-run mode: report intended changes without writing anything. Run a dry-run first and review the report before applying.
 .TP
 .B DB_CONNECTION, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
 SQL Server connection parameters for accessing the Pohoda database.

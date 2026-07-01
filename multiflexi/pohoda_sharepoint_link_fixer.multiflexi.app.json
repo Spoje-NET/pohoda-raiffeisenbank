@@ -7,8 +7,8 @@
     "cs": "Oprava chybějících odkazů na výpisy v SharePointu v Pohodě"
   },
   "description": {
-    "en": "Retroactively attach missing SharePoint statement PDF links to Pohoda bank records. Use when records were imported into Pohoda but the SharePoint URL attachment was not written (e.g. after a period when MSSQL support was temporarily broken).",
-    "cs": "Zpětně přiloží chybějící odkazy na PDF výpisy v SharePointu k bankovním záznamům v Pohodě. Použijte pokud byly záznamy importovány do Pohody bez odkazu na SharePoint (např. po období kdy MSSQL podpora dočasně nefungovala)."
+    "en": "Validate and repair SharePoint statement PDF links on Pohoda bank records: attach missing links and repoint links cross-attached to another bank account's statement (multi-account Pohoda companies). Dry-run by default; set LINK_FIX_APPLY to apply.",
+    "cs": "Ověří a opraví odkazy na PDF výpisy v SharePointu u bankovních záznamů v Pohodě: přiloží chybějící odkazy a přesměruje odkazy chybně přiřazené k výpisu jiného bankovního účtu (firmy s více účty). Ve výchozím stavu pouze náhled; pro provedení nastavte LINK_FIX_APPLY."
   },
   "tags": [
     "Raiffeisen",
@@ -81,6 +81,16 @@
       "defval": "",
       "required": false,
       "category": "Other"
+    },
+    "LINK_FIX_APPLY": {
+      "type": "bool",
+      "description": {
+        "en": "Apply changes to Pohoda. When false (default) the tool runs a dry-run and only reports intended fixes without writing.",
+        "cs": "Provést změny v Pohodě. Při false (výchozí) běží pouze náhled a nahlásí zamýšlené opravy bez zápisu."
+      },
+      "defval": "False",
+      "required": false,
+      "category": "Behavior"
     },
     "DB_CONNECTION": {
       "type": "text",
@@ -294,8 +304,8 @@
     },
     "3": {
       "description": {
-        "en": "One or more link attachments failed",
-        "cs": "Jeden nebo více odkazů se nepodařilo přiložit"
+        "en": "One or more link attach/correct/remove operations failed",
+        "cs": "Jednu nebo více operací přiložení/opravy/odebrání odkazu se nepodařilo provést"
       },
       "severity": "warning",
       "retry": true

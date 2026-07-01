@@ -164,12 +164,42 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
             Statementor::statementFilename('/tmp/194_2024_630804003_3780381_CZK_2024-11-06.xml'),
         );
         $this->assertSame(
-            '007_2026_5230011111_4243005_CZK_2026-05-28.pdf',
-            Statementor::statementFilename('/tmp/7_2026_5230011111_4243005_CZK_2026-05-28.pdf'),
+            '007_2026_1000000001_9999999_CZK_2026-05-28.pdf',
+            Statementor::statementFilename('/tmp/7_2026_1000000001_9999999_CZK_2026-05-28.pdf'),
         );
         $this->assertSame(
-            '007_2026_5230011111_4243005_CZK_2026-05-28.xml',
-            Statementor::statementFilename('/tmp/7_2026_5230011111_4243005_CZK_2026-05-28.xml'),
+            '007_2026_1000000001_9999999_CZK_2026-05-28.xml',
+            Statementor::statementFilename('/tmp/7_2026_1000000001_9999999_CZK_2026-05-28.xml'),
+        );
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\Statementor::filenameMatchesAccount
+     */
+    public function testFilenameMatchesAccount(): void
+    {
+        // NOTE: account numbers below are fictional example values only.
+        // Correct account embedded in the statement filename.
+        $this->assertTrue(
+            Statementor::filenameMatchesAccount('151_2026_1000000001_9999999_CZK_2026-05-31.pdf', '1000000001'),
+        );
+
+        // Wrong-account (cross-attached) link: a record pointing at a sibling account's statement.
+        $this->assertFalse(
+            Statementor::filenameMatchesAccount('151_2026_1000000001_9999999_CZK_2026-05-31.pdf', '2000000002'),
+        );
+
+        // Account number with a slash is normalised to underscore.
+        $this->assertTrue(
+            Statementor::filenameMatchesAccount('001_1234567890_0100_9999999_CZK_2026-05-31.pdf', '1234567890/0100'),
+        );
+
+        // Empty / NULL DOC.Name (broken manual link) never matches.
+        $this->assertFalse(Statementor::filenameMatchesAccount('', '1000000001'));
+
+        // A manually attached local-file link does not match the account.
+        $this->assertFalse(
+            Statementor::filenameMatchesAccount('file:///C:/Users/Downloads/219_2025_1000000001.pdf', '2000000002'),
         );
     }
 }
