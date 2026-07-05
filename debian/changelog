@@ -1,3 +1,10 @@
+pohoda-raiffeisenbank (1.8.1) noble; urgency=medium
+
+  * Add PohodaBankClient::describeRequestException() to build diagnostic messages for failed remote requests: names the file/operation, HTTP status, and (for Office365\Runtime\Http\RequestException) the raw SharePoint/OAuth2 response body, labelled explicitly as an Office365/SharePoint API error so it isn't mistaken for a Pohoda mServer error
+  * Apply it to the SharePoint upload/listing error paths in pohodaSQL-raiffeisenbank-statements-sharepoint.php, raiffeisenbank-statements-sharepoint-uploader.php and pohoda-sharepoint-link-fixer.php, replacing bare/severity-less exception messages
+
+ -- vitex <info@vitexsoftware.cz>  Sun, 05 Jul 2026 11:30:00 +0200
+
 pohoda-raiffeisenbank (1.8.0) noble; urgency=medium
 
   * sharepoint link fixer: validate and repair ALL links, not just missing ones — detect links whose attached PDF belongs to another bank account (cross-attached within a multi-account Pohoda company) and repoint them to the record's own statement, or remove them when no correct PDF exists

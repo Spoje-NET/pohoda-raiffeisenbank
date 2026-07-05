@@ -136,8 +136,9 @@ try {
     $report['sharepoint_files'] = array_keys($dateToSharepoint);
     $logger->addStatusMessage(sprintf('Found %d statement PDFs in SharePoint for period', \count($dateToSharepoint)), 'info');
 } catch (\Exception $exc) {
-    $logger->addStatusMessage('SharePoint error: '.$exc->getMessage(), 'error');
-    $report['errors'][] = 'SharePoint listing failed: '.$exc->getMessage();
+    $errorMessage = PohodaBankClient::describeRequestException($exc, 'SharePoint file listing');
+    $logger->addStatusMessage($errorMessage, 'error');
+    $report['errors'][] = $errorMessage;
     $exitcode = 1;
 }
 
