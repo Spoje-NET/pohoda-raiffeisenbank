@@ -581,37 +581,6 @@ EOD;
     }
 
     /**
-     * Build a diagnostic message for a failed remote request (e.g. SharePoint upload).
-     *
-     * Bare exception messages from office365/php-sdk are often just a terse
-     * OAuth2 error code (e.g. "invalid_request") with no indication of which
-     * file/operation failed or what the actual server-side reason was.
-     * \Office365\Runtime\Http\RequestException carries the HTTP status and
-     * raw response body (which usually holds Microsoft's error_description) -
-     * surface both here so the log line alone is enough to diagnose the
-     * failure without production access.
-     *
-     * @param string $context short description of what was being attempted, e.g. "PDF upload of foo.pdf"
-     */
-    public static function describeRequestException(\Exception $exc, string $context): string
-    {
-        $detail = $exc->getMessage();
-        $source = 'error';
-
-        if ($exc instanceof \Office365\Runtime\Http\RequestException) {
-            // Response is Microsoft's own OAuth2/SharePoint REST error JSON, not
-            // Pohoda mServer's - label it explicitly so it isn't mistaken for one.
-            $source = 'Office365/SharePoint API error';
-
-            if ($exc->getResponseBody()) {
-                $detail .= ' | response: '.$exc->getResponseBody();
-            }
-        }
-
-        return sprintf('%s: %s (HTTP %d): %s', $context, $source, $exc->getCode(), $detail);
-    }
-
-    /**
      * Determine whether given message text indicates an authentication error.
      *
      * @param string $text Log or exception message

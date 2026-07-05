@@ -190,7 +190,7 @@ if (!$certValid) {
                 $fileUrls[$uploadAs] = $uploaded;
                 $dayUrls[$statementDate][$uploadAs] = $uploaded;
             } catch (\Exception $exc) {
-                $errorMessage = PohodaBankClient::describeRequestException($exc, 'SharePoint PDF upload of '.$uploadAs);
+                $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'SharePoint PDF upload of '.$uploadAs);
                 $report['sharepoint']['pdf'][$uploadAs] = ['error' => $errorMessage, 'httpCode' => $exc->getCode()];
                 $engine->addStatusMessage($errorMessage, 'error');
 
@@ -210,7 +210,7 @@ if (!$certValid) {
                 $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
                 $report['sharepoint']['xml'][$uploadAs] = $uploaded;
             } catch (\Exception $exc) {
-                $errorMessage = PohodaBankClient::describeRequestException($exc, 'SharePoint XML upload of '.$uploadAs);
+                $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'SharePoint XML upload of '.$uploadAs);
                 $report['sharepoint']['xml'][$uploadAs] = ['error' => $errorMessage, 'httpCode' => $exc->getCode()];
                 $engine->addStatusMessage($errorMessage, 'error');
 

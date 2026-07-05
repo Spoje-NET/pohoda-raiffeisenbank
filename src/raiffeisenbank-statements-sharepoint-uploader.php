@@ -157,7 +157,7 @@ if (!$certValid) {
                                 $report['sharepoint'][basename($pdfStatement)] = $uploaded;
                                 $fileUrls[basename($pdfStatement)] = $uploaded;
                             } catch (\Exception $exc) {
-                                $errorMessage = PohodaBankClient::describeRequestException($exc, 'SharePoint upload of '.$uploadAs);
+                                $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'SharePoint upload of '.$uploadAs);
                                 $engine->addStatusMessage($errorMessage, 'error');
                                 $report['sharepoint_errors'][$uploadAs] = $errorMessage;
 

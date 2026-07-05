@@ -1,3 +1,22 @@
+pohoda-raiffeisenbank (1.8.2) noble; urgency=medium
+
+  * Add PohodaBankClientOffice::probeOffice365Auth(): independently
+    re-acquires an ACS app-only token for the same OFFICE365_* credential
+    outside the SDK, so a failed SharePoint upload/list can be diagnosed as
+    "auth itself is broken" vs "auth is fine, the REST call failed for
+    another reason" without needing production access. Memoized per run;
+    wired into describeRequestException() so every existing call site gets
+    it for free.
+  * Extract describeRequestException()/probeOffice365Auth() out of
+    PohodaBankClient into a new PohodaBankClientOffice subclass, keeping the
+    Office365/SharePoint-only diagnostics separate from the generic Pohoda
+    bank client used by RaiffeisenBank statement/transaction import; update
+    pohodaSQL-raiffeisenbank-statements-sharepoint.php,
+    raiffeisenbank-statements-sharepoint-uploader.php and
+    pohoda-sharepoint-link-fixer.php to call the new class
+
+ -- vitex <info@vitexsoftware.cz>  Sun, 05 Jul 2026 17:15:00 +0200
+
 pohoda-raiffeisenbank (1.8.1) noble; urgency=medium
 
   * Add PohodaBankClient::describeRequestException() to build diagnostic messages for failed remote requests: names the file/operation, HTTP status, and (for Office365\Runtime\Http\RequestException) the raw SharePoint/OAuth2 response body, labelled explicitly as an Office365/SharePoint API error so it isn't mistaken for a Pohoda mServer error
