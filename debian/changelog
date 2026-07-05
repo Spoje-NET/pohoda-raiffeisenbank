@@ -1,3 +1,21 @@
+pohoda-raiffeisenbank (1.8.3) noble; urgency=medium
+
+  * Add PohodaBankClientOffice::withSharePointRetry(): retries a SharePoint
+    operation once after resetting the ClientContext's credentials.
+    \Office365\Runtime\Auth\ACSTokenProvider hands ACS's decoded response
+    straight to AuthenticationContext as the access token without checking
+    the HTTP status, so a transient ACS hiccup leaves a broken token
+    (e.g. {"error":"invalid_request"}) cached on the context; since
+    AuthenticationContext only re-acquires a token when none is cached yet,
+    every further request - not just the one that hit the hiccup - then
+    fails identically, and a plain executeQuery() retry would resend the
+    same broken token. Calling ClientContext::withCredentials() again
+    installs a fresh, unauthenticated AuthenticationContext, forcing a real
+    new ACS token request on the next attempt.
+  * Wire it into the SharePoint file listing and PDF/XML upload calls in
+    pohodaSQL-raiffeisenbank-statements-sharepoint.php and
+    raiffeisenbank-statements-sharepoint-uploader.php
+
 pohoda-raiffeisenbank (1.8.2) noble; urgency=medium
 
   * Add PohodaBankClientOffice::probeOffice365Auth(): independently

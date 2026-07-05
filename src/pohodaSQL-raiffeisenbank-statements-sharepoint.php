@@ -180,11 +180,13 @@ if (!$certValid) {
             preg_match('/\d{4}-\d{2}-\d{2}/', $uploadAs, $dateMatches);
             $statementDate = $dateMatches[0] ?? '';
 
-            $uploadFile = $targetFolder->uploadFile($uploadAs, file_get_contents($filename));
-
             try {
-                $ctx->executeQuery();
-                $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+                $uploaded = PohodaBankClientOffice::withSharePointRetry($ctx, $credentials, static function ($ctx) use ($targetFolder, $uploadAs, $filename) {
+                    $uploadFile = $targetFolder->uploadFile($uploadAs, file_get_contents($filename));
+                    $ctx->executeQuery();
+
+                    return $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+                });
                 $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
                 $report['sharepoint']['pdf'][$uploadAs] = $uploaded;
                 $fileUrls[$uploadAs] = $uploaded;
@@ -202,11 +204,13 @@ if (!$certValid) {
 
         foreach ($xmlStatements ?: [] as $filename) {
             $uploadAs = Statementor::statementFilename($filename);
-            $uploadFile = $targetFolder->uploadFile($uploadAs, file_get_contents($filename));
-
             try {
-                $ctx->executeQuery();
-                $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+                $uploaded = PohodaBankClientOffice::withSharePointRetry($ctx, $credentials, static function ($ctx) use ($targetFolder, $uploadAs, $filename) {
+                    $uploadFile = $targetFolder->uploadFile($uploadAs, file_get_contents($filename));
+                    $ctx->executeQuery();
+
+                    return $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+                });
                 $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
                 $report['sharepoint']['xml'][$uploadAs] = $uploaded;
             } catch (\Exception $exc) {

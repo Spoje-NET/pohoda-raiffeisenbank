@@ -95,7 +95,9 @@ if (!$certValid) {
             $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
 
             try {
-                $sharepointFilesRaw = $targetFolder->getFiles()->get()->executeQuery();
+                $sharepointFilesRaw = PohodaBankClientOffice::withSharePointRetry($ctx, $credentials, static function () use ($targetFolder) {
+                    return $targetFolder->getFiles()->get()->executeQuery();
+                });
                 $sharepointFiles = [];
 
                 // @phpstan-ignore foreach.nonIterable
@@ -148,11 +150,13 @@ if (!$certValid) {
                                 continue;
                             }
 
-                            $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents($pdfFilePath));
-
                             try {
-                                $ctx->executeQuery();
-                                $uploaded = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+                                $uploaded = PohodaBankClientOffice::withSharePointRetry($ctx, $credentials, static function ($ctx) use ($targetFolder, $uploadAs, $pdfFilePath) {
+                                    $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents($pdfFilePath));
+                                    $ctx->executeQuery();
+
+                                    return $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+                                });
                                 $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
                                 $report['sharepoint'][basename($pdfStatement)] = $uploaded;
                                 $fileUrls[basename($pdfStatement)] = $uploaded;

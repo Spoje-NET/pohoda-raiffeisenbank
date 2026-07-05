@@ -18,14 +18,17 @@ namespace Pohoda\RaiffeisenBank;
 use Ease\Shared;
 
 /**
- * Office365/SharePoint-specific diagnostics for the bank statement upload flow.
+ * Office365/SharePoint-specific diagnostics and resilience for the bank
+ * statement upload flow.
  *
  * Used by pohodaSQL-raiffeisenbank-statements-sharepoint.php and
  * raiffeisenbank-statements-sharepoint-uploader.php to turn a bare
  * \Office365\Runtime\Http\RequestException into a report line that says
  * which file/operation failed, what Microsoft actually returned, and
  * (via probeOffice365Auth()) whether the OFFICE365_* credentials
- * themselves are still valid.
+ * themselves are still valid; and to retry an operation once when a
+ * transient Microsoft ACS failure poisons the SDK's cached token
+ * (see withSharePointRetry()).
  *
  * @author vitex
  */
@@ -175,5 +178,56 @@ abstract class PohodaBankClientOffice extends PohodaBankClient
             $decoded['error'] ?? ($tokenResponse ?: '(empty response)'),
             $tokenCurlError !== '' ? ", curl error: {$tokenCurlError}" : '',
         );
+    }
+
+    /**
+     * Run a SharePoint ClientContext operation, retrying once if a transient
+     * Microsoft ACS failure leaves the SDK's cached auth token broken.
+     *
+     * \Office365\Runtime\Auth\ACSTokenProvider posts the client_credentials
+     * grant and hands the *decoded response body* straight to
+     * AuthenticationContext as the access token, without checking the HTTP
+     * status - if ACS itself has a transient hiccup, the "token" ends up
+     * being e.g. {"error":"invalid_request"} instead of a real one.
+     * AuthenticationContext::authenticateRequest() then only re-acquires a
+     * token when it is null, so once this happens every further request on
+     * the same ClientContext - not just the one that tripped over it - keeps
+     * sending the same broken token and failing identically. A plain
+     * ClientRuntimeContext::executeQueryRetry() doesn't help here: it resends
+     * the same request without touching the cached token.
+     *
+     * Calling ClientContext::withCredentials() again installs a fresh
+     * AuthenticationContext (token reset to null), forcing a brand new ACS
+     * token request on the next call, while $ctx and any ClientObject
+     * (folder, file, ...) built from it keep working unchanged - they only
+     * hold a reference to $ctx, not a copy.
+     *
+     * @param \Office365\SharePoint\ClientContext $ctx         context the operation acts through; reset in place on retry
+     * @param \Office365\Runtime\Auth\ClientCredential|\Office365\Runtime\Auth\UserCredentials $credentials credentials to reinstall on $ctx before retrying
+     * @param callable                             $operation   receives $ctx, performs the SharePoint call(s) and executeQuery(), and returns the result
+     * @param int                                   $maxAttempts total attempts including the first, before giving up
+     * @param int                                   $delaySeconds seconds to wait before a retry, to give ACS a moment to recover
+     *
+     * @return mixed whatever $operation returned
+     */
+    public static function withSharePointRetry(
+        \Office365\SharePoint\ClientContext $ctx,
+        $credentials,
+        callable $operation,
+        int $maxAttempts = 2,
+        int $delaySeconds = 2,
+    ) {
+        for ($attempt = 1; ; ++$attempt) {
+            try {
+                return $operation($ctx);
+            } catch (\Office365\Runtime\Http\RequestException $exc) {
+                if ($attempt >= $maxAttempts) {
+                    throw $exc;
+                }
+
+                sleep($delaySeconds);
+                $ctx->withCredentials($credentials);
+            }
+        }
     }
 }
