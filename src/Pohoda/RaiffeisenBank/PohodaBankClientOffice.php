@@ -21,15 +21,17 @@ use Ease\Shared;
  * Office365/SharePoint-specific diagnostics and resilience for the bank
  * statement upload flow.
  *
- * Used by pohodaSQL-raiffeisenbank-statements-sharepoint.php and
- * raiffeisenbank-statements-sharepoint-uploader.php to turn a bare
- * \Office365\Runtime\Http\RequestException into a report line that says
- * which file/operation failed, what Microsoft actually returned, and
- * (via probeOffice365Auth()) whether the OFFICE365_* credentials
- * themselves are still valid; to build the modern Entra ID v2 app-only
- * context (see buildEntraIdContext()) that replaces the retired Azure
- * ACS flow; and to retry an operation once on a transient auth failure
- * (see withSharePointRetry()).
+ * Used by pohodaSQL-raiffeisenbank-statements-sharepoint.php,
+ * raiffeisenbank-statements-sharepoint-uploader.php,
+ * raiffeisenbank-statements-sharepoint-checker.php and
+ * pohoda-sharepoint-link-fixer.php to turn a bare exception into a report
+ * line that says which file/operation failed, what Microsoft actually
+ * returned, and (via probeOffice365Auth()) whether the OFFICE365_*
+ * credentials themselves are still valid; to build the Microsoft Graph
+ * client (see buildGraphClient()) that replaces the retired Azure ACS flow
+ * for the client-id/secret case; and to retry a SharePoint ClientContext
+ * operation once on a transient auth failure (see withSharePointRetry()),
+ * used only by the separate, still-classic-REST-based user-credential flow.
  *
  * Microsoft fully retired SharePoint "App-Only via Azure ACS" on
  * 2026-04-02 for all tenants, with no extension possible (see
@@ -42,6 +44,20 @@ use Ease\Shared;
  * daramis) nor a credential/secret problem, it is Microsoft's
  * infrastructure no longer honoring ACS-issued tokens at all.
  *
+ * Switching the client-id/secret case's token source to Entra ID v2 alone
+ * (EntraIdAppOnlyAuthenticationContext) is not sufficient either: classic
+ * SharePoint REST (`_api/web/...`, what \Office365\SharePoint\ClientContext
+ * uses) checks the token's `appidacr` claim and requires `appidacr=2`
+ * (certificate-based app-only auth) - a client_credentials token obtained
+ * with a client *secret* always has `appidacr=1` and is unconditionally
+ * rejected with "Unsupported app only token.", regardless of permissions
+ * granted. Confirmed against daramis: the exact same token/app/site that
+ * gets HTTP 200 from Microsoft Graph gets HTTP 401 from `_api/web/title`.
+ * See https://techcommunity.microsoft.com/blog/microsoftmissioncriticalblog/avoiding-access-errors-with-sharepoint-app-only-access/4459761
+ * File operations for the client-id/secret case therefore go through
+ * GraphSharePointClient (Microsoft Graph's drive API) instead of
+ * \Office365\SharePoint\ClientContext/Folder/File.
+ *
  * @author vitex
  */
 abstract class PohodaBankClientOffice extends PohodaBankClient
@@ -52,26 +68,27 @@ abstract class PohodaBankClientOffice extends PohodaBankClient
     private static ?string $office365AuthProbe = null;
 
     /**
-     * Build a SharePoint ClientContext authenticated via the modern Entra ID
-     * v2 app-only client_credentials flow (replaces the retired ACS
-     * ClientCredential/withCredentials() path for the client-id/secret case).
+     * Build a GraphSharePointClient authenticated via the modern Entra ID v2
+     * app-only client_credentials flow (replaces the retired ACS
+     * ClientCredential/withCredentials() classic-REST path for the
+     * client-id/secret case).
      *
      * The app registration behind OFFICE365_CLIENTID/OFFICE365_CLSECRET must
      * have the Microsoft Graph "Sites.Selected" application permission,
      * admin-consented, and be granted access to the target site via
      * `POST /sites/{siteId}/permissions` - a token here does not by itself
-     * guarantee the REST call below will succeed if that grant is missing.
+     * guarantee the calls below will succeed if that grant is missing.
      */
-    public static function buildEntraIdContext(string $tenant, string $site, string $clientId, string $clientSecret): \Office365\SharePoint\ClientContext
+    public static function buildGraphClient(string $tenant, string $site, string $clientId, string $clientSecret): GraphSharePointClient
     {
         $authCtx = new EntraIdAppOnlyAuthenticationContext(
             $tenant,
             $clientId,
             $clientSecret,
-            'https://'.$tenant.'.sharepoint.com/.default',
+            'https://graph.microsoft.com/.default',
         );
 
-        return new \Office365\SharePoint\ClientContext('https://'.$tenant.'.sharepoint.com/sites/'.$site, $authCtx);
+        return new GraphSharePointClient($tenant, $site, $authCtx);
     }
 
     /**
@@ -92,21 +109,22 @@ abstract class PohodaBankClientOffice extends PohodaBankClient
         $detail = $exc->getMessage();
         $source = 'error';
 
-        if ($exc instanceof \Office365\Runtime\Http\RequestException) {
-            // Response is Microsoft's own OAuth2/SharePoint REST error JSON, not
-            // Pohoda mServer's - label it explicitly so it isn't mistaken for one.
-            $source = 'Office365/SharePoint API error';
+        if ($exc instanceof \Office365\Runtime\Http\RequestException || $exc instanceof GraphApiException) {
+            // Response is Microsoft's own OAuth2/SharePoint/Graph error JSON,
+            // not Pohoda mServer's - label it explicitly so it isn't mistaken
+            // for one.
+            $source = $exc instanceof GraphApiException ? 'Microsoft Graph API error' : 'Office365/SharePoint API error';
 
             if ($exc->getResponseBody()) {
                 $detail .= ' | response: '.$exc->getResponseBody();
             }
 
-            // The SDK exception alone often can't tell us whether the token
-            // acquisition itself failed (bad/expired secret, retired ACS
-            // realm) or whether auth succeeded and the failure is specific to
-            // the REST call that follows it (e.g. missing folder/permission).
-            // Re-run the token exchange independently, outside the SDK, so the
-            // report says which one it was without needing production access.
+            // The SDK/client exception alone often can't tell us whether the
+            // token acquisition itself failed (bad/expired secret, missing
+            // Graph permission) or whether auth succeeded and the failure is
+            // specific to the call that follows it (e.g. missing folder). Re-run
+            // the token exchange independently, so the report says which one it
+            // was without needing production access.
             $detail .= ' | '.self::probeOffice365Auth();
         }
 
@@ -140,14 +158,14 @@ abstract class PohodaBankClientOffice extends PohodaBankClient
             $tenant,
             Shared::cfg('OFFICE365_CLIENTID'),
             Shared::cfg('OFFICE365_CLSECRET'),
-            'https://'.$tenant.'.sharepoint.com/.default',
+            'https://graph.microsoft.com/.default',
         );
 
         try {
-            $authCtx->authenticateRequest(new \Office365\Runtime\Http\RequestOptions('https://'.$tenant.'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')));
+            $authCtx->getBearerToken();
 
-            return self::$office365AuthProbe = 'auth probe: independent Entra ID v2 token request succeeded (HTTP 200) - '
-                .'credentials/tenant/app registration are valid; if the SharePoint call above still failed with 401/403, '
+            return self::$office365AuthProbe = 'auth probe: independent Entra ID v2 (Microsoft Graph) token request succeeded (HTTP 200) - '
+                .'credentials/tenant/app registration are valid; if the call above still failed, '
                 .'the app is missing the Microsoft Graph "Sites.Selected" grant on this site';
         } catch (\Office365\Runtime\Http\RequestException $exc) {
             return self::$office365AuthProbe = \sprintf(

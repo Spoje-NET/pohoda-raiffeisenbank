@@ -1,3 +1,51 @@
+pohoda-raiffeisenbank (1.8.5) noble; urgency=medium
+
+  * Migrate SharePoint file upload/listing from classic REST
+    (\Office365\SharePoint\ClientContext/Folder/File) to Microsoft Graph's
+    drive API, for the client-id/secret (app-only) case only - the
+    OFFICE365_USERNAME/OFFICE365_PASSWORD user-credential flow is
+    unaffected. Switching the token source to Entra ID v2
+    (EntraIdAppOnlyAuthenticationContext, 1.8.4) fixed authentication
+    against Microsoft Graph, but not against classic SharePoint REST
+    (`_api/web/...`): that endpoint checks the token's `appidacr` claim and
+    requires `appidacr=2` (certificate-based app-only auth) - a
+    client_credentials token obtained with a client *secret* always has
+    `appidacr=1` and is unconditionally rejected with "Unsupported app
+    only token.", regardless of Sites.Selected permissions granted.
+    Confirmed against the daramis tenant: the exact same token/app/site
+    that gets HTTP 200 from Microsoft Graph gets HTTP 401 from
+    `_api/web/title`. See
+    https://techcommunity.microsoft.com/blog/microsoftmissioncriticalblog/avoiding-access-errors-with-sharepoint-app-only-access/4459761
+  * Add GraphSharePointClient (plain curl, no vgrem/php-spo dependency):
+    uploadFile()/listFiles() against `/v1.0/sites/{id}/drive/root:/...`,
+    with one built-in retry (forces a fresh token via
+    EntraIdAppOnlyAuthenticationContext::forceRefresh() before retrying).
+    Strips the configured OFFICE365_PATH's first segment (the default
+    document library's display name, e.g. "Sdilene dokumenty") before
+    building Graph paths, since Graph's `drive/root:/` already refers to
+    that same library - confirmed live (200 without the segment, 404
+    itemNotFound with it).
+  * Add GraphApiException, handled by describeRequestException() alongside
+    the existing \Office365\Runtime\Http\RequestException so both
+    transports report consistently.
+  * PohodaBankClientOffice::buildEntraIdContext() (built a classic-REST
+    ClientContext) replaced by buildGraphClient() (builds a
+    GraphSharePointClient); probeOffice365Auth() now probes the Graph
+    scope to match the auth path actually in use.
+  * Wired into pohodaSQL-raiffeisenbank-statements-sharepoint.php,
+    raiffeisenbank-statements-sharepoint-uploader.php,
+    raiffeisenbank-statements-sharepoint-checker.php and
+    pohoda-sharepoint-link-fixer.php via local $doUpload/$doList closures,
+    so the rest of each script doesn't need to know which transport
+    backs the client-credential case.
+  * NOTE: the uploaded file's reported URL changes format for the
+    client-credential case, from the classic
+    ".../_layouts/15/download.aspx?SourceUrl=..." link to Microsoft
+    Graph's own driveItem `webUrl` - both are valid direct links to the
+    file. The user-credential flow's link format is unchanged.
+
+ -- vitex <info@vitexsoftware.cz>  Tue, 07 Jul 2026 08:00:00 +0200
+
 pohoda-raiffeisenbank (1.8.4) noble; urgency=medium
 
   * Add EntraIdAppOnlyAuthenticationContext: real Entra ID (Azure AD) v2

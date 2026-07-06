@@ -64,11 +64,23 @@ final class EntraIdAppOnlyAuthenticationContext implements IAuthenticationContex
 
     public function authenticateRequest(RequestOptions $request): void
     {
+        $request->ensureHeader('Authorization', 'Bearer '.$this->getBearerToken());
+    }
+
+    /**
+     * Raw access token, acquiring/refreshing it as needed. For callers that
+     * talk to an API directly (e.g. Microsoft Graph via plain curl) rather
+     * than through an \Office365\Runtime\Http\RequestOptions-based SDK call.
+     *
+     * @throws RequestException when the token endpoint doesn't return a usable token
+     */
+    public function getBearerToken(): string
+    {
         if ($this->accessToken === null || time() >= $this->expiresAt) {
             $this->acquireToken();
         }
 
-        $request->ensureHeader('Authorization', 'Bearer '.$this->accessToken);
+        return $this->accessToken;
     }
 
     /**

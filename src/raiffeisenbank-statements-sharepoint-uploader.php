@@ -81,42 +81,64 @@ if (!$certValid) {
 
         if ($pdfStatements) {
             if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
-                // Legacy user credential flow, untouched by the ACS retirement.
+                // Legacy user credential flow, untouched by the ACS retirement -
+                // still goes through classic SharePoint REST (_api/web/...).
                 $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
                 $engine->addStatusMessage('Using OFFICE365_USERNAME '.Shared::cfg('OFFICE365_USERNAME').' and OFFICE365_PASSWORD', 'debug');
                 $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
                 $resetAuth = static function () use ($ctx, $credentials): void {
                     $ctx->withCredentials($credentials);
                 };
+                $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
+                $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
+
+                $doList = static function () use ($ctx, $resetAuth, $targetFolder): array {
+                    $sharepointFilesRaw = PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function () use ($targetFolder) {
+                        return $targetFolder->getFiles()->get()->executeQuery();
+                    });
+                    $sharepointFiles = [];
+
+                    // @phpstan-ignore foreach.nonIterable
+                    foreach ($sharepointFilesRaw as $fileInSharepint) {
+                        $sharepointFiles[$fileInSharepint->getName()] = $fileInSharepint->getServerRelativeUrl();
+                    }
+
+                    return $sharepointFiles;
+                };
+                $doUpload = static function (string $uploadAs, string $contents) use ($ctx, $resetAuth, $targetFolder): string {
+                    return PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function ($ctx) use ($targetFolder, $uploadAs, $contents) {
+                        $uploadFile = $targetFolder->uploadFile(basename($uploadAs), $contents);
+                        $ctx->executeQuery();
+
+                        return $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
+                    });
+                };
             } else {
-                // Modern Entra ID v2 app-only client_credentials, replacing the
-                // Azure ACS flow Microsoft fully retired on 2026-04-02.
-                $engine->addStatusMessage('Using Entra ID v2 app-only auth with OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID'), 'debug');
-                $ctx = PohodaBankClientOffice::buildEntraIdContext(
+                // Client-id/secret (app-only) case goes through Microsoft
+                // Graph, not classic SharePoint REST - see
+                // PohodaBankClientOffice's class docblock for why
+                // (client-secret tokens are unconditionally rejected by
+                // _api/web/... regardless of permissions granted,
+                // "Unsupported app only token.").
+                $engine->addStatusMessage('Using Microsoft Graph API (Entra ID v2 app-only) with OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID'), 'debug');
+                $graph = PohodaBankClientOffice::buildGraphClient(
                     Shared::cfg('OFFICE365_TENANT'),
                     Shared::cfg('OFFICE365_SITE'),
                     Shared::cfg('OFFICE365_CLIENTID'),
                     Shared::cfg('OFFICE365_CLSECRET'),
                 );
-                $resetAuth = static function () use ($ctx): void {
-                    $ctx->getAuthenticationContext()->forceRefresh();
+                $path = Shared::cfg('OFFICE365_PATH');
+
+                $doList = static function () use ($graph, $path): array {
+                    return $graph->listFiles($path);
+                };
+                $doUpload = static function (string $uploadAs, string $contents) use ($graph, $path): string {
+                    return (string) $graph->uploadFile($path, basename($uploadAs), $contents)['webUrl'];
                 };
             }
 
-            $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
-
-            $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
-
             try {
-                $sharepointFilesRaw = PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function () use ($targetFolder) {
-                    return $targetFolder->getFiles()->get()->executeQuery();
-                });
-                $sharepointFiles = [];
-
-                // @phpstan-ignore foreach.nonIterable
-                foreach ($sharepointFilesRaw as $fileInSharepint) {
-                    $sharepointFiles[$fileInSharepint->getName()] = $fileInSharepint->getServerRelativeUrl();
-                }
+                $sharepointFiles = $doList();
 
                 foreach ($pdfStatements as $pdfStatement) {
                     $uploadAs = Statementor::statementFilename($pdfStatement);
@@ -164,12 +186,7 @@ if (!$certValid) {
                             }
 
                             try {
-                                $uploaded = PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function ($ctx) use ($targetFolder, $uploadAs, $pdfFilePath) {
-                                    $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents($pdfFilePath));
-                                    $ctx->executeQuery();
-
-                                    return $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
-                                });
+                                $uploaded = $doUpload($uploadAs, file_get_contents($pdfFilePath));
                                 $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
                                 $report['sharepoint'][basename($pdfStatement)] = $uploaded;
                                 $fileUrls[basename($pdfStatement)] = $uploaded;
@@ -195,8 +212,10 @@ if (!$certValid) {
                         }
                     }
                 }
-            } catch (\Office365\Runtime\Http\RequestException $exc) {
-                $report['message'] = $exc->getMessage();
+            } catch (\Office365\Runtime\Http\RequestException|GraphApiException $exc) {
+                $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'SharePoint file listing');
+                $report['message'] = $errorMessage;
+                $engine->addStatusMessage($errorMessage, 'error');
                 $exitcode = $exc->getCode();
             }
         }

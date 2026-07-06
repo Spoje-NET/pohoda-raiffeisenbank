@@ -90,43 +90,57 @@ if (Shared::cfg('APP_DEBUG', false)) {
 $logger->addStatusMessage('stage 1/3: Listing SharePoint statement PDFs', 'debug');
 
 if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
-    // Legacy user credential flow, untouched by the ACS retirement.
+    // Legacy user credential flow, untouched by the ACS retirement - still
+    // goes through classic SharePoint REST (_api/web/...).
     $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
     $logger->addStatusMessage('Using OFFICE365_USERNAME '.Shared::cfg('OFFICE365_USERNAME'), 'debug');
     $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
     $resetAuth = static function () use ($ctx, $credentials): void {
         $ctx->withCredentials($credentials);
     };
+    $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
+
+    $doList = static function () use ($ctx, $resetAuth, $targetFolder): array {
+        $sharepointFilesRaw = PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function () use ($targetFolder) {
+            return $targetFolder->getFiles()->get()->executeQuery();
+        });
+        $files = [];
+
+        // @phpstan-ignore foreach.nonIterable
+        foreach ($sharepointFilesRaw as $spFile) {
+            $files[$spFile->getName()] = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($spFile->getServerRelativeUrl());
+        }
+
+        return $files;
+    };
 } else {
-    // Modern Entra ID v2 app-only client_credentials, replacing the Azure
-    // ACS flow Microsoft fully retired on 2026-04-02.
-    $logger->addStatusMessage('Using Entra ID v2 app-only auth with OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID'), 'debug');
-    $ctx = PohodaBankClientOffice::buildEntraIdContext(
+    // Client-id/secret (app-only) case goes through Microsoft Graph, not
+    // classic SharePoint REST - see PohodaBankClientOffice's class docblock
+    // for why (client-secret tokens are unconditionally rejected by
+    // _api/web/... regardless of permissions granted, "Unsupported app only
+    // token.").
+    $logger->addStatusMessage('Using Microsoft Graph API (Entra ID v2 app-only) with OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID'), 'debug');
+    $graph = PohodaBankClientOffice::buildGraphClient(
         Shared::cfg('OFFICE365_TENANT'),
         Shared::cfg('OFFICE365_SITE'),
         Shared::cfg('OFFICE365_CLIENTID'),
         Shared::cfg('OFFICE365_CLSECRET'),
     );
-    $resetAuth = static function () use ($ctx): void {
-        $ctx->getAuthenticationContext()->forceRefresh();
+    $path = Shared::cfg('OFFICE365_PATH');
+
+    $doList = static function () use ($graph, $path): array {
+        return $graph->listFiles($path);
     };
 }
-
-$targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
 
 // Date → ['filename' => ..., 'url' => ...] mapping built from SharePoint filenames.
 // Filename pattern: {statNum}_{account}_{accountId}_{currency}_{YYYY-MM-DD}.pdf
 $dateToSharepoint = [];
 
 try {
-    $sharepointFilesRaw = PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function () use ($targetFolder) {
-        return $targetFolder->getFiles()->get()->executeQuery();
-    });
+    $sharepointFiles = $doList();
 
-    // @phpstan-ignore foreach.nonIterable
-    foreach ($sharepointFilesRaw as $spFile) {
-        $name = $spFile->getName();
-
+    foreach ($sharepointFiles as $name => $url) {
         if (!preg_match('/\.pdf$/i', $name)) {
             continue;
         }
@@ -142,7 +156,6 @@ try {
                 continue;
             }
 
-            $url = $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($spFile->getServerRelativeUrl());
             $dateToSharepoint[$fileDate] = ['filename' => $name, 'url' => $url];
             $logger->addStatusMessage(sprintf('SharePoint: %s (%s)', $name, $fileDate), 'debug');
         }
