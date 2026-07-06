@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Pohoda\RaiffeisenBank;
 
 use Ease\Shared;
-use Office365\Runtime\Auth\ClientCredential;
 use Office365\Runtime\Auth\UserCredentials;
 use Office365\SharePoint\ClientContext;
 
@@ -82,20 +81,34 @@ if (!$certValid) {
 
         if ($pdfStatements) {
             if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
+                // Legacy user credential flow, untouched by the ACS retirement.
                 $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
                 $engine->addStatusMessage('Using OFFICE365_USERNAME '.Shared::cfg('OFFICE365_USERNAME').' and OFFICE365_PASSWORD', 'debug');
+                $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
+                $resetAuth = static function () use ($ctx, $credentials): void {
+                    $ctx->withCredentials($credentials);
+                };
             } else {
-                $credentials = new ClientCredential(Shared::cfg('OFFICE365_CLIENTID'), Shared::cfg('OFFICE365_CLSECRET'));
-                $engine->addStatusMessage('Using OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID').' and OFFICE365_CLSECRET', 'debug');
+                // Modern Entra ID v2 app-only client_credentials, replacing the
+                // Azure ACS flow Microsoft fully retired on 2026-04-02.
+                $engine->addStatusMessage('Using Entra ID v2 app-only auth with OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID'), 'debug');
+                $ctx = PohodaBankClientOffice::buildEntraIdContext(
+                    Shared::cfg('OFFICE365_TENANT'),
+                    Shared::cfg('OFFICE365_SITE'),
+                    Shared::cfg('OFFICE365_CLIENTID'),
+                    Shared::cfg('OFFICE365_CLSECRET'),
+                );
+                $resetAuth = static function () use ($ctx): void {
+                    $ctx->getAuthenticationContext()->forceRefresh();
+                };
             }
 
-            $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
             $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
 
             $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
 
             try {
-                $sharepointFilesRaw = PohodaBankClientOffice::withSharePointRetry($ctx, $credentials, static function () use ($targetFolder) {
+                $sharepointFilesRaw = PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function () use ($targetFolder) {
                     return $targetFolder->getFiles()->get()->executeQuery();
                 });
                 $sharepointFiles = [];
@@ -151,7 +164,7 @@ if (!$certValid) {
                             }
 
                             try {
-                                $uploaded = PohodaBankClientOffice::withSharePointRetry($ctx, $credentials, static function ($ctx) use ($targetFolder, $uploadAs, $pdfFilePath) {
+                                $uploaded = PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function ($ctx) use ($targetFolder, $uploadAs, $pdfFilePath) {
                                     $uploadFile = $targetFolder->uploadFile(basename($uploadAs), file_get_contents($pdfFilePath));
                                     $ctx->executeQuery();
 

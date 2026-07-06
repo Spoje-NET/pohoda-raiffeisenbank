@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Pohoda\RaiffeisenBank;
 
 use Ease\Shared;
-use Office365\Runtime\Auth\ClientCredential;
 use Office365\Runtime\Auth\UserCredentials;
 use Office365\SharePoint\ClientContext;
 
@@ -91,14 +90,28 @@ if (Shared::cfg('APP_DEBUG', false)) {
 $logger->addStatusMessage('stage 1/3: Listing SharePoint statement PDFs', 'debug');
 
 if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
+    // Legacy user credential flow, untouched by the ACS retirement.
     $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
     $logger->addStatusMessage('Using OFFICE365_USERNAME '.Shared::cfg('OFFICE365_USERNAME'), 'debug');
+    $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
+    $resetAuth = static function () use ($ctx, $credentials): void {
+        $ctx->withCredentials($credentials);
+    };
 } else {
-    $credentials = new ClientCredential(Shared::cfg('OFFICE365_CLIENTID'), Shared::cfg('OFFICE365_CLSECRET'));
-    $logger->addStatusMessage('Using OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID'), 'debug');
+    // Modern Entra ID v2 app-only client_credentials, replacing the Azure
+    // ACS flow Microsoft fully retired on 2026-04-02.
+    $logger->addStatusMessage('Using Entra ID v2 app-only auth with OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID'), 'debug');
+    $ctx = PohodaBankClientOffice::buildEntraIdContext(
+        Shared::cfg('OFFICE365_TENANT'),
+        Shared::cfg('OFFICE365_SITE'),
+        Shared::cfg('OFFICE365_CLIENTID'),
+        Shared::cfg('OFFICE365_CLSECRET'),
+    );
+    $resetAuth = static function () use ($ctx): void {
+        $ctx->getAuthenticationContext()->forceRefresh();
+    };
 }
 
-$ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
 $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
 
 // Date → ['filename' => ..., 'url' => ...] mapping built from SharePoint filenames.
@@ -106,7 +119,9 @@ $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE
 $dateToSharepoint = [];
 
 try {
-    $sharepointFilesRaw = $targetFolder->getFiles()->get()->executeQuery();
+    $sharepointFilesRaw = PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function () use ($targetFolder) {
+        return $targetFolder->getFiles()->get()->executeQuery();
+    });
 
     // @phpstan-ignore foreach.nonIterable
     foreach ($sharepointFilesRaw as $spFile) {

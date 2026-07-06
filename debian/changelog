@@ -1,3 +1,39 @@
+pohoda-raiffeisenbank (1.8.4) noble; urgency=medium
+
+  * Add EntraIdAppOnlyAuthenticationContext: real Entra ID (Azure AD) v2
+    app-only client_credentials authentication for SharePoint, replacing
+    the Azure ACS app-only flow Microsoft fully retired on 2026-04-02 (no
+    extension possible for any tenant, see
+    https://learn.microsoft.com/sharepoint/dev/sp-add-ins/retirement-announcement-for-azure-acs).
+    Confirmed against the daramis tenant: ACS's token endpoint still issues
+    a syntactically valid token, but SharePoint Online now rejects it on
+    the actual REST call (HTTP 401 {"error":"invalid_request"}) regardless
+    of credentials or the tenant's DisableCustomAppAuthentication setting.
+    Implements Office365\Runtime\Auth\IAuthenticationContext directly
+    (rather than extending the SDK's AuthenticationContext, whose
+    authenticateRequest() only builds the Authorization header for its own
+    ACSTokenProvider/AADTokenProvider instances) so it can be passed
+    straight to `new ClientContext($url, $authCtx)`.
+  * Add PohodaBankClientOffice::buildEntraIdContext() to construct a
+    ClientContext authenticated this way from OFFICE365_TENANT/_SITE/
+    _CLIENTID/_CLSECRET, used by pohodaSQL-raiffeisenbank-statements-sharepoint.php,
+    raiffeisenbank-statements-sharepoint-uploader.php,
+    raiffeisenbank-statements-sharepoint-checker.php and
+    pohoda-sharepoint-link-fixer.php for the client-id/secret auth case (the
+    OFFICE365_USERNAME/_PASSWORD user-credential flow is unchanged, ACS
+    retirement doesn't affect it)
+  * Rework probeOffice365Auth() to independently test the Entra ID v2 flow
+    instead of the now-permanently-dead ACS one, and generalize
+    withSharePointRetry()'s second parameter from SDK credentials
+    (ACS-specific reset via withCredentials()) to a plain reset callback, so
+    it works for EntraIdAppOnlyAuthenticationContext::forceRefresh() too
+  * NOTE: the app registration behind OFFICE365_CLIENTID/OFFICE365_CLSECRET
+    still needs the Microsoft Graph "Sites.Selected" application permission,
+    admin-consented, and an explicit grant on the target site via
+    `POST /sites/{siteId}/permissions` - confirmed by hand against daramis
+    that a valid Entra ID v2 token alone is not sufficient without it
+    (SharePoint responds "Unsupported app only token.")
+
 pohoda-raiffeisenbank (1.8.3) noble; urgency=medium
 
   * Add PohodaBankClientOffice::withSharePointRetry(): retries a SharePoint

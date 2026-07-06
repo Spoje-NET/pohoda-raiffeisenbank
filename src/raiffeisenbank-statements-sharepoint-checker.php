@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Pohoda\RaiffeisenBank;
 
 use Ease\Shared;
-use Office365\Runtime\Auth\ClientCredential;
 use Office365\Runtime\Auth\UserCredentials;
 use Office365\SharePoint\ClientContext;
 
@@ -66,34 +65,57 @@ if (!$certValid) {
 
         if ($pdfStatements) {
             if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
+                // Legacy user credential flow, untouched by the ACS retirement.
                 $credentials = new UserCredentials(Shared::cfg('OFFICE365_USERNAME'), Shared::cfg('OFFICE365_PASSWORD'));
                 $engine->addStatusMessage('Using OFFICE365_USERNAME '.Shared::cfg('OFFICE365_USERNAME').' and OFFICE365_PASSWORD', 'debug');
+                $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
+                $resetAuth = static function () use ($ctx, $credentials): void {
+                    $ctx->withCredentials($credentials);
+                };
             } else {
-                $credentials = new ClientCredential(Shared::cfg('OFFICE365_CLIENTID'), Shared::cfg('OFFICE365_CLSECRET'));
-                $engine->addStatusMessage('Using OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID').' and OFFICE365_CLSECRET', 'debug');
+                // Modern Entra ID v2 app-only client_credentials, replacing the
+                // Azure ACS flow Microsoft fully retired on 2026-04-02.
+                $engine->addStatusMessage('Using Entra ID v2 app-only auth with OFFICE365_CLIENTID '.Shared::cfg('OFFICE365_CLIENTID'), 'debug');
+                $ctx = PohodaBankClientOffice::buildEntraIdContext(
+                    Shared::cfg('OFFICE365_TENANT'),
+                    Shared::cfg('OFFICE365_SITE'),
+                    Shared::cfg('OFFICE365_CLIENTID'),
+                    Shared::cfg('OFFICE365_CLSECRET'),
+                );
+                $resetAuth = static function () use ($ctx): void {
+                    $ctx->getAuthenticationContext()->forceRefresh();
+                };
             }
 
-            $ctx = (new ClientContext('https://'.Shared::cfg('OFFICE365_TENANT').'.sharepoint.com/sites/'.Shared::cfg('OFFICE365_SITE')))->withCredentials($credentials);
             $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
 
             $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
 
-            $sharepointFilesRaw = $targetFolder->getFiles()->get()->executeQuery();
-            $sharepointFiles = [];
+            try {
+                $sharepointFilesRaw = PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function () use ($targetFolder) {
+                    return $targetFolder->getFiles()->get()->executeQuery();
+                });
+                $sharepointFiles = [];
 
-            // @phpstan-ignore foreach.nonIterable
-            foreach ($sharepointFilesRaw as $fileInSharepint) {
-                $sharepointFiles[$fileInSharepint->getName()] = $fileInSharepint->getServerRelativeUrl();
-            }
-
-            foreach ($pdfStatements as $pdfStatement) {
-                if (\array_key_exists($pdfStatement, $sharepointFiles)) {
-                    $engine->addStatusMessage(sprintf(_('File %s exists in SharePoint'), $pdfStatement), 'success');
-                    $report['existing'][] = $pdfStatement;
-                } else {
-                    $engine->addStatusMessage(sprintf(_('File %s does not exist in SharePoint'), $pdfStatement), 'warning');
-                    $report['missing'][] = $pdfStatement;
+                // @phpstan-ignore foreach.nonIterable
+                foreach ($sharepointFilesRaw as $fileInSharepint) {
+                    $sharepointFiles[$fileInSharepint->getName()] = $fileInSharepint->getServerRelativeUrl();
                 }
+
+                foreach ($pdfStatements as $pdfStatement) {
+                    if (\array_key_exists($pdfStatement, $sharepointFiles)) {
+                        $engine->addStatusMessage(sprintf(_('File %s exists in SharePoint'), $pdfStatement), 'success');
+                        $report['existing'][] = $pdfStatement;
+                    } else {
+                        $engine->addStatusMessage(sprintf(_('File %s does not exist in SharePoint'), $pdfStatement), 'warning');
+                        $report['missing'][] = $pdfStatement;
+                    }
+                }
+            } catch (\Office365\Runtime\Http\RequestException $exc) {
+                $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'SharePoint file listing');
+                $engine->addStatusMessage($errorMessage, 'error');
+                $report['mesage'] = $errorMessage;
+                $exitcode = 1;
             }
         }
     } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
