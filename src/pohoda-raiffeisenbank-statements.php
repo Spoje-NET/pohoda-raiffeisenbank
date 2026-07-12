@@ -92,7 +92,14 @@ try {
     }
 }
 
-if ($engine->isOnline()) {
+try {
+    $mServerOnline = $engine->isOnline();
+} catch (\mServer\HttpException $exc) {
+    $mServerOnline = false;
+    $engine->lastCurlResponse = $exc->getMessage();
+}
+
+if ($mServerOnline) {
     $report['inserted'] = $engine->import();
     $report['messages'] = $engine->getMessages();
     $report['exitcode'] = $engine->getExitCode();

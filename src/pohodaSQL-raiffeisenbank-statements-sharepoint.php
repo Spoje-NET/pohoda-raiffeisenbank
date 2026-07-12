@@ -252,7 +252,14 @@ if (!$certValid) {
     }
 
     if ($xmlStatements) {
-        if ($engine->isOnline()) {
+        try {
+            $mServerOnline = $engine->isOnline();
+        } catch (\mServer\HttpException $exc) {
+            $mServerOnline = false;
+            $engine->lastCurlResponse = $exc->getMessage();
+        }
+
+        if ($mServerOnline) {
             $engine->addStatusMessage('stage 4/6: Import XML Statements to Pohoda via mServer', 'debug');
             $inserted = $engine->import(Shared::cfg('POHODA_BANK_IDS', ''));
 
