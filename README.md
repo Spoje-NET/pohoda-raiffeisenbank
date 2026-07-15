@@ -149,6 +149,12 @@ All scripts perform certificate validation before attempting API calls. If the c
 * `145` - API authentication error (HTTP 401 Unauthorized - typically certificate blocked or invalid)
 * `254` - Another exception without numeric code occurred
 
+**mServer availability (exit code 3):** before importing, `pohodasql-raiffeisenbank-statements-sharepoint` probes `POHODA_URL` via `isOnline()`. If that check fails, `PohodaBankClient::describeMServerOfflineReason()` turns the raw curl/HTTP state into a specific message instead of a bare `mServer error:` line, e.g.:
+* `mServer at http://SE-APP01:40016 is unreachable: Connection timed out after 30001 milliseconds` - transport-level failure (connection refused, timeout, DNS)
+* `mServer at http://SE-APP01:40016 responded with HTTP 500 and an empty body (mServer may be restarting, overloaded, or crashed)` - mServer process itself is unhealthy
+* `mServer at http://SE-APP01:40016 returned HTTP 200 without the expected "Response from POHODA mServer" marker (got: ...)` - something else is answering on that port/URL
+This message is written both to the status log and to the JSON report's `pohoda.error`/`message` fields.
+
 **Note on Exit Codes:** Unix/Linux exit codes are limited to 0-255. When an HTTP error code like 401 (Unauthorized) is used as an exit code, it may be truncated by the shell to its modulo 256 value. For example:
 * HTTP 401 → Unix exit code 145 (401 % 256 = 145)
 * The full HTTP status code and error details are always available in the JSON report's `message` field

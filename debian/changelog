@@ -1,3 +1,11 @@
+pohoda-raiffeisenbank (1.8.6) noble; urgency=medium
+
+  * Add specific mServer offline diagnostics (HTTP status/body/curl
+    error) instead of a bare 'mServer error:' line; surface the reason
+    in the JSON report's pohoda.error/message fields.
+
+ -- Vitex <cybervitexus@gmail.com>  Wed, 15 Jul 2026 11:31:57 +0200
+
 pohoda-raiffeisenbank (1.8.5) noble; urgency=medium
 
   * Migrate SharePoint file upload/listing from classic REST

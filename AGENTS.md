@@ -158,7 +158,7 @@ multiflexi-cli application:validate-json --file multiflexi/[filename].app.json
 The application uses specific exit codes:
 
 - `2`: Error obtaining PDF statements
-- `3`: Error accessing Pohoda mServer  
+- `3`: Error accessing Pohoda mServer (see `PohodaBankClient::describeMServerOfflineReason()` for the specific reason - transport failure vs. HTTP error vs. malformed response - logged and put into the JSON report's `pohoda.error`/`message` fields)
 - `4`: SharePoint connection problem
 - `254`: Generic exception without numeric code
 - `401`: User not authorized to import XML files to Pohoda
