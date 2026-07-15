@@ -607,6 +607,47 @@ EOD;
     }
 
     /**
+     * Build a specific diagnostic message for a failed mServer::isOnline() check.
+     *
+     * isOnline() only throws on curl-transport failures (connection refused, timeout);
+     * an HTTP-level failure (e.g. 500 from an overloaded/restarting mServer instance)
+     * just returns false with lastResponseCode/lastCurlResponse left for us to inspect,
+     * which otherwise produces an empty "mServer error: " log line.
+     *
+     * @param \mServer\Client $engine mServer client right after a failed isOnline() call
+     * @param string          $url    URL that was probed (POHODA_URL)
+     */
+    public static function describeMServerOfflineReason(\mServer\Client $engine, string $url): string
+    {
+        $code = $engine->lastResponseCode;
+        $body = trim((string) $engine->lastCurlResponse);
+        $curlError = trim((string) $engine->lastCurlError);
+
+        if ($code === null || $code === 0) {
+            return sprintf('mServer at %s is unreachable: %s', $url, $curlError !== '' ? $curlError : ($body !== '' ? $body : 'no response received (timeout?)'));
+        }
+
+        if ($code !== 200) {
+            return sprintf(
+                'mServer at %s responded with HTTP %d%s',
+                $url,
+                $code,
+                $body === '' ? ' and an empty body (mServer may be restarting, overloaded, or crashed)' : ': '.mb_substr($body, 0, 300),
+            );
+        }
+
+        if ($body === '') {
+            return sprintf('mServer at %s returned HTTP 200 with an empty body (expected "Response from POHODA mServer")', $url);
+        }
+
+        if (!str_contains($body, 'Response from POHODA mServer')) {
+            return sprintf('mServer at %s returned HTTP 200 without the expected "Response from POHODA mServer" marker (got: %s)', $url, mb_substr($body, 0, 300));
+        }
+
+        return sprintf('mServer at %s: availability check failed for an unknown reason', $url);
+    }
+
+    /**
      * Scan an array of status messages (objects or strings) and return first auth error message.
      *
      * @param array<int, mixed> $messages Status messages from engine

@@ -140,4 +140,84 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::describeMServerOfflineReason
+     */
+    public function testDescribeMServerOfflineReasonTransportFailure(): void
+    {
+        $client = new \mServer\Client();
+        $client->lastResponseCode = 0;
+        $client->lastCurlResponse = '';
+        $client->lastCurlError = 'Connection timed out after 30001 milliseconds';
+
+        $reason = PohodaBankClient::describeMServerOfflineReason($client, 'http://SE-APP01:40016');
+
+        $this->assertStringContainsString('http://SE-APP01:40016', $reason);
+        $this->assertStringContainsString('unreachable', $reason);
+        $this->assertStringContainsString('Connection timed out', $reason);
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::describeMServerOfflineReason
+     */
+    public function testDescribeMServerOfflineReasonHttpErrorWithEmptyBody(): void
+    {
+        $client = new \mServer\Client();
+        $client->lastResponseCode = 500;
+        $client->lastCurlResponse = '';
+        $client->lastCurlError = '';
+
+        $reason = PohodaBankClient::describeMServerOfflineReason($client, 'http://SE-APP01:40016');
+
+        $this->assertStringContainsString('HTTP 500', $reason);
+        $this->assertStringContainsString('empty body', $reason);
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::describeMServerOfflineReason
+     */
+    public function testDescribeMServerOfflineReasonHttpErrorWithBody(): void
+    {
+        $client = new \mServer\Client();
+        $client->lastResponseCode = 503;
+        $client->lastCurlResponse = 'Service temporarily unavailable';
+        $client->lastCurlError = '';
+
+        $reason = PohodaBankClient::describeMServerOfflineReason($client, 'http://SE-APP01:40016');
+
+        $this->assertStringContainsString('HTTP 503', $reason);
+        $this->assertStringContainsString('Service temporarily unavailable', $reason);
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::describeMServerOfflineReason
+     */
+    public function testDescribeMServerOfflineReasonOkButNoMarker(): void
+    {
+        $client = new \mServer\Client();
+        $client->lastResponseCode = 200;
+        $client->lastCurlResponse = '<html><body>Not mServer</body></html>';
+        $client->lastCurlError = '';
+
+        $reason = PohodaBankClient::describeMServerOfflineReason($client, 'http://SE-APP01:40016');
+
+        $this->assertStringContainsString('without the expected', $reason);
+        $this->assertStringContainsString('Not mServer', $reason);
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::describeMServerOfflineReason
+     */
+    public function testDescribeMServerOfflineReasonOkWithEmptyBody(): void
+    {
+        $client = new \mServer\Client();
+        $client->lastResponseCode = 200;
+        $client->lastCurlResponse = '';
+        $client->lastCurlError = '';
+
+        $reason = PohodaBankClient::describeMServerOfflineReason($client, 'http://SE-APP01:40016');
+
+        $this->assertStringContainsString('empty body', $reason);
+    }
 }

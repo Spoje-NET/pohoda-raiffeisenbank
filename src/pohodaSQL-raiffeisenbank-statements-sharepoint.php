@@ -256,7 +256,6 @@ if (!$certValid) {
             $mServerOnline = $engine->isOnline();
         } catch (\mServer\HttpException $exc) {
             $mServerOnline = false;
-            $engine->lastCurlResponse = $exc->getMessage();
         }
 
         if ($mServerOnline) {
@@ -310,7 +309,10 @@ if (!$certValid) {
                 $engine->addStatusMessage(_('Empty statement(s)'), 'warning');
             }
         } else {
-            $engine->addStatusMessage('mServer error: '.$engine->lastCurlResponse, 'error');
+            $mServerOfflineReason = PohodaBankClient::describeMServerOfflineReason($engine, Shared::cfg('POHODA_URL'));
+            $engine->addStatusMessage($mServerOfflineReason, 'error');
+            $report['pohoda'] = ['error' => $mServerOfflineReason];
+            $report['message'] = $mServerOfflineReason;
 
             if ($exitcode === 0) {
                 $exitcode = 3;
