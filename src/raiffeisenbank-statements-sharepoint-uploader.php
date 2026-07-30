@@ -128,12 +128,21 @@ if (!$certValid) {
                     Shared::cfg('OFFICE365_CLSECRET'),
                 );
                 $path = Shared::cfg('OFFICE365_PATH');
+                $permanentLink = Shared::cfg('SHAREPOINT_PERMANENT_LINK', 'true') !== 'false';
+                $linkType = Shared::cfg('SHAREPOINT_LINK_TYPE', 'view');
+                $linkScope = Shared::cfg('SHAREPOINT_LINK_SCOPE', 'organization');
 
                 $doList = static function () use ($graph, $path): array {
                     return $graph->listFiles($path);
                 };
-                $doUpload = static function (string $uploadAs, string $contents) use ($graph, $path): string {
-                    return (string) $graph->uploadFile($path, basename($uploadAs), $contents)['webUrl'];
+                $doUpload = static function (string $uploadAs, string $contents) use ($graph, $path, $permanentLink, $linkType, $linkScope): string {
+                    $uploaded = $graph->uploadFile($path, basename($uploadAs), $contents);
+
+                    if ($permanentLink) {
+                        return $graph->createShareLink((string) $uploaded['id'], $linkType, $linkScope);
+                    }
+
+                    return (string) $uploaded['webUrl'];
                 };
             }
 
@@ -209,6 +218,10 @@ if (!$certValid) {
                                     $exitcode = (int) $codeRaw[1];
                                 }
                             }
+
+                            if ($exitcode === 429) {
+                                $exitcode = 174; // "Too many requests. Rate limit exceeded." per the .multiflexi.app.json manifest
+                            }
                         }
                     }
                 }
@@ -223,13 +236,18 @@ if (!$certValid) {
         $report['mesage'] = $exc->getMessage();
         $engine->addStatusMessage($report['mesage'], 'error');
         $exitcode = $exc->getCode();
-        $report['exitcode'] = $exitcode;
 
         if (!$exitcode) {
             if (preg_match('/cURL error ([0-9]*):/', $report['message'], $codeRaw)) {
                 $exitcode = (int) $codeRaw[1];
             }
         }
+
+        if ($exitcode === 429) {
+            $exitcode = 174; // "Too many requests. Rate limit exceeded." per the .multiflexi.app.json manifest
+        }
+
+        $report['exitcode'] = $exitcode;
     }
 }
 

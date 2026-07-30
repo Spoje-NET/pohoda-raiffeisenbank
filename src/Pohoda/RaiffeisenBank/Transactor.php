@@ -57,14 +57,22 @@ class Transactor extends PohodaBankClient
             } while ($result['lastPage'] === false);
         } catch (\VitexSoftware\Raiffeisenbank\ApiException $e) {
             $errorMessage = $e->getMessage();
-            preg_match('/cURL error ([0-9]+)/', $errorMessage, $matches);
+            $errorCode = $e->getCode();
 
-            if (\array_key_exists(1, $matches)) {
-                $errorCode = $matches[1];
-            } elseif (preg_match('/\[([0-9]+)\]/', $errorMessage, $matches)) {
-                $errorCode = $matches[1];
-            } else {
-                $errorCode = 2;
+            if (!$errorCode) {
+                preg_match('/cURL error ([0-9]+)/', $errorMessage, $matches);
+
+                if (\array_key_exists(1, $matches)) {
+                    $errorCode = $matches[1];
+                } elseif (preg_match('/\[([0-9]+)\]/', $errorMessage, $matches)) {
+                    $errorCode = $matches[1];
+                } else {
+                    $errorCode = 2;
+                }
+            }
+
+            if ((int) $errorCode === 429) {
+                $errorCode = 174; // "Too many requests. Rate limit exceeded." per the .multiflexi.app.json manifest
             }
 
             $this->addStatusMessage('Exception when calling GetTransactionListApi->getTransactionList: '.$errorMessage, 'error', $apiInstance);

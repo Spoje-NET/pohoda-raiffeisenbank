@@ -90,6 +90,10 @@ try {
             $exitcode = 1; // Generic error if no specific code available
         }
     }
+
+    if ($exitcode === 429) {
+        $exitcode = 174; // "Too many requests. Rate limit exceeded." per the .multiflexi.app.json manifest
+    }
 }
 
 try {

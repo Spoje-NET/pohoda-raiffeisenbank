@@ -1,6 +1,8 @@
 # Raiffeisenbank for Stormware Pohoda
 
 ![](pohoda-raiffeisenbank.svg?raw=true)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Packaging: deb](https://img.shields.io/badge/packaging-.deb-red?logo=debian&logoColor=white)
 
 It downloads PDF and XML statements from the Raiffeisen Premium API for a specified period and uploads both to SharePoint.
 
@@ -128,6 +130,23 @@ OFFICE365_PATH='Shared documents/statements'
 ```
 
 Into configuration file .env please put ClientID **OR** Login/Password values.
+
+**Permanent sharing links (ClientID auth only):** by default, the URL stored for an uploaded
+statement is a permanent SharePoint sharing link (Microsoft Graph `createLink`), which keeps
+working even if the file is later moved or renamed. Set `SHAREPOINT_PERMANENT_LINK=false` to
+instead use the upload response's `webUrl`, which is path-based and goes stale on move/rename.
+
+```env
+SHAREPOINT_PERMANENT_LINK=true
+SHAREPOINT_LINK_TYPE=view
+SHAREPOINT_LINK_SCOPE=organization
+```
+
+* `SHAREPOINT_LINK_TYPE` - `view` (read-only) or `edit`
+* `SHAREPOINT_LINK_SCOPE` - `anonymous`, `organization` (default, only people in your org), or `users` (only people already granted access)
+
+This only applies to the Graph (client-id/secret) app-only path - the legacy Login/Password
+flow still goes through classic SharePoint REST and is unaffected.
 
 ## Error Handling
 

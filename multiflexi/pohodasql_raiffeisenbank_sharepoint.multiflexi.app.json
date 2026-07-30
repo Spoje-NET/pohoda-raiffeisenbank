@@ -351,6 +351,45 @@
       "required": true,
       "category": "Other"
     },
+    "SHAREPOINT_PERMANENT_LINK": {
+      "type": "bool",
+      "description": {
+        "en": "Store a permanent SharePoint sharing link (Graph createLink) instead of the path-based upload URL, which goes stale on move/rename. Graph (client-id/secret) auth only.",
+        "cs": "Ukládat trvalý sdílený odkaz SharePoint (Graph createLink) místo URL závislé na cestě, která přestane platit po přesunu či přejmenování souboru. Platí pouze pro Graph (client-id/secret) autentizaci."
+      },
+      "defval": true,
+      "required": false,
+      "category": "Other"
+    },
+    "SHAREPOINT_LINK_TYPE": {
+      "type": "set",
+      "description": {
+        "en": "Type of SharePoint sharing link to create",
+        "cs": "Typ vytvářeného sdíleného odkazu SharePoint"
+      },
+      "defval": "view",
+      "options": {
+        "view": "View (read-only)",
+        "edit": "Edit"
+      },
+      "required": false,
+      "category": "Other"
+    },
+    "SHAREPOINT_LINK_SCOPE": {
+      "type": "set",
+      "description": {
+        "en": "Who the SharePoint sharing link works for",
+        "cs": "Pro koho sdílený odkaz SharePoint platí"
+      },
+      "defval": "organization",
+      "options": {
+        "anonymous": "Anonymous - anyone with the link",
+        "organization": "Organization - only people in your org",
+        "users": "Users - only people already granted access"
+      },
+      "required": false,
+      "category": "Other"
+    },
     "STATEMENT_SAVE_DIR": {
       "type": "text",
       "description": {

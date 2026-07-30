@@ -139,6 +139,10 @@ if (!$certValid) {
                 $exitcode = (int) $codeRaw[1];
             }
         }
+
+        if ($exitcode === 429) {
+            $exitcode = 174; // "Too many requests. Rate limit exceeded." per the .multiflexi.app.json manifest
+        }
     }
 }
 

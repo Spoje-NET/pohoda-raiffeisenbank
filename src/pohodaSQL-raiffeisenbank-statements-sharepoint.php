@@ -103,6 +103,10 @@ if (!$certValid) {
             }
         }
 
+        if ($apiExitCode === 429) {
+            $apiExitCode = 174; // "Too many requests. Rate limit exceeded." per the .multiflexi.app.json manifest
+        }
+
         // Only update exit code if not already set or if new error is more severe
         if ($exitcode === 0 || $apiExitCode > 0) {
             $exitcode = $apiExitCode;
@@ -143,6 +147,10 @@ if (!$certValid) {
             } else {
                 $apiExitCode = 1;
             }
+        }
+
+        if ($apiExitCode === 429) {
+            $apiExitCode = 174; // "Too many requests. Rate limit exceeded." per the .multiflexi.app.json manifest
         }
 
         // Only update exit code if not already set or if new error is more severe
@@ -193,9 +201,18 @@ if (!$certValid) {
                 Shared::cfg('OFFICE365_CLSECRET'),
             );
             $path = Shared::cfg('OFFICE365_PATH');
+            $permanentLink = Shared::cfg('SHAREPOINT_PERMANENT_LINK', 'true') !== 'false';
+            $linkType = Shared::cfg('SHAREPOINT_LINK_TYPE', 'view');
+            $linkScope = Shared::cfg('SHAREPOINT_LINK_SCOPE', 'organization');
 
-            $doUpload = static function (string $uploadAs, string $contents) use ($graph, $path): string {
-                return (string) $graph->uploadFile($path, $uploadAs, $contents)['webUrl'];
+            $doUpload = static function (string $uploadAs, string $contents) use ($graph, $path, $permanentLink, $linkType, $linkScope): string {
+                $uploaded = $graph->uploadFile($path, $uploadAs, $contents);
+
+                if ($permanentLink) {
+                    return $graph->createShareLink((string) $uploaded['id'], $linkType, $linkScope);
+                }
+
+                return (string) $uploaded['webUrl'];
             };
         }
 

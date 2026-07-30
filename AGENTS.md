@@ -108,6 +108,13 @@ OFFICE365_SECRET=...
 OFFICE365_CLSECRET=...
 ```
 
+ClientID-based uploads go through `Pohoda\RaiffeisenBank\GraphSharePointClient` (Microsoft Graph
+drive API). By default the URL stored for an uploaded file is a permanent sharing link
+(`createShareLink()`, Graph `createLink`) rather than the upload response's path-based `webUrl`,
+so links keep working after the file is moved/renamed. Controlled by `SHAREPOINT_PERMANENT_LINK`
+(default `true`), `SHAREPOINT_LINK_TYPE` (`view`/`edit`), `SHAREPOINT_LINK_SCOPE`
+(`anonymous`/`organization`/`users`) - see README.md's Sharepoint Integration section.
+
 ## Import Scopes
 
 The application supports various time scopes for importing transactions:
