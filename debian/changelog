@@ -1,3 +1,16 @@
+pohoda-raiffeisenbank (1.8.7) noble; urgency=medium
+
+  * Bump vitexsoftware/rbczpremiumapi to 1.5.8: RateLimitExceededException
+    now extends ApiException, so the existing catch(ApiException) blocks in
+    pohodaSQL-raiffeisenbank-statements-sharepoint.php catch it (mapped to
+    exit code 174) instead of crashing the job with an uncaught exception.
+  * Add a broader catch(\Exception) fallback around the PDF/XML statement
+    downloads in pohodaSQL-raiffeisenbank-statements-sharepoint.php, so any
+    other unclassified vendor-library exception degrades to a logged error
+    instead of a fatal crash.
+
+ -- Vitex <cybervitexus@gmail.com>  Fri, 31 Jul 2026 08:25:45 +0200
+
 pohoda-raiffeisenbank (1.8.6) noble; urgency=medium
 
   * Add specific mServer offline diagnostics (HTTP status/body/curl

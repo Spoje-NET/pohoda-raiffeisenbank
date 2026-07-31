@@ -111,6 +111,15 @@ if (!$certValid) {
         if ($exitcode === 0 || $apiExitCode > 0) {
             $exitcode = $apiExitCode;
         }
+    } catch (\Exception $exc) {
+        $engine->addStatusMessage($exc->getMessage(), 'error');
+        $report['raiffeisenbank']['pdf'] = 'download failed';
+        $report['message'] = $exc->getMessage();
+        $pdfStatements = [];
+
+        if ($exitcode === 0) {
+            $exitcode = 1;
+        }
     }
 
     try {
@@ -159,6 +168,15 @@ if (!$certValid) {
         }
 
         $xmlStatements = false;
+    } catch (\Exception $exc) {
+        $engine->addStatusMessage($exc->getMessage(), 'error');
+        $report['raiffeisenbank']['xml'] = 'download failed';
+        $report['message'] = $exc->getMessage();
+        $xmlStatements = false;
+
+        if ($exitcode === 0) {
+            $exitcode = 1;
+        }
     }
 
     $engine->addStatusMessage('stage 3/6: Upload PDF and XML Statements to SharePoint', 'debug');
