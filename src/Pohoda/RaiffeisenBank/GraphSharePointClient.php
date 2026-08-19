@@ -89,8 +89,25 @@ class GraphSharePointClient
      */
     public function listFiles(string $path): array
     {
+        $files = [];
+
+        foreach ($this->listFilesDetailed($path) as $name => $item) {
+            $files[$name] = $item['webUrl'];
+        }
+
+        return $files;
+    }
+
+    /**
+     * List files directly under $path, including their driveItem id (needed
+     * to call createShareLink()).
+     *
+     * @return array<string, array{id: string, webUrl: string}> filename => ['id' => ..., 'webUrl' => ...]
+     */
+    public function listFilesDetailed(string $path): array
+    {
         $url = \sprintf(
-            'https://graph.microsoft.com/v1.0/sites/%s/drive/root:/%s:/children?$select=name,webUrl',
+            'https://graph.microsoft.com/v1.0/sites/%s/drive/root:/%s:/children?$select=id,name,webUrl',
             $this->siteId(),
             $this->encodePath($path),
         );
@@ -101,7 +118,7 @@ class GraphSharePointClient
             $decoded = json_decode($this->request('GET', $url), true);
 
             foreach ($decoded['value'] ?? [] as $item) {
-                $files[(string) $item['name']] = (string) $item['webUrl'];
+                $files[(string) $item['name']] = ['id' => (string) $item['id'], 'webUrl' => (string) $item['webUrl']];
             }
 
             $url = $decoded['@odata.nextLink'] ?? null;

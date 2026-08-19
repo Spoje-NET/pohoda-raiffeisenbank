@@ -54,6 +54,32 @@ class GraphSharePointClientTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['type' => 'edit', 'scope' => 'anonymous'], json_decode((string) $capturedBody, true));
     }
 
+    public function testListFilesDetailedReturnsIdAndWebUrl(): void
+    {
+        $client = $this->makeClientWithFakeResponses([
+            'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/Team' => '{"id":"site-id"}',
+            'https://graph.microsoft.com/v1.0/sites/site-id/drive/root:/Banky:/children?$select=id,name,webUrl' => '{"value":[{"id":"item-1","name":"statement.pdf","webUrl":"https://contoso.sharepoint.com/sites/Team/statement.pdf"}]}',
+        ]);
+
+        self::assertSame(
+            ['statement.pdf' => ['id' => 'item-1', 'webUrl' => 'https://contoso.sharepoint.com/sites/Team/statement.pdf']],
+            $client->listFilesDetailed('Sdilene dokumenty/Banky'),
+        );
+    }
+
+    public function testListFilesDelegatesToListFilesDetailed(): void
+    {
+        $client = $this->makeClientWithFakeResponses([
+            'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/Team' => '{"id":"site-id"}',
+            'https://graph.microsoft.com/v1.0/sites/site-id/drive/root:/Banky:/children?$select=id,name,webUrl' => '{"value":[{"id":"item-1","name":"statement.pdf","webUrl":"https://contoso.sharepoint.com/sites/Team/statement.pdf"}]}',
+        ]);
+
+        self::assertSame(
+            ['statement.pdf' => 'https://contoso.sharepoint.com/sites/Team/statement.pdf'],
+            $client->listFiles('Sdilene dokumenty/Banky'),
+        );
+    }
+
     /**
      * @param array<string, string> $responsesByUrl
      */

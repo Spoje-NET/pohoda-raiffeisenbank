@@ -127,9 +127,21 @@ if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD'
         Shared::cfg('OFFICE365_CLSECRET'),
     );
     $path = Shared::cfg('OFFICE365_PATH');
+    $permanentLink = Shared::cfg('SHAREPOINT_PERMANENT_LINK', 'true') !== 'false';
+    $linkType = Shared::cfg('SHAREPOINT_LINK_TYPE', 'view');
+    $linkScope = Shared::cfg('SHAREPOINT_LINK_SCOPE', 'organization');
 
-    $doList = static function () use ($graph, $path): array {
-        return $graph->listFiles($path);
+    // Same permanent-link behavior as the uploaders: prefer a Graph
+    // createLink share URL (stable across move/rename) over the path-based
+    // webUrl, so this tool can also upgrade old-format links to the new one.
+    $doList = static function () use ($graph, $path, $permanentLink, $linkType, $linkScope): array {
+        $files = [];
+
+        foreach ($graph->listFilesDetailed($path) as $name => $item) {
+            $files[$name] = $permanentLink ? $graph->createShareLink($item['id'], $linkType, $linkScope) : $item['webUrl'];
+        }
+
+        return $files;
     };
 }
 
@@ -205,6 +217,7 @@ try {
         ->select('BV.ID, BV.Datum, BV.Cislo, BV.Vypis')
         ->select(sprintf('(SELECT TOP 1 d.ID FROM DOC d WHERE d.RelAgID = %d AND d.RelID = BV.ID AND d.RelDocType = 3 ORDER BY d.ID DESC) AS docId', \SpojeNet\PohodaSQL\Agenda::BANK))
         ->select(sprintf('(SELECT TOP 1 d.Name FROM DOC d WHERE d.RelAgID = %d AND d.RelID = BV.ID AND d.RelDocType = 3 ORDER BY d.ID DESC) AS docName', \SpojeNet\PohodaSQL\Agenda::BANK))
+        ->select(sprintf('(SELECT TOP 1 d.Url FROM DOC d WHERE d.RelAgID = %d AND d.RelID = BV.ID AND d.RelDocType = 3 ORDER BY d.ID DESC) AS docUrl', \SpojeNet\PohodaSQL\Agenda::BANK))
         ->where('BV.Datum >= ?', $since->format('Y-m-d H:i:s'))
         ->where('BV.Datum <= ?', $until->format('Y-m-d H:i:s'));
 
@@ -238,8 +251,14 @@ foreach ($bankRecords as $record) {
     $desired = $dateToSharepoint[$recordDate] ?? null;
     $docId = $record['docId'] ?? null;
     $docName = (string) ($record['docName'] ?? '');
+    $docUrl = (string) ($record['docUrl'] ?? '');
     $hasLink = !empty($docId);
-    $linkCorrect = $hasLink && Statementor::filenameMatchesAccount($docName, $accountNumber);
+    // Besides the account matching the filename, the attached URL must also
+    // match what Stage 1 would generate today — this is what lets old-format
+    // links (stale webUrl) get upgraded to the current permanent share link.
+    $linkCorrect = $hasLink
+        && Statementor::filenameMatchesAccount($docName, $accountNumber)
+        && ($desired === null || $docUrl === $desired['url']);
 
     try {
         if ($linkCorrect) {
@@ -274,11 +293,16 @@ foreach ($bankRecords as $record) {
             ];
         } elseif ($desired !== null) {
             // Wrong link, correct statement exists: repoint the existing DOC row.
+            // Two possible causes: the filename points at another account, or
+            // the filename is fine but the URL is in the stale format (e.g.
+            // pre-permanent-link webUrl) and needs to be upgraded.
+            $reason = Statementor::filenameMatchesAccount($docName, $accountNumber) ? 'format_upgrade' : 'wrong_account';
+
             if ($apply) {
                 $fpdo->update('DOC')->set(['Name' => $desired['filename'], 'Url' => $desired['url']])->where('ID', (int) $docId)->execute();
             }
 
-            $logger->addStatusMessage(sprintf('%s #%d (%s) %s → %s', $apply ? 'corrected' : 'would correct', $recordId, $recordDate, $docName, $desired['filename']), 'warning');
+            $logger->addStatusMessage(sprintf('%s #%d (%s) %s → %s [%s]', $apply ? 'corrected' : 'would correct', $recordId, $recordDate, $docName, $desired['filename'], $reason), 'warning');
             $report['corrected'][] = [
                 'pohodaId' => $recordId,
                 'docId' => (int) $docId,
@@ -286,6 +310,7 @@ foreach ($bankRecords as $record) {
                 'from' => $docName,
                 'to' => $desired['filename'],
                 'url' => $desired['url'],
+                'reason' => $reason,
             ];
         } else {
             // Wrong link, no correct statement to point at: remove the misleading link.

@@ -273,9 +273,17 @@ Executes the following pipeline in order:
 2. Query Pohoda MSSQL for bank records (`BV`) in the period **together with their current URL attachment**, filtered by `POHODA_BANK_IDS` when set
 3. For each record decide and (when applying) perform:
    * **missing** link → attach the account's statement PDF (`fixed`)
-   * link pointing to **another account** → repoint to the correct PDF (`corrected`), or remove it when no correct PDF exists (`removed`)
-   * already-**correct** link → leave untouched (`ok`)
+   * link pointing to **another account**, or pointing to the right file but in the **stale URL format** (see below) → repoint to the current link (`corrected`, with `reason` set to `wrong_account` or `format_upgrade`), or remove it when no correct PDF exists (`removed`)
+   * already-**correct** link (right account, current URL format) → leave untouched (`ok`)
    * missing link with **no PDF** for that date → leave (`skipped`)
+
+**Permanent link upgrades (Graph/ClientID auth only):** like the uploaders, this tool respects
+`SHAREPOINT_PERMANENT_LINK` (default `true`), `SHAREPOINT_LINK_TYPE`, `SHAREPOINT_LINK_SCOPE` —
+see "Permanent sharing links" under the ClientID authentication section above. Since it
+re-resolves each SharePoint file's current link on every run, running it with `LINK_FIX_APPLY=true`
+also upgrades records still holding an old-format `webUrl` link to the current permanent share
+link, not just records with a missing or cross-attached link. This does not apply to the legacy
+Login/Password flow, which has no permanent-link concept.
 
 **Dry-run by default**: with `LINK_FIX_APPLY` unset/`false` the tool only reports what it would change and writes nothing. Set `LINK_FIX_APPLY=true` to apply. Always dry-run and review first.
 
