@@ -185,6 +185,9 @@ if (!$certValid) {
         sleep(5);
         $pdfStatements = $engine->getPdfStatements();
 
+        $uploadXmlToSharepoint = Shared::cfg('SHAREPOINT_UPLOAD_XML', 'true') !== 'false';
+        $xmlOffice365Path = Shared::cfg('OFFICE365_PATH_XML', '') ?: Shared::cfg('OFFICE365_PATH');
+
         if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
             // Legacy user credential flow, untouched by the ACS retirement -
             // still goes through classic SharePoint REST (_api/web/...).
@@ -197,14 +200,26 @@ if (!$certValid) {
             $targetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl(Shared::cfg('OFFICE365_PATH'));
             $engine->addStatusMessage('ServiceRootUrl: '.$ctx->getServiceRootUrl(), 'debug');
 
-            $doUpload = static function (string $uploadAs, string $contents) use ($ctx, $resetAuth, $targetFolder): string {
-                return PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function ($ctx) use ($targetFolder, $uploadAs, $contents) {
-                    $uploadFile = $targetFolder->uploadFile($uploadAs, $contents);
+            $doUploadToFolder = static function (\Office365\SharePoint\Folder $folder, string $uploadAs, string $contents) use ($ctx, $resetAuth): string {
+                return PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function ($ctx) use ($folder, $uploadAs, $contents) {
+                    $uploadFile = $folder->uploadFile($uploadAs, $contents);
                     $ctx->executeQuery();
 
                     return $ctx->getBaseUrl().'/_layouts/15/download.aspx?SourceUrl='.urlencode($uploadFile->getServerRelativeUrl());
                 });
             };
+            $doUpload = static function (string $uploadAs, string $contents) use ($doUploadToFolder, $targetFolder): string {
+                return $doUploadToFolder($targetFolder, $uploadAs, $contents);
+            };
+
+            if ($xmlOffice365Path === Shared::cfg('OFFICE365_PATH')) {
+                $doUploadXml = $doUpload;
+            } else {
+                $xmlTargetFolder = $ctx->getWeb()->getFolderByServerRelativeUrl($xmlOffice365Path);
+                $doUploadXml = static function (string $uploadAs, string $contents) use ($doUploadToFolder, $xmlTargetFolder): string {
+                    return $doUploadToFolder($xmlTargetFolder, $uploadAs, $contents);
+                };
+            }
         } else {
             // Client-id/secret (app-only) case goes through Microsoft Graph,
             // not classic SharePoint REST - see PohodaBankClientOffice's
@@ -223,14 +238,20 @@ if (!$certValid) {
             $linkType = Shared::cfg('SHAREPOINT_LINK_TYPE', 'view');
             $linkScope = Shared::cfg('SHAREPOINT_LINK_SCOPE', 'organization');
 
-            $doUpload = static function (string $uploadAs, string $contents) use ($graph, $path, $permanentLink, $linkType, $linkScope): string {
-                $uploaded = $graph->uploadFile($path, $uploadAs, $contents);
+            $doUploadTo = static function (string $targetPath, string $uploadAs, string $contents) use ($graph, $permanentLink, $linkType, $linkScope): string {
+                $uploaded = $graph->uploadFile($targetPath, $uploadAs, $contents);
 
                 if ($permanentLink) {
                     return $graph->createShareLink((string) $uploaded['id'], $linkType, $linkScope);
                 }
 
                 return (string) $uploaded['webUrl'];
+            };
+            $doUpload = static function (string $uploadAs, string $contents) use ($doUploadTo, $path): string {
+                return $doUploadTo($path, $uploadAs, $contents);
+            };
+            $doUploadXml = static function (string $uploadAs, string $contents) use ($doUploadTo, $xmlOffice365Path): string {
+                return $doUploadTo($xmlOffice365Path, $uploadAs, $contents);
             };
         }
 
@@ -258,21 +279,26 @@ if (!$certValid) {
             }
         }
 
-        foreach ($xmlStatements ?: [] as $filename) {
-            $uploadAs = Statementor::statementFilename($filename);
-            try {
-                $uploaded = $doUpload($uploadAs, file_get_contents($filename));
-                $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
-                $report['sharepoint']['xml'][$uploadAs] = $uploaded;
-            } catch (\Exception $exc) {
-                $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'SharePoint XML upload of '.$uploadAs);
-                $report['sharepoint']['xml'][$uploadAs] = ['error' => $errorMessage, 'httpCode' => $exc->getCode()];
-                $engine->addStatusMessage($errorMessage, 'error');
+        if ($uploadXmlToSharepoint) {
+            foreach ($xmlStatements ?: [] as $filename) {
+                $uploadAs = Statementor::statementFilename($filename);
+                try {
+                    $uploaded = $doUploadXml($uploadAs, file_get_contents($filename));
+                    $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');
+                    $report['sharepoint']['xml'][$uploadAs] = $uploaded;
+                } catch (\Exception $exc) {
+                    $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'SharePoint XML upload of '.$uploadAs);
+                    $report['sharepoint']['xml'][$uploadAs] = ['error' => $errorMessage, 'httpCode' => $exc->getCode()];
+                    $engine->addStatusMessage($errorMessage, 'error');
 
-                if ($exitcode === 0) {
-                    $exitcode = 1;
+                    if ($exitcode === 0) {
+                        $exitcode = 1;
+                    }
                 }
             }
+        } else {
+            $engine->addStatusMessage(_('XML statement upload to SharePoint disabled (SHAREPOINT_UPLOAD_XML=false)'), 'info');
+            $report['sharepoint']['xml'] = 'disabled';
         }
     } else {
         if (null === $pdfStatements) {

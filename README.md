@@ -148,6 +148,17 @@ SHAREPOINT_LINK_SCOPE=organization
 This only applies to the Graph (client-id/secret) app-only path - the legacy Login/Password
 flow still goes through classic SharePoint REST and is unaffected.
 
+**Controlling XML statement uploads (pohodaSQL-raiffeisenbank-statements-sharepoint only):**
+by default, both PDF and XML statements are uploaded to SharePoint into `OFFICE365_PATH`. Set
+`SHAREPOINT_UPLOAD_XML=false` to keep XML statements local only - the PDF upload and the Pohoda
+import via mServer are unaffected. Set `OFFICE365_PATH_XML` to upload XML statements into a
+different SharePoint folder than PDFs.
+
+```env
+SHAREPOINT_UPLOAD_XML=true
+OFFICE365_PATH_XML='Shared documents/statements-xml'
+```
+
 ## Error Handling
 
 All scripts perform certificate validation before attempting API calls. If the certificate cannot be read or validated, a detailed error report is generated including:
