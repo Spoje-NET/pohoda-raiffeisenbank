@@ -153,6 +153,12 @@ try {
     $sharepointFiles = $doList();
 
     foreach ($sharepointFiles as $name => $url) {
+        // PHP silently coerces purely-numeric string array keys to int (e.g.
+        // a SharePoint item literally named "20260821"), so $name isn't
+        // reliably a string here even though both $doList() branches build
+        // it from a filename - cast back before using it as one.
+        $name = (string) $name;
+
         if (!preg_match('/\.pdf$/i', $name)) {
             continue;
         }
