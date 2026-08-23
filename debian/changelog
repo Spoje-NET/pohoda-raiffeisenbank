@@ -1,3 +1,10 @@
+pohoda-raiffeisenbank (1.8.8) noble; urgency=medium
+
+  * Release 1.8.8: repair stale PHPUnit tests and add credential-
+    availability skipping
+
+ -- Vitex <cybervitexus@gmail.com>  Sun, 23 Aug 2026 17:06:42 +0200
+
 pohoda-raiffeisenbank (1.8.7) noble; urgency=medium
 
   * Bump vitexsoftware/rbczpremiumapi to 1.5.8: RateLimitExceededException
