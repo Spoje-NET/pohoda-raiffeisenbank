@@ -28,8 +28,9 @@ PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_P
 
 /**
  * Grant the low-privilege runtime DB user (pohodaSQL-raiffeisenbank-statements-sharepoint.php,
- * pohoda-sharepoint-link-fixer.php) INSERT on DOC, so PohodaBankClient::attachSharepointUrl()
- * can write the SharePoint link attachment.
+ * pohoda-sharepoint-link-fixer.php) INSERT/UPDATE/DELETE on DOC, so
+ * PohodaBankClient::attachSharepointUrl() can write the SharePoint link attachment, and the
+ * link fixer's --apply "corrected"/"removed" cases can repair or remove a stale one.
  *
  * Run this once per Pohoda MSSQL database with DB_* pointed at an account that has GRANT
  * rights (e.g. sa) - the standard MultiFlexi SQLServer/DatabaseConnection credential only
@@ -48,6 +49,11 @@ if (Shared::cfg('GRANT_INSERT_TO', false)) {
         'dbSettings' => Shared::cfg('DB_SETTINGS', ''),
     ]);
     $grantTo = Shared::cfg('GRANT_INSERT_TO');
-    $adminDoc->getFluentPDO(true)->pdo->exec(\sprintf('GRANT INSERT ON dbo.DOC TO [%s]', $grantTo));
-    echo \sprintf('Granted INSERT on DOC to %s', $grantTo).\PHP_EOL;
+    $pdo = $adminDoc->getFluentPDO(true)->pdo;
+
+    foreach (['INSERT', 'UPDATE', 'DELETE'] as $permission) {
+        $pdo->exec(\sprintf('GRANT %s ON dbo.DOC TO [%s]', $permission, $grantTo));
+    }
+
+    echo \sprintf('Granted INSERT, UPDATE, DELETE on DOC to %s', $grantTo).\PHP_EOL;
 }

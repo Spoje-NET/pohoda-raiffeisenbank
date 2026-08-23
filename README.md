@@ -24,6 +24,26 @@ After uploading to SharePoint, links to the PDF statements are attached to all i
 
 Check certificate presence yet.
 
+The low-privilege runtime DB account used for `DB_USERNAME` (by
+`pohodaSQL-raiffeisenbank-statements-sharepoint.php` and
+`pohoda-sharepoint-link-fixer.php`) needs write access to the `DOC` table
+so `attachSharepointUrl()` can attach/repair the SharePoint link on bank
+records - most Pohoda MSSQL setups otherwise leave this account read-only.
+Grant it once per database, connected as an account with `GRANT` rights
+(e.g. `sa`):
+
+```sql
+USE StwPh_12345678_2026;
+
+GRANT INSERT ON dbo.DOC TO pohodaSQLuser;
+GRANT UPDATE ON dbo.DOC TO pohodaSQLuser;
+GRANT DELETE ON dbo.DOC TO pohodaSQLuser;
+```
+
+`pohoda-raiffeisenbank-setup` can also run this for you: set `DB_*` to an
+admin-capable connection and `GRANT_INSERT_TO` to the low-privilege
+runtime username (see `.env.example`).
+
 ## Transactions tool
 
 Import Bank movements from RaiffeisenBank (using [getTransactionList](https://developers.rb.cz/premium/documentation/01rbczpremiumapi#/Get%20Transaction%20List/getTransactionList) as source)
