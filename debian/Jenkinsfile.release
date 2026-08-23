@@ -1,6 +1,10 @@
 #!groovy
 
-String[] distributions = ['debian:bookworm', 'debian:trixie', 'ubuntu:jammy', 'ubuntu:noble', 'ubuntu:resolute']
+// ubuntu:resolute disabled: multiflexi-database-connection (a hard
+// dependency of multiflexi-pohoda-raiffeisenbank) is not yet published for
+// resolute, so the post-build install-test always fails there.
+// Re-enable once multiflexi-database-connection is available for resolute.
+String[] distributions = ['debian:bookworm', 'debian:trixie', 'ubuntu:jammy', 'ubuntu:noble']
 
 String vendor = 'vitexsoftware'
 String imagePrefix = 'multiflexi-'

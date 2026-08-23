@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Test\Pohoda\RaiffeisenBank;
 
+use Pohoda\RaiffeisenBank\CredentialGuard;
 use Pohoda\RaiffeisenBank\PohodaBankClient;
 
 /**
@@ -22,6 +23,8 @@ use Pohoda\RaiffeisenBank\PohodaBankClient;
  */
 class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
 {
+    use CredentialGuard;
+
     protected PohodaBankClient $object;
 
     /**
@@ -56,7 +59,7 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
      */
     public function testcheckCertificatePresence(): void
     {
-        $this->assertEquals('', $this->object->checkCertificatePresence());
+        $this->assertFalse($this->object->checkCertificatePresence('/nonexistent/cert.p12'));
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -68,7 +71,7 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
      */
     public function testsetScope(): void
     {
-        $this->assertEquals('', $this->object->setScope());
+        $this->assertInstanceOf(\DatePeriod::class, $this->object->setScope('today'));
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -88,7 +91,8 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
      */
     public function testgetCurrencyCode(): void
     {
-        $this->assertEquals('', $this->object->getCurrencyCode());
+        $this->object->currency = 'CZK';
+        $this->assertEquals('CZK', $this->object->getCurrencyCode());
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -100,7 +104,8 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
      */
     public function testcheckForTransactionPresence(): void
     {
-        $this->assertEquals('', $this->object->checkForTransactionPresence());
+        $this->skipUnlessMServerReachable();
+        $this->assertFalse($this->object->checkForTransactionPresence('123'));
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -112,6 +117,10 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
      */
     public function testensureKSExists(): void
     {
+        if (!method_exists($this->object, 'ensureKSExists')) {
+            $this->markTestSkipped('ensureKSExists() is not present on PohodaBankClient in this codebase version');
+        }
+
         $this->assertEquals('', $this->object->ensureKSExists());
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
@@ -124,7 +133,7 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
      */
     public function testinsertTransactionToPohoda(): void
     {
-        $this->assertEquals('', $this->object->insertTransactionToPohoda());
+        $this->assertIsArray($this->object->insertTransactionToPohoda());
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -136,6 +145,10 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
      */
     public function testAttachSharepointUrl(): void
     {
+        if (!class_exists(\SpojeNet\PohodaSQL\DOC::class)) {
+            $this->markTestSkipped('SpojeNet\\PohodaSQL\\DOC is not available in this environment (provided by the pohodaSQL runtime, not a composer dependency)');
+        }
+
         $this->assertIsBool($this->object->attachSharepointUrl(0, 'https://example.com/statement.pdf', 'statement.pdf'));
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');

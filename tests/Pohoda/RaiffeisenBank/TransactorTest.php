@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Test\Pohoda\RaiffeisenBank;
 
+use Pohoda\RaiffeisenBank\CredentialGuard;
 use Pohoda\RaiffeisenBank\Transactor;
 
 /**
@@ -22,6 +23,8 @@ use Pohoda\RaiffeisenBank\Transactor;
  */
 class TransactorTest extends \PHPUnit\Framework\TestCase
 {
+    use CredentialGuard;
+
     protected Transactor $object;
 
     /**
@@ -48,7 +51,15 @@ class TransactorTest extends \PHPUnit\Framework\TestCase
      */
     public function testgetTransactions(): void
     {
-        $this->assertEquals('', $this->object->getTransactions());
+        // getTransactions() calls exit() on an API failure (e.g. an expired test
+        // certificate), which would kill the PHPUnit process rather than raise a
+        // catchable error — so the credential precondition must be checked up front.
+        $this->skipUnlessCertificateUsable();
+
+        $this->object->setScope('today');
+        $this->object->currency = 'CZK';
+
+        $this->assertIsArray($this->object->getTransactions());
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -60,7 +71,14 @@ class TransactorTest extends \PHPUnit\Framework\TestCase
      */
     public function testimport(): void
     {
-        $this->assertEquals('', $this->object->import());
+        // import() calls getTransactions(), which calls exit() on an API failure —
+        // check credentials up front rather than relying on a catchable exception.
+        $this->skipUnlessCertificateUsable();
+
+        $this->object->setScope('today');
+        $this->object->currency = 'CZK';
+
+        $this->object->import();
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -72,7 +90,31 @@ class TransactorTest extends \PHPUnit\Framework\TestCase
      */
     public function testtakeTransactionData(): void
     {
-        $this->assertEquals('', $this->object->takeTransactionData());
+        $transactionData = json_decode(json_encode([
+            'creditDebitIndication' => 'CRDT',
+            'valueDate' => '2026-01-01',
+            'entryReference' => 'TX123',
+            'amount' => ['value' => 100, 'currency' => 'CZK'],
+            'bankTransactionCode' => ['code' => 'PMNT'],
+            'entryDetails' => [
+                'transactionDetails' => [
+                    'remittanceInformation' => [
+                        'creditorReferenceInformation' => ['variable' => '123'],
+                        'originatorMessage' => 'Test payment',
+                    ],
+                    'relatedParties' => [
+                        'counterParty' => [
+                            'name' => 'Test Counterparty',
+                            'account' => ['accountNumber' => '1234567890'],
+                            'organisationIdentification' => ['bankCode' => '0100'],
+                        ],
+                    ],
+                ],
+            ],
+        ]));
+
+        $this->object->takeTransactionData($transactionData);
+        $this->assertSame('receipt', $this->object->getDataValue('bankType'));
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -84,7 +126,7 @@ class TransactorTest extends \PHPUnit\Framework\TestCase
      */
     public function testsetScope(): void
     {
-        $this->assertEquals('', $this->object->setScope());
+        $this->assertInstanceOf(\DatePeriod::class, $this->object->setScope('today'));
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
