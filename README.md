@@ -172,7 +172,9 @@ flow still goes through classic SharePoint REST and is unaffected.
 by default, both PDF and XML statements are uploaded to SharePoint into `OFFICE365_PATH`. Set
 `SHAREPOINT_UPLOAD_XML=false` to keep XML statements local only - the PDF upload and the Pohoda
 import via mServer are unaffected. Set `OFFICE365_PATH_XML` to upload XML statements into a
-different SharePoint folder than PDFs.
+different SharePoint folder than PDFs. `OFFICE365_PATH_XML` is also read by
+`pohoda-sharepoint-link-fixer`, which relocates any already-uploaded XML statements it finds
+sitting in `OFFICE365_PATH` to this folder - see its section below.
 
 ```env
 SHAREPOINT_UPLOAD_XML=true
@@ -318,6 +320,8 @@ Login/Password flow, which has no permanent-link concept.
 
 **Dry-run by default**: with `LINK_FIX_APPLY` unset/`false` the tool only reports what it would change and writes nothing. Set `LINK_FIX_APPLY=true` to apply. Always dry-run and review first.
 
+**Relocating XML statements**: when `OFFICE365_PATH_XML` is set to a folder different from `OFFICE365_PATH`, any XML statement belonging to `ACCOUNT_NUMBER` found alongside the PDFs in `OFFICE365_PATH` (for example, uploaded before `OFFICE365_PATH_XML` was configured, or from before that feature existed) is moved there - listed in the report's `xml_moved`. This runs independently of `LINK_FIX_APPLY`'s dry-run for Pohoda records: with `LINK_FIX_APPLY` unset it's also a dry-run (nothing moved, just reported); set it to actually move the files. Use `pohoda-raiffeisenbank-setup` first if `OFFICE365_PATH_XML` doesn't exist yet in SharePoint (see "Setup command" above).
+
 **Date range** is resolved by `IMPORT_SCOPE` (default: `last_month`). `DATE_FROM` / `DATE_TO` override `IMPORT_SCOPE` when explicitly set.
 
 **Multi-bank behaviour**: When `POHODA_BANK_IDS` is set (e.g. `RB`), only records belonging to that bank account are processed. Because one Pohoda company can hold several bank accounts, run the tool once per account (each with its own `ACCOUNT_NUMBER` + `POHODA_BANK_IDS` + SharePoint folder). SharePoint files and existing links are matched by `ACCOUNT_NUMBER` embedded in the filename to detect and prevent cross-account attachment.
@@ -342,6 +346,7 @@ Example JSON report (account numbers below are fictional):
   ],
   "removed": [],
   "skipped": [],
+  "xml_moved": ["001_1234567890_0100_9999999_CZK_2026-05-31.xml"],
   "errors": [],
   "exitcode": 0
 }

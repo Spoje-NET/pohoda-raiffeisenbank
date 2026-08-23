@@ -232,6 +232,16 @@
       "required": true,
       "category": "API"
     },
+    "OFFICE365_PATH_XML": {
+      "type": "text",
+      "description": {
+        "en": "If different from OFFICE365_PATH, XML statements found alongside the PDFs in OFFICE365_PATH (e.g. uploaded before this separate folder was configured) are relocated here. Leave empty to leave XML statements where they are.",
+        "cs": "Pokud se liší od OFFICE365_PATH, XML výpisy nalezené společně s PDF v OFFICE365_PATH (např. nahrané před nastavením této samostatné složky) se sem přesunou. Ponechte prázdné, pokud mají XML výpisy zůstat na místě."
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
     "SHAREPOINT_PERMANENT_LINK": {
       "type": "bool",
       "description": {
@@ -343,8 +353,8 @@
     },
     "3": {
       "description": {
-        "en": "One or more link attach/correct/remove operations failed",
-        "cs": "Jednu nebo více operací přiložení/opravy/odebrání odkazu se nepodařilo provést"
+        "en": "One or more link attach/correct/remove or XML move operations failed",
+        "cs": "Jednu nebo více operací přiložení/opravy/odebrání odkazu nebo přesunu XML souboru se nepodařilo provést"
       },
       "severity": "warning",
       "retry": true

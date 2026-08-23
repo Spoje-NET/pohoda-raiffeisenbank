@@ -83,6 +83,26 @@ class GraphSharePointClient
     }
 
     /**
+     * Move an already-uploaded item to a different folder (optionally renaming
+     * it in the same call). Used to relocate XML statements uploaded under the
+     * old single-folder convention into a since-configured OFFICE365_PATH_XML.
+     *
+     * @return array{webUrl: string, id: string, name: string} decoded driveItem
+     */
+    public function moveFile(string $itemId, string $targetPath, ?string $newName = null): array
+    {
+        $url = \sprintf('https://graph.microsoft.com/v1.0/sites/%s/drive/items/%s', $this->siteId(), rawurlencode($itemId));
+
+        $body = ['parentReference' => ['path' => '/drive/root:/'.$this->encodePath($targetPath)]];
+
+        if ($newName !== null) {
+            $body['name'] = $newName;
+        }
+
+        return (array) json_decode($this->request('PATCH', $url, json_encode($body, \JSON_THROW_ON_ERROR), 'application/json'), true);
+    }
+
+    /**
      * List files directly under $path.
      *
      * @return array<string, string> filename => webUrl
@@ -125,6 +145,74 @@ class GraphSharePointClient
         } while ($url !== null);
 
         return $files;
+    }
+
+    /**
+     * Ensure $path exists as a folder, creating any missing segments.
+     *
+     * Graph's simple upload (`PUT .../content`, used by uploadFile()) does
+     * *not* auto-create missing parent folders - it 404s instead. Needed
+     * when OFFICE365_PATH_XML points at a folder that hasn't been created
+     * in SharePoint yet. Idempotent: an already-existing segment (checked
+     * individually, walking from the root) is left untouched - never
+     * recreated/replaced, so existing files in it are never at risk.
+     */
+    public function ensureFolder(string $path): void
+    {
+        $segments = \array_slice(explode('/', trim($path, '/')), 1);
+        $built = '';
+
+        foreach ($segments as $segment) {
+            $childPath = $built === '' ? $segment : $built.'/'.$segment;
+
+            if (!$this->folderExists($childPath)) {
+                $this->createFolder($built, $segment);
+            }
+
+            $built = $childPath;
+        }
+    }
+
+    private function folderExists(string $path): bool
+    {
+        $url = \sprintf(
+            'https://graph.microsoft.com/v1.0/sites/%s/drive/root:/%s',
+            $this->siteId(),
+            implode('/', array_map('rawurlencode', explode('/', $path))),
+        );
+
+        try {
+            $this->request('GET', $url);
+
+            return true;
+        } catch (GraphApiException $e) {
+            if ($e->getCode() === 404) {
+                return false;
+            }
+
+            throw $e;
+        }
+    }
+
+    private function createFolder(string $parentPath, string $name): void
+    {
+        $url = $parentPath === ''
+            ? \sprintf('https://graph.microsoft.com/v1.0/sites/%s/drive/root/children', $this->siteId())
+            : \sprintf(
+                'https://graph.microsoft.com/v1.0/sites/%s/drive/root:/%s:/children',
+                $this->siteId(),
+                implode('/', array_map('rawurlencode', explode('/', $parentPath))),
+            );
+
+        $body = json_encode(['name' => $name, 'folder' => new \stdClass()], \JSON_THROW_ON_ERROR);
+
+        try {
+            $this->request('POST', $url, $body, 'application/json');
+        } catch (GraphApiException $e) {
+            if ($e->getCode() !== 409) { // 409 Conflict = already exists (race with another process) - fine
+                throw $e;
+            }
+        }
     }
 
     /**

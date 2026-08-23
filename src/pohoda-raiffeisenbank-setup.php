@@ -57,3 +57,23 @@ if (Shared::cfg('GRANT_INSERT_TO', false)) {
 
     echo \sprintf('Granted INSERT, UPDATE, DELETE on DOC to %s', $grantTo).\PHP_EOL;
 }
+
+/**
+ * Ensure OFFICE365_PATH_XML exists as a SharePoint folder, if a custom one is
+ * configured (pohodaSQL-raiffeisenbank-statements-sharepoint.php uploads XML
+ * statements there instead of OFFICE365_PATH). Graph's simple upload PUT does
+ * not auto-create missing parent folders, so without this, the first XML
+ * upload to a not-yet-created folder 404s. Graph (client-id/secret) auth
+ * only, matching OFFICE365_PATH_XML's own auth requirement.
+ */
+if (Shared::cfg('OFFICE365_PATH_XML', false) && Shared::cfg('OFFICE365_CLIENTID', false)) {
+    $graph = PohodaBankClientOffice::buildGraphClient(
+        Shared::cfg('OFFICE365_TENANT'),
+        Shared::cfg('OFFICE365_SITE'),
+        Shared::cfg('OFFICE365_CLIENTID'),
+        Shared::cfg('OFFICE365_CLSECRET'),
+    );
+    $xmlPath = Shared::cfg('OFFICE365_PATH_XML');
+    $graph->ensureFolder($xmlPath);
+    echo \sprintf('Ensured SharePoint folder exists: %s', $xmlPath).\PHP_EOL;
+}

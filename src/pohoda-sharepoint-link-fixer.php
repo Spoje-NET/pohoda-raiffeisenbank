@@ -76,6 +76,7 @@ $report = [
     'corrected' => [], // wrong-account link → repointed to the correct PDF
     'removed' => [],  // wrong-account link with no correct PDF → deleted
     'skipped' => [],  // missing link but no SharePoint PDF for that date
+    'xml_moved' => [], // XML statement relocated from OFFICE365_PATH to OFFICE365_PATH_XML
     'errors' => [],
 ];
 
@@ -113,6 +114,15 @@ if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD'
 
         return $files;
     };
+    $doMoveXml = static function (string $filename) use ($ctx, $resetAuth): void {
+        PohodaBankClientOffice::withSharePointRetry($ctx, $resetAuth, static function () use ($ctx, $filename) {
+            $sourceUrl = rtrim(Shared::cfg('OFFICE365_PATH'), '/').'/'.$filename;
+            $destUrl = rtrim(Shared::cfg('OFFICE365_PATH_XML'), '/').'/'.$filename;
+            $ctx->getWeb()->getFileByServerRelativeUrl($sourceUrl)->moveToEx($destUrl, true);
+
+            return $ctx->executeQuery();
+        });
+    };
 } else {
     // Client-id/secret (app-only) case goes through Microsoft Graph, not
     // classic SharePoint REST - see PohodaBankClientOffice's class docblock
@@ -134,20 +144,34 @@ if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD'
     // Same permanent-link behavior as the uploaders: prefer a Graph
     // createLink share URL (stable across move/rename) over the path-based
     // webUrl, so this tool can also upgrade old-format links to the new one.
-    $doList = static function () use ($graph, $path, $permanentLink, $linkType, $linkScope): array {
+    $xmlItemIds = [];
+    $doList = static function () use ($graph, $path, $permanentLink, $linkType, $linkScope, &$xmlItemIds): array {
         $files = [];
 
         foreach ($graph->listFilesDetailed($path) as $name => $item) {
             $files[$name] = $permanentLink ? $graph->createShareLink($item['id'], $linkType, $linkScope) : $item['webUrl'];
+            $xmlItemIds[$name] = $item['id'];
         }
 
         return $files;
+    };
+    $doMoveXml = static function (string $filename) use ($graph, &$xmlItemIds): void {
+        $graph->moveFile($xmlItemIds[$filename], Shared::cfg('OFFICE365_PATH_XML'));
     };
 }
 
 // Date → ['filename' => ..., 'url' => ...] mapping built from SharePoint filenames.
 // Filename pattern: {statNum}_{account}_{accountId}_{currency}_{YYYY-MM-DD}.pdf
 $dateToSharepoint = [];
+
+// XML statements uploaded under the old single-folder convention (before
+// OFFICE365_PATH_XML existed, or with SHAREPOINT_UPLOAD_XML/OFFICE365_PATH_XML
+// changed later) sit alongside the PDFs in OFFICE365_PATH - collect the ones
+// belonging to this account/period here, and relocate them below once a
+// distinct OFFICE365_PATH_XML is actually configured.
+$xmlFilesToMove = [];
+$moveXmlEnabled = Shared::cfg('OFFICE365_PATH_XML', false)
+    && rtrim((string) Shared::cfg('OFFICE365_PATH_XML'), '/') !== rtrim((string) Shared::cfg('OFFICE365_PATH'), '/');
 
 try {
     $sharepointFiles = $doList();
@@ -158,6 +182,14 @@ try {
         // reliably a string here even though both $doList() branches build
         // it from a filename - cast back before using it as one.
         $name = (string) $name;
+
+        if ($moveXmlEnabled
+            && preg_match('/(\d{4}-\d{2}-\d{2})\.xml$/i', $name, $xmlDateMatch)
+            && Statementor::filenameMatchesAccount($name, (string) Shared::cfg('ACCOUNT_NUMBER'))
+            && $xmlDateMatch[1] >= $since->format('Y-m-d') && $xmlDateMatch[1] <= $until->format('Y-m-d')
+        ) {
+            $xmlFilesToMove[] = $name;
+        }
 
         if (!preg_match('/\.pdf$/i', $name)) {
             continue;
@@ -186,6 +218,29 @@ try {
     $logger->addStatusMessage($errorMessage, 'error');
     $report['errors'][] = $errorMessage;
     $exitcode = 1;
+}
+
+if (!empty($xmlFilesToMove)) {
+    $logger->addStatusMessage(sprintf('%s %d XML statement(s) from %s to %s', $apply ? 'Moving' : 'Would move', \count($xmlFilesToMove), Shared::cfg('OFFICE365_PATH'), Shared::cfg('OFFICE365_PATH_XML')), 'debug');
+
+    foreach ($xmlFilesToMove as $xmlFilename) {
+        try {
+            if ($apply) {
+                $doMoveXml($xmlFilename);
+            }
+
+            $logger->addStatusMessage(sprintf('%s %s → %s', $apply ? 'moved' : 'would move', $xmlFilename, Shared::cfg('OFFICE365_PATH_XML')), 'success');
+            $report['xml_moved'][] = $xmlFilename;
+        } catch (\Exception $exc) {
+            $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'XML move of '.$xmlFilename);
+            $logger->addStatusMessage($errorMessage, 'error');
+            $report['errors'][] = $errorMessage;
+
+            if ($exitcode === 0) {
+                $exitcode = 3;
+            }
+        }
+    }
 }
 
 if (empty($dateToSharepoint)) {
@@ -343,7 +398,7 @@ foreach ($bankRecords as $record) {
     }
 }
 
-$logger->addStatusMessage(sprintf('Done (%s): %d fixed, %d corrected, %d removed, %d ok, %d skipped, %d errors', $apply ? 'applied' : 'dry-run', \count($report['fixed']), \count($report['corrected']), \count($report['removed']), $report['ok'], \count($report['skipped']), \count($report['errors'])), $exitcode === 0 ? 'success' : 'warning');
+$logger->addStatusMessage(sprintf('Done (%s): %d fixed, %d corrected, %d removed, %d ok, %d skipped, %d xml moved, %d errors', $apply ? 'applied' : 'dry-run', \count($report['fixed']), \count($report['corrected']), \count($report['removed']), $report['ok'], \count($report['skipped']), \count($report['xml_moved']), \count($report['errors'])), $exitcode === 0 ? 'success' : 'warning');
 
 $report['exitcode'] = $exitcode;
 $written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE : 0));
