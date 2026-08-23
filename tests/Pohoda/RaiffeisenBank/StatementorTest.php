@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Test\Pohoda\RaiffeisenBank;
 
+use Pohoda\RaiffeisenBank\CredentialGuard;
 use Pohoda\RaiffeisenBank\Statementor;
 
 /**
@@ -22,6 +23,8 @@ use Pohoda\RaiffeisenBank\Statementor;
  */
 class StatementorTest extends \PHPUnit\Framework\TestCase
 {
+    use CredentialGuard;
+
     protected Statementor $object;
 
     /**
@@ -46,8 +49,8 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
      */
     public function testimportXML(): void
     {
-        $this->assertIsArray($this->object->importXML('../tests/194_2024_630804003_3780381_CZK_2024-11-06.xml'));
-        $this->assertIsArray($this->object->importXML('../tests/testczk.xml'));
+        $this->assertIsArray($this->object->importXML('tests/194_2024_630804003_3780381_CZK_2024-11-06.xml'));
+        $this->assertIsArray($this->object->importXML('tests/testczk.xml'));
     }
 
     /**
@@ -55,6 +58,7 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
      */
     public function testdownloadXML(): void
     {
+        $this->skipUnlessCertificateUsable();
         $this->object->setScope('yesterday');
         $this->assertIsArray($this->object->downloadXML());
     }
@@ -66,7 +70,9 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
      */
     public function testdownloadPDF(): void
     {
-        $this->assertEquals('', $this->object->downloadPDF());
+        $this->skipUnlessCertificateUsable();
+        $this->object->setScope('yesterday');
+        $this->assertIsArray($this->object->downloadPDF());
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -78,7 +84,9 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
      */
     public function testimportOnline(): void
     {
-        $this->assertEquals('', $this->object->importOnline());
+        $this->skipUnlessCertificateUsable();
+        $this->object->setScope('yesterday');
+        $this->assertIsArray($this->object->importOnline());
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -90,7 +98,7 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
      */
     public function testimport(): void
     {
-        $this->assertEquals('', $this->object->import());
+        $this->assertIsArray($this->object->import());
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -102,7 +110,10 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
      */
     public function testentryToPohoda(): void
     {
-        $this->assertEquals('', $this->object->entryToPohoda());
+        $statementXML = new \SimpleXMLElement(file_get_contents('tests/testczk.xml'));
+        $entry = $statementXML->BkToCstmrStmt->Stmt->Ntry[0];
+
+        $this->assertIsArray($this->object->entryToPohoda($entry));
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -121,7 +132,7 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame((new \DateTime('first day of last month'))->format('Y-m-d'), $since->format('Y-m-d'));
         $this->assertSame((new \DateTime('last day of last month'))->format('Y-m-d'), $until->format('Y-m-d'));
 
-        $period2 = $this->object->setScope('this_month');
+        $period2 = $this->object->setScope('current_month');
         $since2 = \DateTime::createFromInterface($period2->getStartDate());
         $this->assertSame((new \DateTime('first day of this month'))->format('Y-m-d'), $since2->format('Y-m-d'));
     }
@@ -133,7 +144,7 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
      */
     public function testgetPdfStatements(): void
     {
-        $this->assertEquals('', $this->object->getPdfStatements());
+        $this->assertIsArray($this->object->getPdfStatements());
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }
@@ -145,7 +156,7 @@ class StatementorTest extends \PHPUnit\Framework\TestCase
      */
     public function testgetXmlStatements(): void
     {
-        $this->assertEquals('', $this->object->getXmlStatements());
+        $this->assertIsArray($this->object->getXmlStatements());
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete('This test has not been implemented yet.');
     }

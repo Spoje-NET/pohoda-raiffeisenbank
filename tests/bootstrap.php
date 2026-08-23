@@ -21,3 +21,4 @@ require_once __DIR__.'/../vendor/autoload.php';
 Transactor::checkCertificatePresence(\Ease\Shared::cfg('CERT_FILE'));
 
 include_once __DIR__.'/BankClientTester.php';
+include_once __DIR__.'/CredentialGuard.php';
