@@ -351,6 +351,26 @@
       "required": true,
       "category": "Other"
     },
+    "SHAREPOINT_UPLOAD_XML": {
+      "type": "bool",
+      "description": {
+        "en": "Upload XML statement files to SharePoint. Disable to keep XML statements local only (PDF upload and Pohoda import are unaffected).",
+        "cs": "Nahrávat XML výpisy do SharePointu. Vypnutím zůstanou XML výpisy pouze lokálně (nahrávání PDF a import do Pohody tím není ovlivněn)."
+      },
+      "defval": true,
+      "required": false,
+      "category": "Other"
+    },
+    "OFFICE365_PATH_XML": {
+      "type": "text",
+      "description": {
+        "en": "SharePoint destination folder for XML statements, if different from OFFICE365_PATH (used for PDFs). Leave empty to use the same folder.",
+        "cs": "Cílová složka SharePoint pro XML výpisy, pokud se má lišit od OFFICE365_PATH (použité pro PDF). Ponechte prázdné pro stejnou složku."
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
     "SHAREPOINT_PERMANENT_LINK": {
       "type": "bool",
       "description": {

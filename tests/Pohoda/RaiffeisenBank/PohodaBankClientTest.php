@@ -220,4 +220,32 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
 
         $this->assertStringContainsString('empty body', $reason);
     }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::isUnitMismatchError
+     */
+    public function testIsUnitMismatchErrorDetectsKnownMessage(): void
+    {
+        $this->assertTrue(PohodaBankClient::isUnitMismatchError('Tento balíček není určen pro tuto jednotku.'));
+        $this->assertTrue(PohodaBankClient::isUnitMismatchError('mServer\\Bank: Tento balíček není určen pro tuto jednotku.'));
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::isUnitMismatchError
+     */
+    public function testIsUnitMismatchErrorIgnoresUnrelatedMessages(): void
+    {
+        $this->assertFalse(PohodaBankClient::isUnitMismatchError('Certificate is blocked'));
+        $this->assertFalse(PohodaBankClient::isUnitMismatchError('Duplicate ExtID 121'));
+        $this->assertFalse(PohodaBankClient::isUnitMismatchError(''));
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::EXIT_UNIT_MISMATCH
+     */
+    public function testExitUnitMismatchConstantDoesNotCollideWithAuth(): void
+    {
+        $this->assertNotSame(PohodaBankClient::EXIT_AUTH, PohodaBankClient::EXIT_UNIT_MISMATCH);
+        $this->assertSame(153, PohodaBankClient::EXIT_UNIT_MISMATCH);
+    }
 }

@@ -25,3 +25,55 @@ Shared::init(['POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO', 
 $apiInstance = new \VitexSoftware\Raiffeisenbank\PremiumAPI\GetAccountsApi();
 
 PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('CERT_PASS'));
+
+/**
+ * Grant the low-privilege runtime DB user (pohodaSQL-raiffeisenbank-statements-sharepoint.php,
+ * pohoda-sharepoint-link-fixer.php) INSERT/UPDATE/DELETE on DOC, so
+ * PohodaBankClient::attachSharepointUrl() can write the SharePoint link attachment, and the
+ * link fixer's --apply "corrected"/"removed" cases can repair or remove a stale one.
+ *
+ * Run this once per Pohoda MSSQL database with DB_* pointed at an account that has GRANT
+ * rights (e.g. sa) - the standard MultiFlexi SQLServer/DatabaseConnection credential only
+ * ever supplies DB_CONNECTION/DB_HOST/DB_PORT/DB_DATABASE/DB_USERNAME/DB_PASSWORD/DB_SETTINGS,
+ * so that's the connection this admin credential fills in here; GRANT_INSERT_TO is a plain
+ * (non-credential) field naming the separate low-privilege runtime account to grant to.
+ */
+if (Shared::cfg('GRANT_INSERT_TO', false)) {
+    $adminDoc = new \SpojeNet\PohodaSQL\DOC(null, [
+        'dbType' => Shared::cfg('DB_CONNECTION', 'sqlsrv'),
+        'server' => Shared::cfg('DB_HOST'),
+        'dbLogin' => Shared::cfg('DB_USERNAME'),
+        'dbPass' => Shared::cfg('DB_PASSWORD'),
+        'database' => Shared::cfg('DB_DATABASE'),
+        'port' => Shared::cfg('DB_PORT', '1433'),
+        'dbSettings' => Shared::cfg('DB_SETTINGS', ''),
+    ]);
+    $grantTo = Shared::cfg('GRANT_INSERT_TO');
+    $pdo = $adminDoc->getFluentPDO(true)->pdo;
+
+    foreach (['INSERT', 'UPDATE', 'DELETE'] as $permission) {
+        $pdo->exec(\sprintf('GRANT %s ON dbo.DOC TO [%s]', $permission, $grantTo));
+    }
+
+    echo \sprintf('Granted INSERT, UPDATE, DELETE on DOC to %s', $grantTo).\PHP_EOL;
+}
+
+/**
+ * Ensure OFFICE365_PATH_XML exists as a SharePoint folder, if a custom one is
+ * configured (pohodaSQL-raiffeisenbank-statements-sharepoint.php uploads XML
+ * statements there instead of OFFICE365_PATH). Graph's simple upload PUT does
+ * not auto-create missing parent folders, so without this, the first XML
+ * upload to a not-yet-created folder 404s. Graph (client-id/secret) auth
+ * only, matching OFFICE365_PATH_XML's own auth requirement.
+ */
+if (Shared::cfg('OFFICE365_PATH_XML', false) && Shared::cfg('OFFICE365_CLIENTID', false)) {
+    $graph = PohodaBankClientOffice::buildGraphClient(
+        Shared::cfg('OFFICE365_TENANT'),
+        Shared::cfg('OFFICE365_SITE'),
+        Shared::cfg('OFFICE365_CLIENTID'),
+        Shared::cfg('OFFICE365_CLSECRET'),
+    );
+    $xmlPath = Shared::cfg('OFFICE365_PATH_XML');
+    $graph->ensureFolder($xmlPath);
+    echo \sprintf('Ensured SharePoint folder exists: %s', $xmlPath).\PHP_EOL;
+}

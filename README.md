@@ -24,6 +24,26 @@ After uploading to SharePoint, links to the PDF statements are attached to all i
 
 Check certificate presence yet.
 
+The low-privilege runtime DB account used for `DB_USERNAME` (by
+`pohodaSQL-raiffeisenbank-statements-sharepoint.php` and
+`pohoda-sharepoint-link-fixer.php`) needs write access to the `DOC` table
+so `attachSharepointUrl()` can attach/repair the SharePoint link on bank
+records - most Pohoda MSSQL setups otherwise leave this account read-only.
+Grant it once per database, connected as an account with `GRANT` rights
+(e.g. `sa`):
+
+```sql
+USE StwPh_12345678_2026;
+
+GRANT INSERT ON dbo.DOC TO pohodaSQLuser;
+GRANT UPDATE ON dbo.DOC TO pohodaSQLuser;
+GRANT DELETE ON dbo.DOC TO pohodaSQLuser;
+```
+
+`pohoda-raiffeisenbank-setup` can also run this for you: set `DB_*` to an
+admin-capable connection and `GRANT_INSERT_TO` to the low-privilege
+runtime username (see `.env.example`).
+
 ## Transactions tool
 
 Import Bank movements from RaiffeisenBank (using [getTransactionList](https://developers.rb.cz/premium/documentation/01rbczpremiumapi#/Get%20Transaction%20List/getTransactionList) as source)
@@ -147,6 +167,19 @@ SHAREPOINT_LINK_SCOPE=organization
 
 This only applies to the Graph (client-id/secret) app-only path - the legacy Login/Password
 flow still goes through classic SharePoint REST and is unaffected.
+
+**Controlling XML statement uploads (pohodaSQL-raiffeisenbank-statements-sharepoint only):**
+by default, both PDF and XML statements are uploaded to SharePoint into `OFFICE365_PATH`. Set
+`SHAREPOINT_UPLOAD_XML=false` to keep XML statements local only - the PDF upload and the Pohoda
+import via mServer are unaffected. Set `OFFICE365_PATH_XML` to upload XML statements into a
+different SharePoint folder than PDFs. `OFFICE365_PATH_XML` is also read by
+`pohoda-sharepoint-link-fixer`, which relocates any already-uploaded XML statements it finds
+sitting in `OFFICE365_PATH` to this folder - see its section below.
+
+```env
+SHAREPOINT_UPLOAD_XML=true
+OFFICE365_PATH_XML='Shared documents/statements-xml'
+```
 
 ## Error Handling
 
@@ -273,11 +306,21 @@ Executes the following pipeline in order:
 2. Query Pohoda MSSQL for bank records (`BV`) in the period **together with their current URL attachment**, filtered by `POHODA_BANK_IDS` when set
 3. For each record decide and (when applying) perform:
    * **missing** link → attach the account's statement PDF (`fixed`)
-   * link pointing to **another account** → repoint to the correct PDF (`corrected`), or remove it when no correct PDF exists (`removed`)
-   * already-**correct** link → leave untouched (`ok`)
+   * link pointing to **another account**, or pointing to the right file but in the **stale URL format** (see below) → repoint to the current link (`corrected`, with `reason` set to `wrong_account` or `format_upgrade`), or remove it when no correct PDF exists (`removed`)
+   * already-**correct** link (right account, current URL format) → leave untouched (`ok`)
    * missing link with **no PDF** for that date → leave (`skipped`)
 
+**Permanent link upgrades (Graph/ClientID auth only):** like the uploaders, this tool respects
+`SHAREPOINT_PERMANENT_LINK` (default `true`), `SHAREPOINT_LINK_TYPE`, `SHAREPOINT_LINK_SCOPE` —
+see "Permanent sharing links" under the ClientID authentication section above. Since it
+re-resolves each SharePoint file's current link on every run, running it with `LINK_FIX_APPLY=true`
+also upgrades records still holding an old-format `webUrl` link to the current permanent share
+link, not just records with a missing or cross-attached link. This does not apply to the legacy
+Login/Password flow, which has no permanent-link concept.
+
 **Dry-run by default**: with `LINK_FIX_APPLY` unset/`false` the tool only reports what it would change and writes nothing. Set `LINK_FIX_APPLY=true` to apply. Always dry-run and review first.
+
+**Relocating XML statements**: when `OFFICE365_PATH_XML` is set to a folder different from `OFFICE365_PATH`, any XML statement belonging to `ACCOUNT_NUMBER` found alongside the PDFs in `OFFICE365_PATH` (for example, uploaded before `OFFICE365_PATH_XML` was configured, or from before that feature existed) is moved there - listed in the report's `xml_moved`. This runs independently of `LINK_FIX_APPLY`'s dry-run for Pohoda records: with `LINK_FIX_APPLY` unset it's also a dry-run (nothing moved, just reported); set it to actually move the files. Use `pohoda-raiffeisenbank-setup` first if `OFFICE365_PATH_XML` doesn't exist yet in SharePoint (see "Setup command" above).
 
 **Date range** is resolved by `IMPORT_SCOPE` (default: `last_month`). `DATE_FROM` / `DATE_TO` override `IMPORT_SCOPE` when explicitly set.
 
@@ -303,6 +346,7 @@ Example JSON report (account numbers below are fictional):
   ],
   "removed": [],
   "skipped": [],
+  "xml_moved": ["001_1234567890_0100_9999999_CZK_2026-05-31.xml"],
   "errors": [],
   "exitcode": 0
 }

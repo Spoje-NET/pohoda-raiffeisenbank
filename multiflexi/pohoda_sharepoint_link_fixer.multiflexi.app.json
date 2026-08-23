@@ -232,6 +232,55 @@
       "required": true,
       "category": "API"
     },
+    "OFFICE365_PATH_XML": {
+      "type": "text",
+      "description": {
+        "en": "If different from OFFICE365_PATH, XML statements found alongside the PDFs in OFFICE365_PATH (e.g. uploaded before this separate folder was configured) are relocated here. Leave empty to leave XML statements where they are.",
+        "cs": "Pokud se liší od OFFICE365_PATH, XML výpisy nalezené společně s PDF v OFFICE365_PATH (např. nahrané před nastavením této samostatné složky) se sem přesunou. Ponechte prázdné, pokud mají XML výpisy zůstat na místě."
+      },
+      "defval": "",
+      "required": false,
+      "category": "Other"
+    },
+    "SHAREPOINT_PERMANENT_LINK": {
+      "type": "bool",
+      "description": {
+        "en": "Store a permanent SharePoint sharing link (Graph createLink) instead of the path-based upload URL, which goes stale on move/rename. Graph (client-id/secret) auth only. Also controls which link format existing DOC records get upgraded to on --apply.",
+        "cs": "Ukládat trvalý sdílený odkaz SharePoint (Graph createLink) místo URL závislé na cestě, která přestane platit po přesunu či přejmenování souboru. Platí pouze pro Graph (client-id/secret) autentizaci. Určuje také formát odkazu, na který se stávající záznamy DOC aktualizují při --apply."
+      },
+      "defval": true,
+      "required": false,
+      "category": "Other"
+    },
+    "SHAREPOINT_LINK_TYPE": {
+      "type": "set",
+      "description": {
+        "en": "Type of SharePoint sharing link to create",
+        "cs": "Typ vytvářeného sdíleného odkazu SharePoint"
+      },
+      "defval": "view",
+      "options": {
+        "view": "View (read-only)",
+        "edit": "Edit"
+      },
+      "required": false,
+      "category": "Other"
+    },
+    "SHAREPOINT_LINK_SCOPE": {
+      "type": "set",
+      "description": {
+        "en": "Who the SharePoint sharing link works for",
+        "cs": "Pro koho sdílený odkaz SharePoint platí"
+      },
+      "defval": "organization",
+      "options": {
+        "anonymous": "Anonymous - anyone with the link",
+        "organization": "Organization - only people in your org",
+        "users": "Users - only people already granted access"
+      },
+      "required": false,
+      "category": "Other"
+    },
     "APP_DEBUG": {
       "type": "bool",
       "description": {
@@ -304,8 +353,8 @@
     },
     "3": {
       "description": {
-        "en": "One or more link attach/correct/remove operations failed",
-        "cs": "Jednu nebo více operací přiložení/opravy/odebrání odkazu se nepodařilo provést"
+        "en": "One or more link attach/correct/remove or XML move operations failed",
+        "cs": "Jednu nebo více operací přiložení/opravy/odebrání odkazu nebo přesunu XML souboru se nepodařilo provést"
       },
       "severity": "warning",
       "retry": true

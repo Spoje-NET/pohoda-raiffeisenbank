@@ -30,6 +30,13 @@ abstract class PohodaBankClient extends \mServer\Bank
     public const EXIT_AUTH = 145; // 401 % 256
 
     /**
+     * Exit code for Pohoda accounting-unit (IČO) mismatch: the dataPack's
+     * configured company does not match the accounting unit served by the
+     * target mServer instance/credentials.
+     */
+    public const EXIT_UNIT_MISMATCH = 153; // 409 % 256 (Conflict: wrong accounting unit)
+
+    /**
      * DateTime Formating eg. 2021-08-01T10:00:00.0Z.
      */
     public static string $dateTimeFormat = 'Y-m-d\\TH:i:s.0\\Z';
@@ -325,7 +332,9 @@ abstract class PohodaBankClient extends \mServer\Bank
         // null means the export query failed (e.g. user lacks export rights — error 101).
         // Fall through to import attempt; extId on the bankHeader acts as a secondary guard.
         if ($found === null) {
-            $this->addStatusMessage('Cannot verify transaction presence (export rights missing?), attempting import anyway: '.$transactionId, 'warning');
+            $reason = trim((string) $checker->lastCurlResponse);
+            $detail = $reason !== '' ? ' mServer response: '.mb_substr($reason, 0, 300) : ' (no response body — export rights missing?)';
+            $this->addStatusMessage('Cannot verify transaction presence, attempting import anyway: '.$transactionId.$detail, 'warning');
 
             return false;
         }
@@ -427,10 +436,18 @@ abstract class PohodaBankClient extends \mServer\Bank
 
                     if (\array_key_exists('error', $resultMessages) && \count($resultMessages['error'])) {
                         foreach ($resultMessages['error'] as $errMsg) {
-                            $result['messages'][] = 'error: '.$errMsg;
-                        }
+                            if (self::isUnitMismatchError((string) $errMsg)) {
+                                $result['messages'][] = 'error: Pohoda unit mismatch (check POHODA_ICO / mServer company binding): '.$errMsg;
+                                $result['unitMismatch'] = true;
+                                $this->exitCode = self::EXIT_UNIT_MISMATCH;
+                            } else {
+                                $result['messages'][] = 'error: '.$errMsg;
 
-                        $this->exitCode = 401;
+                                if ($this->exitCode !== self::EXIT_UNIT_MISMATCH) {
+                                    $this->exitCode = 401;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -604,6 +621,19 @@ EOD;
         }
 
         return false;
+    }
+
+    /**
+     * Determine whether given message text indicates the dataPack's accounting
+     * unit (IČO) does not match the unit served by the target mServer instance.
+     *
+     * @param string $text Log or exception message
+     *
+     * @return bool True if message matches the known "wrong unit" mServer error
+     */
+    public static function isUnitMismatchError(string $text): bool
+    {
+        return preg_match('/Tento balíček není určen pro tuto jednotku/iu', $text) === 1;
     }
 
     /**

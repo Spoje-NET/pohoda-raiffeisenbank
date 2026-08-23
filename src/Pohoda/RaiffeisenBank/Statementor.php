@@ -235,6 +235,10 @@ class Statementor extends PohodaBankClient
                         if ($lastInsert['success']) {
                             $inserted[$lastInsert['id']] = $lastInsert;
                             ++$success;
+                        } elseif (!empty($lastInsert['unitMismatch'])) {
+                            $this->addStatusMessage('Aborting remaining imports: Pohoda unit mismatch detected — every further transaction would fail identically until the accounting-unit configuration is fixed', 'error');
+
+                            return $inserted;
                         }
                     }
                 } catch (\Exception $exc) {
