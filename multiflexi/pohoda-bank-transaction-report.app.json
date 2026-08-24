@@ -164,7 +164,7 @@
         "en": "Transaction report"
       },
       "type": "file",
-      "path": "bank_transaction_report_{\\d+}.json$",
+      "path": "bank_transaction_report_\\d+\\.json$",
       "description": {
         "en": "Destiled bank statement",
         "cs": "Zjednodušený bankovní výpis"
