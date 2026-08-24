@@ -319,7 +319,7 @@
         "en": "Link fixer report"
       },
       "type": "file",
-      "path": "sharepoint_link_fixer_{\\d+}.json$",
+      "path": "sharepoint_link_fixer_\\d+\\.json$",
       "description": {
         "en": "Report listing fixed, skipped and errored Pohoda bank records",
         "cs": "Report se seznamem opravených, přeskočených a chybných bankovních záznamů Pohody"

@@ -193,7 +193,7 @@
         "en": "Place for PDF files",
         "cs": "Místo pro PDF soubory"
       },
-      "defval": "",
+      "defval": "{MULTIFLEXI_TMP}",
       "required": false,
       "category": "Other"
     },

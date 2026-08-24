@@ -201,7 +201,7 @@
         "en": "Place for PDF files",
         "cs": "Místo pro PDF soubory"
       },
-      "defval": "",
+      "defval": "{MULTIFLEXI_TMP}",
       "required": false,
       "category": "Other"
     },
@@ -243,10 +243,34 @@
         "en": "Import report"
       },
       "type": "file",
-      "path": "bank_import_report_{\\d+}.json$",
+      "path": "bank_import_report_\\d+\\.json$",
       "description": {
         "en": "Stauses of Statement: download from bank, import to Pohoda",
         "cs": "Stavy výpisu: stažení z banky, import do pohody"
+      }
+    },
+    {
+      "name": {
+        "en": "Statement PDF",
+        "cs": "Výpis PDF"
+      },
+      "type": "file",
+      "path": "\\d+_\\d{4}_\\d+_\\d+_[A-Z]{3}_\\d{4}-\\d{2}-\\d{2}\\.pdf$",
+      "description": {
+        "en": "Downloaded bank statement (PDF)",
+        "cs": "Stažený bankovní výpis (PDF)"
+      }
+    },
+    {
+      "name": {
+        "en": "Statement XML",
+        "cs": "Výpis XML"
+      },
+      "type": "file",
+      "path": "\\d+_\\d{4}_\\d+_\\d+_[A-Z]{3}_\\d{4}-\\d{2}-\\d{2}\\.xml$",
+      "description": {
+        "en": "Downloaded bank statement (XML)",
+        "cs": "Stažený bankovní výpis (XML)"
       }
     }
   ],
