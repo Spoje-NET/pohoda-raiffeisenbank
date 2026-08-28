@@ -1,3 +1,11 @@
+pohoda-raiffeisenbank (1.8.9) noble; urgency=medium
+
+  * Fix MultiFlexi application:import-json failure: shorten
+    pohoda_sharepoint_year_archiver and pohoda_sharepoint_link_fixer app
+    descriptions to fit the 255-char apps.description column.
+
+ -- Vitex <cybervitexus@gmail.com>  Fri, 28 Aug 2026 15:07:31 +0200
+
 pohoda-raiffeisenbank (1.8.8) noble; urgency=medium
 
   * Release 1.8.8: repair stale PHPUnit tests and add credential-

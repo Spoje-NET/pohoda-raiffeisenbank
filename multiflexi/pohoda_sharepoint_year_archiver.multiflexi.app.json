@@ -7,8 +7,8 @@
     "cs": "Archivace výpisů v SharePointu podle roku"
   },
   "description": {
-    "en": "Sorts bank statement PDF/XML files out of the working SharePoint folder into per-year subfolders (2025, 2024, 2023, ...) based on the date in each filename, keeping only the current year's statements in the working folder while older years stay available, grouped by year, for occasional audit lookups. Dry-run by default; set ARCHIVE_APPLY to apply.",
-    "cs": "Roztřídí soubory PDF/XML výpisů z pracovní složky SharePointu do podsložek podle roku (2025, 2024, 2023, ...) na základě data v názvu souboru. V pracovní složce tak zůstanou pouze výpisy z aktuálního roku, starší roky zůstávají dostupné, roztříděné podle roku, pro příležitostné nahlédnutí při auditu. Ve výchozím stavu pouze náhled; pro provedení nastavte ARCHIVE_APPLY."
+    "en": "Sorts bank statement PDF/XML files out of the working SharePoint folder into per-year subfolders by filename date, keeping only the current year in the working folder. Dry-run by default; set ARCHIVE_APPLY to apply.",
+    "cs": "Roztřídí soubory PDF/XML výpisů z pracovní složky SharePointu do podsložek podle roku dle data v názvu souboru, v pracovní složce zůstanou jen výpisy aktuálního roku. Ve výchozím stavu pouze náhled; pro provedení nastavte ARCHIVE_APPLY."
   },
   "tags": [
     "Raiffeisen",

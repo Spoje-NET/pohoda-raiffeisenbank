@@ -8,7 +8,7 @@
   },
   "description": {
     "en": "Validate and repair SharePoint statement PDF links on Pohoda bank records: attach missing links and repoint links cross-attached to another bank account's statement (multi-account Pohoda companies). Dry-run by default; set LINK_FIX_APPLY to apply.",
-    "cs": "Ověří a opraví odkazy na PDF výpisy v SharePointu u bankovních záznamů v Pohodě: přiloží chybějící odkazy a přesměruje odkazy chybně přiřazené k výpisu jiného bankovního účtu (firmy s více účty). Ve výchozím stavu pouze náhled; pro provedení nastavte LINK_FIX_APPLY."
+    "cs": "Ověří a opraví odkazy na PDF výpisy v SharePointu u bankovních záznamů v Pohodě: přiloží chybějící odkazy a přesměruje odkazy chybně přiřazené k výpisu jiného účtu. Ve výchozím stavu pouze náhled; pro provedení nastavte LINK_FIX_APPLY."
   },
   "tags": [
     "Raiffeisen",
