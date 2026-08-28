@@ -1,0 +1,197 @@
+{
+  "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
+  "schemaVersion": "3.4.0",
+  "uuid": "e4e3fb86-1332-492c-b09b-f1a7297ef3c6",
+  "name": {
+    "en": "Pohoda SharePoint year archiver",
+    "cs": "Archivace výpisů v SharePointu podle roku"
+  },
+  "description": {
+    "en": "Sorts bank statement PDF/XML files out of the working SharePoint folder into per-year subfolders (2025, 2024, 2023, ...) based on the date in each filename, keeping only the current year's statements in the working folder while older years stay available, grouped by year, for occasional audit lookups. Dry-run by default; set ARCHIVE_APPLY to apply.",
+    "cs": "Roztřídí soubory PDF/XML výpisů z pracovní složky SharePointu do podsložek podle roku (2025, 2024, 2023, ...) na základě data v názvu souboru. V pracovní složce tak zůstanou pouze výpisy z aktuálního roku, starší roky zůstávají dostupné, roztříděné podle roku, pro příležitostné nahlédnutí při auditu. Ve výchozím stavu pouze náhled; pro provedení nastavte ARCHIVE_APPLY."
+  },
+  "tags": [
+    "Raiffeisen",
+    "Bank",
+    "Statements",
+    "SharePoint",
+    "Archive"
+  ],
+  "requirements": [
+    "Office365"
+  ],
+  "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
+  "executable": "pohoda-sharepoint-year-archiver",
+  "environment": {
+    "OFFICE365_USERNAME": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Username",
+        "cs": "Uživatelské jméno Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "API"
+    },
+    "OFFICE365_PASSWORD": {
+      "type": "password",
+      "description": {
+        "en": "Office 365 Password",
+        "cs": "Heslo Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "API"
+    },
+    "OFFICE365_CLIENTID": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Client ID",
+        "cs": "Client ID Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "API"
+    },
+    "OFFICE365_CLSECRET": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Client Secret",
+        "cs": "Client Secret Office 365"
+      },
+      "defval": "",
+      "required": false,
+      "category": "API"
+    },
+    "OFFICE365_TENANT": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Tenant",
+        "cs": "Tenant Office 365"
+      },
+      "defval": "",
+      "required": true,
+      "category": "API"
+    },
+    "OFFICE365_SITE": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 SharePoint Site",
+        "cs": "SharePoint Site Office 365"
+      },
+      "defval": "",
+      "required": true,
+      "category": "API"
+    },
+    "OFFICE365_PATH": {
+      "type": "text",
+      "description": {
+        "en": "SharePoint working folder path containing the current statement PDFs/XMLs",
+        "cs": "Cesta k pracovní složce SharePointu s aktuálními PDF/XML výpisy"
+      },
+      "defval": "",
+      "required": true,
+      "category": "API"
+    },
+    "OFFICE365_ARCHIVE_PATH": {
+      "type": "text",
+      "description": {
+        "en": "Path prefix under which per-year archive subfolders (<prefix>/2025, <prefix>/2024, ...) are created. Defaults to OFFICE365_PATH itself when left empty.",
+        "cs": "Cesta, pod kterou se vytvářejí podsložky jednotlivých roků (<cesta>/2025, <cesta>/2024, ...). Pokud je prázdné, použije se OFFICE365_PATH."
+      },
+      "defval": "",
+      "required": false,
+      "category": "API"
+    },
+    "CURRENT_YEAR": {
+      "type": "text",
+      "description": {
+        "en": "The year that stays in the working folder — every file dated to a different year is moved into its own archive subfolder. Defaults to the current calendar year.",
+        "cs": "Rok, který zůstává v pracovní složce — soubory s jiným rokem v názvu se přesunou do vlastní podsložky podle roku. Výchozí hodnota je aktuální kalendářní rok."
+      },
+      "defval": "",
+      "required": false,
+      "category": "Behavior"
+    },
+    "ARCHIVE_APPLY": {
+      "type": "bool",
+      "description": {
+        "en": "Apply the moves in SharePoint. When false (default) the tool runs a dry-run and only reports intended moves without relocating anything.",
+        "cs": "Provést přesun souborů v SharePointu. Při false (výchozí) běží pouze náhled a nahlásí zamýšlené přesuny bez jejich provedení."
+      },
+      "defval": "False",
+      "required": false,
+      "category": "Behavior"
+    },
+    "APP_DEBUG": {
+      "type": "bool",
+      "description": {
+        "en": "Show debug messages",
+        "cs": "Zobrazit ladicí zprávy"
+      },
+      "defval": "False",
+      "required": false,
+      "category": "Behavior"
+    },
+    "RESULT_FILE": {
+      "type": "string",
+      "description": {
+        "en": "Write output JSON data to",
+        "cs": "Zápis výstupních dat do JSON"
+      },
+      "defval": "sharepoint_year_archiver.json",
+      "required": false,
+      "category": "Other"
+    },
+    "EASE_LOGGER": {
+      "type": "string",
+      "description": {
+        "en": "Write log messages using",
+        "cs": "Způsob zápisu logovacích zpráv"
+      },
+      "defval": "console|syslog",
+      "required": false,
+      "category": "Behavior"
+    }
+  },
+  "artifacts": [
+    {
+      "name": {
+        "cs": "Report archivace výpisů",
+        "en": "Year archiver report"
+      },
+      "type": "file",
+      "path": "sharepoint_year_archiver\\.json$",
+      "description": {
+        "en": "Report listing files moved, archive years created and any errors",
+        "cs": "Report se seznamem přesunutých souborů, vytvořených ročních složek a případných chyb"
+      }
+    }
+  ],
+  "exitCodes": {
+    "0": {
+      "description": {
+        "en": "Success",
+        "cs": "Úspěšné dokončení"
+      },
+      "severity": "success",
+      "retry": false
+    },
+    "1": {
+      "description": {
+        "en": "SharePoint listing failed",
+        "cs": "Chyba při výpisu souborů ze SharePointu"
+      },
+      "severity": "error",
+      "retry": true
+    },
+    "3": {
+      "description": {
+        "en": "One or more archive folder creations or file moves failed",
+        "cs": "Jedno nebo více vytvoření archivní složky nebo přesunů souborů se nezdařilo"
+      },
+      "severity": "warning",
+      "retry": true
+    }
+  }
+}

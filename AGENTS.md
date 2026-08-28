@@ -33,6 +33,8 @@ All executable scripts are in the `src/` directory:
 - `pohoda-raiffeisenbank-offline-statement-importer.php`: Import from offline XML files
 - `pohodasql-raiffeisenbank-statements-sharepoint.php`: Import with SharePoint links
 - `pohoda-bank-transaction-report.php`: Generate JSON transaction reports
+- `pohoda-sharepoint-link-fixer.php`: Attach/repair missing or cross-attached SharePoint PDF links on Pohoda bank records
+- `pohoda-sharepoint-year-archiver.php`: Sort out-of-year statement files in the SharePoint working folder into per-year subfolders
 
 ## Development Commands
 

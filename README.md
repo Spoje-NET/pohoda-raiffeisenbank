@@ -181,6 +181,18 @@ SHAREPOINT_UPLOAD_XML=true
 OFFICE365_PATH_XML='Shared documents/statements-xml'
 ```
 
+**Archiving old years (`pohoda-sharepoint-year-archiver` only):** by default the working
+folder (`OFFICE365_PATH`) accumulates every year's statements indefinitely. Run this tool at
+year-end to sort anything not from the current year into a `<year>` subfolder, so the working
+folder only ever contains the current year - older years stay available, grouped by year, for
+occasional audit lookups. See its section below.
+
+```env
+OFFICE365_ARCHIVE_PATH='Shared documents/statements'
+CURRENT_YEAR=2026
+ARCHIVE_APPLY=false
+```
+
 ## Error Handling
 
 All scripts perform certificate validation before attempting API calls. If the certificate cannot be read or validated, a detailed error report is generated including:
@@ -251,6 +263,8 @@ Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
 * **pohodasql-raiffeisenbank-statements-sharepoint** - Download PDF+XML statements, upload both to SharePoint, import into Pohoda via mServer, attach SharePoint PDF link to each bank record via direct SQL (DOC table)
 
 * **pohoda-sharepoint-link-fixer** - Validate and repair SharePoint PDF links on Pohoda bank records for a given period: attach missing links and repoint links that were cross-attached to another bank account's statement. Scoped to the configured bank account; supports IMPORT_SCOPE; dry-run by default (LINK_FIX_APPLY).
+
+* **pohoda-sharepoint-year-archiver** - Sort statement PDF/XML files out of the SharePoint working folder into per-year subfolders (`<year>`), based on the date in each filename, so only the current year's statements remain in the working folder. Dry-run by default (ARCHIVE_APPLY).
 
 * **pohoda-bank-transaction-report** - Generate a JSON report of Pohoda bank transactions for a specified period. The output format matches the RaiffeisenBank statement reporter, including totals and transaction breakdowns.
 
@@ -347,6 +361,61 @@ Example JSON report (account numbers below are fictional):
   "removed": [],
   "skipped": [],
   "xml_moved": ["001_1234567890_0100_9999999_CZK_2026-05-31.xml"],
+  "errors": [],
+  "exitcode": 0
+}
+```
+
+### pohoda-sharepoint-year-archiver
+
+Sorts bank statement PDF/XML files out of the SharePoint working folder (`OFFICE365_PATH`) into
+per-year subfolders, based on the `YYYY-MM-DD` date embedded in each filename. Run this at
+year-end so accounting staff only see the current year's statements in the working folder, while
+older years stay reachable - grouped by year - for the occasional audit lookup, instead of
+accumulating indefinitely in one flat folder.
+
+Executes the following pipeline in order:
+
+1. List files in `OFFICE365_PATH`
+2. For each file matching `..._YYYY-MM-DD.pdf` or `..._YYYY-MM-DD.xml`, skip it if its year equals `CURRENT_YEAR` (default: the current calendar year); otherwise group it under its own year
+3. For each year found, ensure `<archive prefix>/<year>` exists (creating it if needed) and move that year's files into it
+
+**Archive location**: files are moved to `<OFFICE365_ARCHIVE_PATH>/<year>`. `OFFICE365_ARCHIVE_PATH`
+defaults to `OFFICE365_PATH` itself (subfolders created directly under the working folder), but can
+be set to a different SharePoint path/library if archived years should live elsewhere entirely.
+
+**Sorted by each file's own year**: a first run can encounter several backlogged years at once
+(e.g. 2023, 2024, 2025 all sitting in the working folder) - each file is moved into the subfolder
+matching its own filename's year, not dumped into one generic "archive" bucket.
+
+**Dry-run by default**: with `ARCHIVE_APPLY` unset/`false` the tool only reports which files
+would move and where, without creating folders or moving anything. Set `ARCHIVE_APPLY=true` to
+apply. Always dry-run and review first.
+
+**Not account-scoped**: unlike `pohoda-sharepoint-link-fixer`, this tool doesn't filter by
+`ACCOUNT_NUMBER` - it sorts every dated statement file in the folder regardless of which bank
+account it belongs to.
+
+**Side effect on other tools**: `raiffeisenbank-statements-sharepoint-checker` and
+`pohoda-sharepoint-link-fixer` only look at the top-level `OFFICE365_PATH`, so once a year is
+archived away they will no longer see (or be able to fix links against) that year's statements.
+This is expected, not a bug - just keep it in mind if link-fixing or checking an archived year is
+ever needed again (point `OFFICE365_PATH` at the archive subfolder for that one run).
+
+Example JSON report:
+
+```json
+{
+  "path": "Sdilene dokumenty/Banky/",
+  "archive_path": "Sdilene dokumenty/Banky",
+  "current_year": "2026",
+  "apply": false,
+  "years_created": ["2024", "2025"],
+  "moved": [
+    {"filename": "001_1234567890_0100_9999999_CZK_2025-12-31.pdf", "year": "2025", "from": "Sdilene dokumenty/Banky/", "to": "Sdilene dokumenty/Banky/2025"},
+    {"filename": "001_1234567890_0100_9999999_CZK_2024-11-30.pdf", "year": "2024", "from": "Sdilene dokumenty/Banky/", "to": "Sdilene dokumenty/Banky/2024"}
+  ],
+  "skipped": [],
   "errors": [],
   "exitcode": 0
 }
