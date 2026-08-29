@@ -339,7 +339,11 @@ if (!$certValid) {
 
                     foreach ($inserted as $refId => $importInfo) {
                         if (!isset($importInfo['details']) || !\is_array($importInfo['details'])) {
-                            $engine->addStatusMessage(sprintf(_('Skipping import %s: missing details'), $refId), 'warning');
+                            if (!empty($importInfo['duplicate'])) {
+                                $engine->addStatusMessage(sprintf(_('Skipping SharePoint attach for %s: already imported (duplicate)'), $refId), 'debug');
+                            } else {
+                                $engine->addStatusMessage(sprintf(_('Skipping import %s: missing details'), $refId), 'warning');
+                            }
 
                             continue;
                         }
