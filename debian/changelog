@@ -1,3 +1,15 @@
+pohoda-raiffeisenbank (1.9.0) noble; urgency=medium
+
+  * Add pohoda-sharepoint-year-archiver: sorts bank statement PDF/XML
+    files in the SharePoint working folder into per-year subfolders,
+    so accounting staff only see the current year's statements while
+    older years stay available, grouped by year, for occasional audit
+    lookups. Dry-run by default (ARCHIVE_APPLY). Optional TARGET_YEAR
+    restricts a run to a single year instead of archiving every
+    out-of-year file at once.
+
+ -- Vitex <cybervitexus@gmail.com>  Fri, 28 Aug 2026 15:12:27 +0200
+
 pohoda-raiffeisenbank (1.8.9) noble; urgency=medium
 
   * Fix MultiFlexi application:import-json failure: shorten

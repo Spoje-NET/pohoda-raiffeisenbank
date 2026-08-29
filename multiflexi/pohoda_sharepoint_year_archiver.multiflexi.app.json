@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/VitexSoftware/php-vitexsoftware-multiflexi-core/refs/heads/main/multiflexi.app.schema.json",
   "schemaVersion": "3.4.0",
-  "uuid": "e4e3fb86-1332-492c-b09b-f1a7297ef3c6",
+  "uuid": "b58d5bbe-c983-4966-8c93-fd5ac0a1edee",
   "name": {
     "en": "Pohoda SharePoint year archiver",
     "cs": "Archivace výpisů v SharePointu podle roku"
@@ -14,7 +14,7 @@
     "Raiffeisen",
     "Bank",
     "Statements",
-    "SharePoint",
+    "Pohoda",
     "Archive"
   ],
   "requirements": [
@@ -23,6 +23,46 @@
   "homepage": "https://github.com/Spoje-NET/pohoda-raiffeisenbank",
   "executable": "pohoda-sharepoint-year-archiver",
   "environment": {
+    "OFFICE365_TENANT": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 Tenant",
+        "cs": "Tenant Office 365"
+      },
+      "defval": "",
+      "required": true,
+      "category": "API"
+    },
+    "OFFICE365_SITE": {
+      "type": "text",
+      "description": {
+        "en": "Office 365 SharePoint Site",
+        "cs": "SharePoint Site Office 365"
+      },
+      "defval": "",
+      "required": true,
+      "category": "API"
+    },
+    "OFFICE365_PATH": {
+      "type": "text",
+      "description": {
+        "en": "SharePoint working folder path containing statement PDFs/XMLs",
+        "cs": "Cesta k pracovní složce se soubory PDF/XML výpisů v SharePointu"
+      },
+      "defval": "",
+      "required": true,
+      "category": "API"
+    },
+    "OFFICE365_ARCHIVE_PATH": {
+      "type": "text",
+      "description": {
+        "en": "Path prefix under which per-year archive subfolders are created. Defaults to OFFICE365_PATH itself when left empty.",
+        "cs": "Cesta, pod kterou se vytvářejí podsložky archivu podle roku. Pokud je prázdné, použije se OFFICE365_PATH."
+      },
+      "defval": "",
+      "required": false,
+      "category": "API"
+    },
     "OFFICE365_USERNAME": {
       "type": "text",
       "description": {
@@ -63,51 +103,21 @@
       "required": false,
       "category": "API"
     },
-    "OFFICE365_TENANT": {
-      "type": "text",
-      "description": {
-        "en": "Office 365 Tenant",
-        "cs": "Tenant Office 365"
-      },
-      "defval": "",
-      "required": true,
-      "category": "API"
-    },
-    "OFFICE365_SITE": {
-      "type": "text",
-      "description": {
-        "en": "Office 365 SharePoint Site",
-        "cs": "SharePoint Site Office 365"
-      },
-      "defval": "",
-      "required": true,
-      "category": "API"
-    },
-    "OFFICE365_PATH": {
-      "type": "text",
-      "description": {
-        "en": "SharePoint working folder path containing the current statement PDFs/XMLs",
-        "cs": "Cesta k pracovní složce SharePointu s aktuálními PDF/XML výpisy"
-      },
-      "defval": "",
-      "required": true,
-      "category": "API"
-    },
-    "OFFICE365_ARCHIVE_PATH": {
-      "type": "text",
-      "description": {
-        "en": "Path prefix under which per-year archive subfolders (<prefix>/2025, <prefix>/2024, ...) are created. Defaults to OFFICE365_PATH itself when left empty.",
-        "cs": "Cesta, pod kterou se vytvářejí podsložky jednotlivých roků (<cesta>/2025, <cesta>/2024, ...). Pokud je prázdné, použije se OFFICE365_PATH."
-      },
-      "defval": "",
-      "required": false,
-      "category": "API"
-    },
     "CURRENT_YEAR": {
       "type": "text",
       "description": {
-        "en": "The year that stays in the working folder — every file dated to a different year is moved into its own archive subfolder. Defaults to the current calendar year.",
-        "cs": "Rok, který zůstává v pracovní složce — soubory s jiným rokem v názvu se přesunou do vlastní podsložky podle roku. Výchozí hodnota je aktuální kalendářní rok."
+        "en": "The year that stays in the working folder — every other year found in a filename gets moved into its own subfolder. Defaults to the current calendar year.",
+        "cs": "Rok, který zůstává v pracovní složce — soubory s jiným rokem ve jméně se přesunou do vlastní podsložky. Výchozí je aktuální kalendářní rok."
+      },
+      "defval": "",
+      "required": false,
+      "category": "Behavior"
+    },
+    "TARGET_YEAR": {
+      "type": "text",
+      "description": {
+        "en": "Restrict this run to a single year (e.g. 2023) instead of archiving every year found outside CURRENT_YEAR at once. Leave empty to process all out-of-year files.",
+        "cs": "Omezí běh na jeden konkrétní rok (např. 2023) místo archivace všech roků mimo CURRENT_YEAR najednou. Ponechte prázdné pro zpracování všech souborů mimo aktuální rok."
       },
       "defval": "",
       "required": false,
@@ -116,8 +126,8 @@
     "ARCHIVE_APPLY": {
       "type": "bool",
       "description": {
-        "en": "Apply the moves in SharePoint. When false (default) the tool runs a dry-run and only reports intended moves without relocating anything.",
-        "cs": "Provést přesun souborů v SharePointu. Při false (výchozí) běží pouze náhled a nahlásí zamýšlené přesuny bez jejich provedení."
+        "en": "Apply changes in SharePoint. When false (default) the tool runs a dry-run and only reports intended moves without moving anything.",
+        "cs": "Provést změny v SharePointu. Při false (výchozí) běží pouze náhled a nahlásí zamýšlené přesuny bez jejich provedení."
       },
       "defval": "False",
       "required": false,
@@ -163,8 +173,8 @@
       "type": "file",
       "path": "sharepoint_year_archiver\\.json$",
       "description": {
-        "en": "Report listing files moved, archive years created and any errors",
-        "cs": "Report se seznamem přesunutých souborů, vytvořených ročních složek a případných chyb"
+        "en": "Report listing which statement files were (or would be) moved into which year folder",
+        "cs": "Report se seznamem souborů výpisů, které byly (nebo by byly) přesunuty do jednotlivých ročních složek"
       }
     }
   ],
@@ -185,10 +195,18 @@
       "severity": "error",
       "retry": true
     },
+    "2": {
+      "description": {
+        "en": "Invalid TARGET_YEAR (expected a 4-digit year)",
+        "cs": "Neplatná hodnota TARGET_YEAR (očekává se čtyřciferný rok)"
+      },
+      "severity": "error",
+      "retry": false
+    },
     "3": {
       "description": {
-        "en": "One or more archive folder creations or file moves failed",
-        "cs": "Jedno nebo více vytvoření archivní složky nebo přesunů souborů se nezdařilo"
+        "en": "One or more folder-create or file-move operations failed",
+        "cs": "Jednu nebo více operací vytvoření složky nebo přesunu souboru se nepodařilo provést"
       },
       "severity": "warning",
       "retry": true
