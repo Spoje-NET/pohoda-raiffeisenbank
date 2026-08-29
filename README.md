@@ -270,6 +270,8 @@ Po instalaci balíku jsou v systému k dispozici tyto nové příkazy:
 
 ### pohodasql-raiffeisenbank-statements-sharepoint
 
+![Statements SharePoint Logo](pohoda-raiffeisenbank-statements-sharepoint.svg?raw=true)
+
 Executes the following pipeline in order:
 
 1. Download PDF statements from Raiffeisen Bank
@@ -310,6 +312,8 @@ The JSON report contains the result of every stage:
 On upload failure, the value is `{"error": "exception message"}` instead of the URL.
 
 ### pohoda-sharepoint-link-fixer
+
+![Link Fixer Logo](pohoda-raiffeisenbank-link-fixer.svg?raw=true)
 
 Validates and repairs the SharePoint PDF links on Pohoda bank records.
 Use when records were imported without the SharePoint URL attachment, or when an earlier un-scoped import **cross-attached** statements between the several bank accounts of one Pohoda company (so a record for one account links to another account's statement).
@@ -368,6 +372,8 @@ Example JSON report (account numbers below are fictional):
 
 ### pohoda-sharepoint-year-archiver
 
+![Archiver Logo](pohoda-raiffeisenbank-year-archiver.svg?raw=true)
+
 Sorts bank statement PDF/XML files out of the SharePoint working folder (`OFFICE365_PATH`) into
 per-year subfolders, based on the `YYYY-MM-DD` date embedded in each filename. Run this at
 year-end so accounting staff only see the current year's statements in the working folder, while
@@ -422,6 +428,8 @@ Example JSON report:
 ```
 
 ### pohoda-bank-transaction-report
+
+![Transaction Report Logo](pohoda-raiffeisenbank-transaction-report.svg?raw=true)
 
 This tool generates a JSON report of bank transactions imported in Pohoda for a given period.
 
