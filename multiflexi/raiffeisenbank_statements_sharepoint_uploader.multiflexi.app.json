@@ -349,6 +349,14 @@
       "severity": "error",
       "retry": true
     },
+    "144": {
+      "description": {
+        "en": "Bad request to Raiffeisen Bank API (HTTP 400).",
+        "cs": "Neplatný požadavek na API Raiffeisen Bank (HTTP 400)."
+      },
+      "severity": "error",
+      "retry": false
+    },
     "145": {
       "description": {
         "en": "Raiffeisen Bank API authentication or certificate error (HTTP 401 Unauthorized).",
@@ -357,61 +365,53 @@
       "severity": "error",
       "retry": false
     },
-    "146": {
+    "147": {
       "description": {
-        "en": "Certificate is invalid.",
-        "cs": "Certifikát je neplatný."
+        "en": "No access rights to perform the operation (HTTP 403 Forbidden).",
+        "cs": "Uživatel nemá práva k provedení operace (HTTP 403 Forbidden)."
       },
       "severity": "error",
       "retry": false
     },
     "148": {
       "description": {
-        "en": "No access rights to perform the operation.",
-        "cs": "Uživatel nemá práva k provedení operace."
+        "en": "Requested resource does not exist (HTTP 404 Not Found).",
+        "cs": "Požadovaný zdroj neexistuje (HTTP 404 Not Found)."
       },
       "severity": "error",
       "retry": false
     },
-    "149": {
+    "157": {
       "description": {
-        "en": "Requested resource does not exist.",
-        "cs": "Požadovaný zdroj neexistuje."
+        "en": "Request payload too large (HTTP 413).",
+        "cs": "Tělo požadavku je příliš velké (HTTP 413)."
       },
       "severity": "error",
       "retry": false
     },
-    "158": {
+    "159": {
       "description": {
-        "en": "Request payload too large.",
-        "cs": "Tělo požadavku je příliš velké."
-      },
-      "severity": "error",
-      "retry": false
-    },
-    "160": {
-      "description": {
-        "en": "Unsupported media type.",
-        "cs": "Nepodporovaný typ obsahu."
+        "en": "Unsupported media type (HTTP 415).",
+        "cs": "Nepodporovaný typ obsahu (HTTP 415)."
       },
       "severity": "error",
       "retry": false
     },
     "174": {
       "description": {
-        "en": "Too many requests. Rate limit exceeded.",
-        "cs": "Příliš mnoho požadavků. Limit překročen."
+        "en": "Too many requests. Rate limit exceeded (HTTP 429).",
+        "cs": "Příliš mnoho požadavků. Limit překročen (HTTP 429)."
       },
       "severity": "warning",
       "retry": true
     },
-    "245": {
+    "244": {
       "description": {
-        "en": "Unexpected internal error.",
-        "cs": "Neočekávaná interní chyba."
+        "en": "Raiffeisen Bank API gateway outage: the gateway itself is down (HTTP 500 with an 'outage: yes' response header), rather than rejecting this specific request.",
+        "cs": "Výpadek brány API Raiffeisen Bank: brána je celá nedostupná (HTTP 500 s hlavičkou 'outage: yes'), nejde o odmítnutí konkrétního požadavku."
       },
       "severity": "critical",
-      "retry": false
+      "retry": true
     }
   }
 }
