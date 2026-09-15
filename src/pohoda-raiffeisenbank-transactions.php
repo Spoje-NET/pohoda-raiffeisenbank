@@ -31,3 +31,5 @@ if (!PohodaBankClient::checkCertificate(Shared::cfg('CERT_FILE'), Shared::cfg('C
 $engine = new Transactor(Shared::cfg('ACCOUNT_NUMBER'));
 $engine->setScope(Shared::cfg('IMPORT_SCOPE', 'yesterday'));
 $engine->import();
+
+exit($engine->getExitCode());
