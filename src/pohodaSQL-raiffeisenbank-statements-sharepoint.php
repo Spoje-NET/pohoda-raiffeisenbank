@@ -89,7 +89,8 @@ if (!$certValid) {
             $report['raiffeisenbank']['pdf'] = array_values($pdfStatements);
         }
     } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
-        $report['message'] = $exc->getMessage();
+        $engine->addStatusMessage($exc->getMessage(), 'error');
+        $report = PohodaBankClient::applyRaiffeisenbankApiException($report, $exc);
         $report['raiffeisenbank']['pdf'] = 'download failed';
         $pdfStatements = [];
 
@@ -145,8 +146,8 @@ if (!$certValid) {
         }
     } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
         $engine->addStatusMessage($exc->getMessage(), 'error');
+        $report = PohodaBankClient::applyRaiffeisenbankApiException($report, $exc);
         $report['raiffeisenbank']['xml'] = 'download failed';
-        $report['message'] = $exc->getMessage();
 
         $apiExitCode = $exc->getCode();
 
@@ -282,6 +283,7 @@ if (!$certValid) {
         if ($uploadXmlToSharepoint) {
             foreach ($xmlStatements ?: [] as $filename) {
                 $uploadAs = Statementor::statementFilename($filename);
+
                 try {
                     $uploaded = $doUploadXml($uploadAs, file_get_contents($filename));
                     $engine->addStatusMessage(_('Uploaded').': '.$uploaded, 'success');

@@ -79,6 +79,8 @@ $report = [
 try {
     $engine->downloadXML();
 } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
+    $engine->addStatusMessage($exc->getMessage(), 'error');
+    $report = PohodaBankClient::applyRaiffeisenbankApiException($report, $exc);
     $report['mesage'] = $exc->getMessage();
 
     $exitcode = $exc->getCode();

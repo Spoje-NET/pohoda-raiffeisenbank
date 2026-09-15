@@ -24,7 +24,6 @@ use Pohoda\RaiffeisenBank\PohodaBankClient;
 class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
 {
     use CredentialGuard;
-
     protected PohodaBankClient $object;
 
     /**
@@ -260,5 +259,35 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertNotSame(PohodaBankClient::EXIT_AUTH, PohodaBankClient::EXIT_UNIT_MISMATCH);
         $this->assertSame(153, PohodaBankClient::EXIT_UNIT_MISMATCH);
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::isAuthError
+     */
+    public function testIsAuthErrorDetectsTerminatedCertificate(): void
+    {
+        $this->assertTrue(PohodaBankClient::isAuthError('Raiffeisenbank API HTTP 401 UNAUTHORISED: Certificate is terminated'));
+        $this->assertTrue(PohodaBankClient::isAuthError('Certificate is terminated'));
+        $this->assertTrue(PohodaBankClient::isAuthError('Certificate is blocked'));
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::applyRaiffeisenbankApiException
+     */
+    public function testApplyRaiffeisenbankApiExceptionExposesErrorDescription(): void
+    {
+        $exc = new \VitexSoftware\Raiffeisenbank\ApiException(
+            'Raiffeisenbank API HTTP 401 UNAUTHORISED: Certificate is terminated',
+            401,
+            [],
+            '{"error":"UNAUTHORISED","error_description":"Certificate is terminated"}',
+        );
+
+        $report = PohodaBankClient::applyRaiffeisenbankApiException([], $exc);
+
+        $this->assertSame(401, $report['http_status']);
+        $this->assertSame('UNAUTHORISED', $report['error']);
+        $this->assertSame('Certificate is terminated', $report['error_description']);
+        $this->assertStringContainsString('Certificate is terminated', $report['message']);
     }
 }

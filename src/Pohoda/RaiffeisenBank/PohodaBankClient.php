@@ -426,7 +426,7 @@ abstract class PohodaBankClient extends \mServer\Bank
             } else {
                 $resultMessages = $this->messages;
 
-                if ($this->isExtIdDuplicateError($resultMessages)) {
+                if (self::isExtIdDuplicateError($resultMessages)) {
                     $result['success'] = true;
                     $result['duplicate'] = true;
                     $result['message'] = 'Already imported (ExtID duplicate): '.($transactionId ?? 'unknown');
@@ -567,26 +567,6 @@ EOD;
         return $xml->asXML();
     }
 
-    /**
-     * Check whether Pohoda response messages indicate an ExtID duplicate (error code 121).
-     *
-     * @param array<string, array<string>> $messages
-     */
-    private function isExtIdDuplicateError(array $messages): bool
-    {
-        $candidates = array_merge($messages['error'] ?? [], $messages['warning'] ?? []);
-
-        foreach ($candidates as $msg) {
-            $text = (string) $msg;
-
-            if (str_contains($text, '121') || stripos($text, 'extid') !== false || stripos($text, 'duplicit') !== false) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public function getExitCode(): int
     {
         return $this->exitCode;
@@ -611,6 +591,7 @@ EOD;
             '/UNAUTHORISED/i',
             '/UNAUTHORIZED/i',
             '/Certificate is blocked/i',
+            '/Certificate is terminated/i',
             '/invalid certificate/i',
         ];
 
@@ -701,5 +682,64 @@ EOD;
         }
 
         return null;
+    }
+
+    /**
+     * Copy a Raiffeisenbank API exception into the JSON report so operators
+     * see HTTP status, `error` and `error_description` (e.g. UNAUTHORISED /
+     * Certificate is terminated) without reading a stack trace.
+     *
+     * @param array<string, mixed> $report Existing report payload
+     *
+     * @return array<string, mixed>
+     */
+    public static function applyRaiffeisenbankApiException(array $report, \VitexSoftware\Raiffeisenbank\ApiException $exc): array
+    {
+        $report['message'] = $exc->getMessage();
+        $report['http_status'] = $exc->getCode();
+
+        if (preg_match('/HTTP (\d+)\s+([A-Z0-9_]+):\s*(.+)$/', $exc->getMessage(), $matches) === 1) {
+            $report['http_status'] = (int) $matches[1];
+            $report['error'] = $matches[2];
+            $report['error_description'] = $matches[3];
+        } else {
+            $responseObject = null;
+
+            try {
+                $responseObject = $exc->getResponseObject();
+            } catch (\Throwable) {
+                $responseObject = null;
+            }
+
+            if (\is_object($responseObject) && method_exists($responseObject, 'getError') && $responseObject->getError()) {
+                $report['error'] = $responseObject->getError();
+            }
+
+            if (\is_object($responseObject) && method_exists($responseObject, 'getErrorDescription') && $responseObject->getErrorDescription()) {
+                $report['error_description'] = $responseObject->getErrorDescription();
+            }
+        }
+
+        return $report;
+    }
+
+    /**
+     * Check whether Pohoda response messages indicate an ExtID duplicate (error code 121).
+     *
+     * @param array<string, array<string>> $messages
+     */
+    private static function isExtIdDuplicateError(array $messages): bool
+    {
+        $candidates = array_merge($messages['error'] ?? [], $messages['warning'] ?? []);
+
+        foreach ($candidates as $msg) {
+            $text = (string) $msg;
+
+            if (str_contains($text, '121') || stripos($text, 'extid') !== false || stripos($text, 'duplicit') !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
