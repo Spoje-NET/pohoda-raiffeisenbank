@@ -21,7 +21,7 @@ use Ease\Shared;
 
 require_once '../vendor/autoload.php';
 
-$options = getopt('i::e::o::', ['input::environment::output::']);
+$options = getopt('i:e:o:', ['input:', 'environment:', 'output:']);
 $statementFile = \array_key_exists('i', $options) ? $options['i'] : (\array_key_exists('input', $options) ? $options['input'] : Shared::cfg('STATEMENT_FILE', 'php://stdin'));
 $destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout'));
 

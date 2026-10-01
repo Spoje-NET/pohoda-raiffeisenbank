@@ -31,7 +31,7 @@ require_once '../vendor/autoload.php';
  * the corresponding URL links were not written into Pohoda's DOC table.
  * This tool finds those bank records and attaches the missing links.
  */
-$options = getopt('o::e:', ['output::environment:']);
+$options = getopt('o:e:', ['output:', 'environment:']);
 Shared::init(
     [
         'OFFICE365_TENANT', 'OFFICE365_PATH', 'OFFICE365_SITE',
