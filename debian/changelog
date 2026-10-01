@@ -7,8 +7,18 @@ pohoda-raiffeisenbank (1.9.0) noble; urgency=medium
     lookups. Dry-run by default (ARCHIVE_APPLY). Optional TARGET_YEAR
     restricts a run to a single year instead of archiving every
     out-of-year file at once.
+  * Report a terminated RB API certificate ("Certificate is terminated")
+    in the log and JSON result instead of crashing with a PHP fatal
+    error; MultiFlexi now shows it as UNAUTHORISED.
+  * pohoda-raiffeisenbank-transactions now returns a non-zero exit code
+    on internal errors; MultiFlexi app definitions document the exit
+    codes the scripts actually produce.
+  * Fix command-line options in all tools: --output/--environment/
+    --input/--scope were never recognised and "-o file" (with a space)
+    was ignored or crashed the year archiver.
+  * Year archiver logic moved into a tested SharePointYearArchiver class.
 
- -- Vitex <cybervitexus@gmail.com>  Fri, 28 Aug 2026 15:12:27 +0200
+ -- Vitex <cybervitexus@gmail.com>  Thu, 01 Oct 2026 15:11:54 +0200
 
 pohoda-raiffeisenbank (1.8.9) noble; urgency=medium
 
