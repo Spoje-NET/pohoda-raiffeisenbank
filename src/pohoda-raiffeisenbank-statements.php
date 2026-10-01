@@ -24,15 +24,15 @@ $exitcode = 0;
 /**
  * Get today's Statements list.
  */
-$options = getopt('o::e::', ['output::environment::']);
+$options = getopt('o:e:', ['output:', 'environment:']);
 Shared::init(
     [
         'POHODA_URL', 'POHODA_USERNAME', 'POHODA_PASSWORD', 'POHODA_ICO',
         'CERT_FILE', 'CERT_PASS', 'XIBMCLIENTID', 'ACCOUNT_NUMBER',
     ],
-    \array_key_exists('environment', $options) ? $options['environment'] : '../.env',
+    \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
 );
-$destination = \array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout');
+$destination = \array_key_exists('o', $options) ? $options['o'] : (\array_key_exists('output', $options) ? $options['output'] : Shared::cfg('RESULT_FILE', 'php://stdout'));
 
 $certFile = Shared::cfg('CERT_FILE');
 

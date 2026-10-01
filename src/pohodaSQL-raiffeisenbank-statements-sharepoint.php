@@ -26,7 +26,7 @@ require_once '../vendor/autoload.php';
 /**
  * Get today's Statements list.
  */
-$options = getopt('o::e::', ['output::environment::']);
+$options = getopt('o:e:', ['output:', 'environment:']);
 Shared::init(
     [
         'OFFICE365_TENANT', 'OFFICE365_PATH', 'OFFICE365_SITE',
