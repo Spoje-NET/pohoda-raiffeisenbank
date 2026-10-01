@@ -478,7 +478,7 @@
         "en": "Import report"
       },
       "type": "file",
-      "path": "bank_import_report_\\d+\\.json$",
+      "path": "bank_import_report_[\\d_]+\\.json$",
       "description": {
         "en": "Stauses of Statement: download from bank, import to Pohoda, upload to Shatepoint,  Attachment link in Pohoda",
         "cs": "Stavy výpisu: stažení z banky, import do pohody, nahrátí do sharepointu, příloha linku do Pohody"

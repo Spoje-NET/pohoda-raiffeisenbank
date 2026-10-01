@@ -301,7 +301,7 @@
         "en": "Download and store report"
       },
       "type": "file",
-      "path": "bank_statement_upload_\\d+\\.json$",
+      "path": "bank_statement_upload_[\\d_]+\\.json$",
       "description": {
         "en": "Stauses of Statement: download from bank, upload to Shatepoint",
         "cs": "Stavy výpisu: stažení z banky, nahrání do Sharepointu"
