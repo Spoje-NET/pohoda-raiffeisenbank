@@ -37,7 +37,7 @@ require_once '../vendor/autoload.php';
  * without touching 2022, 2021, ...) instead of every out-of-CURRENT_YEAR file
  * at once.
  */
-$options = getopt('o::e:', ['output::environment:']);
+$options = getopt('o:e:', ['output:', 'environment:']);
 Shared::init(
     ['OFFICE365_TENANT', 'OFFICE365_PATH', 'OFFICE365_SITE'],
     \array_key_exists('environment', $options) ? $options['environment'] : (\array_key_exists('e', $options) ? $options['e'] : '../.env'),
@@ -58,19 +58,6 @@ if ($targetYear !== '' && !preg_match('/^[0-9]{4}$/', $targetYear)) {
 // nothing — run once in this dry-run mode, review, then set true.
 $apply = filter_var(Shared::cfg('ARCHIVE_APPLY', false), \FILTER_VALIDATE_BOOLEAN);
 
-$exitcode = 0;
-$report = [
-    'path' => Shared::cfg('OFFICE365_PATH'),
-    'archive_prefix' => $archivePrefix,
-    'current_year' => $currentYear,
-    'target_year' => $targetYear !== '' ? $targetYear : null,
-    'apply' => $apply,
-    'years_created' => [],
-    'moved' => [],
-    'skipped' => [],
-    'errors' => [],
-];
-
 $logger = new \Ease\Sand();
 $logger->setObjectName('PohodaSharepointYearArchiver');
 
@@ -78,9 +65,7 @@ if (Shared::cfg('APP_DEBUG', false)) {
     $logger->logBanner(APP_NAME, sprintf('Path: %s | Archive prefix: %s | Current year: %s | %s', Shared::cfg('OFFICE365_PATH'), $archivePrefix, $currentYear, $apply ? 'APPLY' : 'DRY-RUN'));
 }
 
-// Stage 1: Connect to SharePoint and list all files in the working folder.
-$logger->addStatusMessage('stage 1/2: Listing SharePoint statement files', 'debug');
-
+// Build SharePoint access closures for the chosen auth flow.
 if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD', false)) {
     // Legacy user credential flow, untouched by the ACS retirement - still
     // goes through classic SharePoint REST (_api/web/...).
@@ -155,107 +140,19 @@ if (Shared::cfg('OFFICE365_USERNAME', false) && Shared::cfg('OFFICE365_PASSWORD'
     };
 }
 
-// filename => ['year' => 'YYYY', 'ref' => server-relative URL (legacy) or item id (Graph)]
-$filesToMove = [];
+$report = (new SharePointYearArchiver(
+    $doList,
+    $doEnsureFolder,
+    $doMove,
+    (string) Shared::cfg('OFFICE365_PATH'),
+    $archivePrefix,
+    $currentYear,
+    $targetYear,
+    $apply,
+    $logger,
+))->run();
 
-try {
-    $sharepointFiles = $doList();
-
-    foreach ($sharepointFiles as $name => $ref) {
-        // PHP silently coerces purely-numeric string array keys to int, so
-        // $name isn't reliably a string here even though both $doList()
-        // branches build it from a filename - cast back before using it.
-        $name = (string) $name;
-
-        if (!preg_match('/(\d{4})-\d{2}-\d{2}\.(?:pdf|xml)$/i', $name, $dateMatch)) {
-            continue;
-        }
-
-        $year = $dateMatch[1];
-
-        if ($year === $currentYear) {
-            continue;
-        }
-
-        if ($targetYear !== '' && $year !== $targetYear) {
-            continue;
-        }
-
-        $filesToMove[$name] = ['year' => $year, 'ref' => (string) $ref];
-    }
-
-    $logger->addStatusMessage(sprintf('Found %d file(s) to archive out of %d listed%s', \count($filesToMove), \count($sharepointFiles), $targetYear !== '' ? ' (restricted to TARGET_YEAR '.$targetYear.')' : ''), 'info');
-} catch (\Exception $exc) {
-    $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'SharePoint file listing');
-    $logger->addStatusMessage($errorMessage, 'error');
-    $report['errors'][] = $errorMessage;
-    $exitcode = 1;
-}
-
-if (empty($filesToMove)) {
-    $logger->addStatusMessage($targetYear !== ''
-        ? sprintf('No files found for TARGET_YEAR %s — nothing to archive.', $targetYear)
-        : 'No files outside CURRENT_YEAR found — nothing to archive.', $exitcode === 0 ? 'success' : 'warning');
-    $report['exitcode'] = $exitcode;
-    file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE : 0));
-
-    exit($exitcode);
-}
-
-// Stage 2: Ensure each needed year subfolder exists (once per year, not once
-// per file), then move every matched file into it.
-$logger->addStatusMessage('stage 2/2: '.($apply ? 'Archiving' : 'Evaluating (dry-run)').' files by year', 'debug');
-
-$years = array_unique(array_column($filesToMove, 'year'));
-sort($years);
-
-foreach ($years as $year) {
-    if ($apply) {
-        try {
-            $doEnsureFolder($year);
-            $report['years_created'][] = $year;
-        } catch (\Exception $exc) {
-            $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'Ensuring archive folder for '.$year);
-            $logger->addStatusMessage($errorMessage, 'error');
-            $report['errors'][] = $errorMessage;
-            $exitcode = 3;
-        }
-    } else {
-        $report['years_created'][] = $year;
-    }
-}
-
-foreach ($filesToMove as $filename => $info) {
-    $year = $info['year'];
-    $target = rtrim($archivePrefix, '/').'/'.$year;
-
-    try {
-        if ($apply) {
-            $doMove($info['ref'], $year);
-        }
-
-        $logger->addStatusMessage(sprintf('%s %s → %s', $apply ? 'moved' : 'would move', $filename, $target), 'success');
-        $report['moved'][] = [
-            'filename' => $filename,
-            'year' => $year,
-            'from' => Shared::cfg('OFFICE365_PATH'),
-            'to' => $target,
-        ];
-    } catch (\Exception $exc) {
-        $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'Move of '.$filename);
-        $logger->addStatusMessage($errorMessage, 'error');
-        $report['errors'][] = $errorMessage;
-
-        if ($exitcode === 0) {
-            $exitcode = 3;
-        }
-    }
-}
-
-$logger->addStatusMessage(sprintf('Done (%s): %d moved, %d error(s)', $apply ? 'applied' : 'dry-run', \count($report['moved']), \count($report['errors'])), $exitcode === 0 ? 'success' : 'warning');
-
-$report['exitcode'] = $exitcode;
 $written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE : 0));
 $logger->addStatusMessage(sprintf('Saving result to %s', $destination), $written ? 'success' : 'error');
 
-exit($exitcode);
+exit($report['exitcode']);
