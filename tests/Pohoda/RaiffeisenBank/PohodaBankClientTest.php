@@ -262,6 +262,53 @@ class PohodaBankClientTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::EXIT_MSERVER
+     */
+    public function testExitMServerConstantMatchesDocumentedCode(): void
+    {
+        $this->assertSame(3, PohodaBankClient::EXIT_MSERVER);
+        $this->assertNotSame(PohodaBankClient::EXIT_AUTH, PohodaBankClient::EXIT_MSERVER);
+        $this->assertNotSame(PohodaBankClient::EXIT_UNIT_MISMATCH, PohodaBankClient::EXIT_MSERVER);
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::describeMServerHttpFailure
+     */
+    public function testDescribeMServerHttpFailureForbiddenWithEmptyBody(): void
+    {
+        $message = PohodaBankClient::describeMServerHttpFailure(403, 'http://SE-APP01:40047', '');
+
+        $this->assertStringContainsString('http://SE-APP01:40047', $message);
+        $this->assertStringContainsString('HTTP 403', $message);
+        $this->assertStringContainsString('empty response body', $message);
+        $this->assertStringContainsString('rights to open the accounting unit', $message);
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::describeMServerHttpFailure
+     */
+    public function testDescribeMServerHttpFailureWithBody(): void
+    {
+        $message = PohodaBankClient::describeMServerHttpFailure(500, 'http://SE-APP01:40047', 'Internal error');
+
+        $this->assertStringContainsString('HTTP 500', $message);
+        $this->assertStringContainsString('Internal error', $message);
+        $this->assertStringNotContainsString('rights to open the accounting unit', $message);
+    }
+
+    /**
+     * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::describeMServerHttpFailure
+     */
+    public function testDescribeMServerHttpFailureWithoutHttpResponse(): void
+    {
+        $message = PohodaBankClient::describeMServerHttpFailure(null, 'http://SE-APP01:40047', '');
+        $messageZero = PohodaBankClient::describeMServerHttpFailure(0, 'http://SE-APP01:40047', '');
+
+        $this->assertStringContainsString('without an HTTP response', $message);
+        $this->assertStringContainsString('without an HTTP response', $messageZero);
+    }
+
+    /**
      * @covers \Pohoda\RaiffeisenBank\PohodaBankClient::isAuthError
      */
     public function testIsAuthErrorDetectsTerminatedCertificate(): void

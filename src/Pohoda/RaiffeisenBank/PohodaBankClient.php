@@ -37,6 +37,13 @@ abstract class PohodaBankClient extends \mServer\Bank
     public const EXIT_UNIT_MISMATCH = 153; // 409 % 256 (Conflict: wrong accounting unit)
 
     /**
+     * Exit code for mServer HTTP-level failures without a parseable error
+     * message (e.g. 403 Forbidden with an empty body): mServer refused the
+     * import request itself, so nothing could be imported.
+     */
+    public const EXIT_MSERVER = 3; // Error accessing Pohoda mServer
+
+    /**
      * DateTime Formating eg. 2021-08-01T10:00:00.0Z.
      */
     public static string $dateTimeFormat = 'Y-m-d\\TH:i:s.0\\Z';
@@ -333,7 +340,7 @@ abstract class PohodaBankClient extends \mServer\Bank
         // Fall through to import attempt; extId on the bankHeader acts as a secondary guard.
         if ($found === null) {
             $reason = trim((string) $checker->lastCurlResponse);
-            $detail = $reason !== '' ? ' mServer response: '.mb_substr($reason, 0, 300) : ' (no response body — export rights missing?)';
+            $detail = $reason !== '' ? ' mServer response: '.mb_substr($reason, 0, 300) : sprintf(' (no response body, HTTP %s — export rights missing?)', $checker->lastResponseCode ?? 'n/a');
             $this->addStatusMessage('Cannot verify transaction presence, attempting import anyway: '.$transactionId.$detail, 'warning');
 
             return false;
@@ -447,6 +454,24 @@ abstract class PohodaBankClient extends \mServer\Bank
                                     $this->exitCode = 401;
                                 }
                             }
+                        }
+                    } elseif ($this->lastResponseCode === null || $this->lastResponseCode === 0 || $this->lastResponseCode >= 400) {
+                        // mServer rejected the request on the HTTP level without
+                        // any parseable error message (e.g. 403 Forbidden with an
+                        // empty body) — surface it instead of a silent green run.
+                        $errMsg = self::describeMServerHttpFailure($this->lastResponseCode, (string) $this->url, (string) $this->lastCurlResponse);
+                        $result['messages'][] = 'error: '.$errMsg;
+                        $this->addStatusMessage($errMsg, 'error');
+                        $this->exitCode = self::EXIT_MSERVER;
+                    } else {
+                        // No HTTP error and no Pohoda error message, yet no record
+                        // was produced — never let this end as a silent success.
+                        $errMsg = 'Import failed without a mServer error message (HTTP '.(int) $this->lastResponseCode.')';
+                        $result['messages'][] = 'error: '.$errMsg;
+                        $this->addStatusMessage($errMsg, 'error');
+
+                        if ($this->exitCode !== self::EXIT_UNIT_MISMATCH) {
+                            $this->exitCode = 254;
                         }
                     }
                 }
@@ -656,6 +681,38 @@ EOD;
         }
 
         return sprintf('mServer at %s: availability check failed for an unknown reason', $url);
+    }
+
+    /**
+     * Build a diagnostic message for an mServer HTTP-level failure that produced
+     * no parseable Pohoda error message (e.g. 403 Forbidden with an empty body).
+     *
+     * @param null|int $httpCode HTTP status code of the failed request
+     * @param string   $url      POHODA_URL that was targeted
+     * @param string   $body     raw response body (may be empty)
+     *
+     * @return string human-readable description of the HTTP-level failure
+     */
+    public static function describeMServerHttpFailure(?int $httpCode, string $url, string $body): string
+    {
+        $body = trim($body);
+
+        if ($httpCode === null || $httpCode === 0) {
+            return sprintf('mServer at %s: request failed without an HTTP response', $url);
+        }
+
+        $message = sprintf(
+            'mServer at %s rejected the import with HTTP %d%s',
+            $url,
+            $httpCode,
+            $body === '' ? ' (empty response body)' : ': '.mb_substr($body, 0, 300),
+        );
+
+        if ($httpCode === 403) {
+            $message .= ' — the user lacks rights to open the accounting unit (check Pohoda user rights / mServer user list)';
+        }
+
+        return $message;
     }
 
     /**
