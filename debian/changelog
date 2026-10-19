@@ -1,3 +1,16 @@
+pohoda-raiffeisenbank (1.9.1) noble; urgency=medium
+
+  * Report mServer HTTP-level failures (e.g. 403 Forbidden with an empty
+    body) as a failed import: the HTTP status is logged and written into
+    the JSON report, and the job exits with code 3 instead of finishing
+    green with nothing imported.
+  * Include the HTTP status in the duplicate-check warning when Pohoda
+    refuses the bank listing export.
+  * Jenkins: consolidate SCM checkout and fix node scope for Publish to
+    Aptly.
+
+ -- Vítězslav Dvořák <vitezslav.dvorak@spojenet.cz>  Mon, 19 Oct 2026 12:04:41 +0200
+
 pohoda-raiffeisenbank (1.9.0) noble; urgency=medium
 
   * Add pohoda-sharepoint-year-archiver: sorts bank statement PDF/XML
