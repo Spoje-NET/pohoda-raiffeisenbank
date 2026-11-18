@@ -210,6 +210,8 @@ All scripts perform certificate validation before attempting API calls. If the c
 * `2` - Certificate validation failed (file not found, not readable, or invalid password)
 * `3` - Error accessing Pohoda mServer
 * `4` - Cannot link to Sharepoint
+* `5` - No PDF statements obtained from the bank (the application did not fulfil its purpose)
+* `6` - No XML statements obtained from the bank (nothing to import into Pohoda)
 * `145` - API authentication error (HTTP 401 Unauthorized - typically certificate blocked or invalid)
 * `254` - Another exception without numeric code occurred
 

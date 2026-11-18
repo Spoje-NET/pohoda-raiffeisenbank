@@ -310,7 +310,13 @@ if (!$certValid) {
                 $exitcode = 2;
             }
         } else {
-            $engine->addStatusMessage(_('No PDF statements obtained'), 'info');
+            // The bank did not deliver the expected statement: the app's purpose is not fulfilled
+            // and the operator must be notified, so this is a failure, not a success.
+            $engine->addStatusMessage(_('No PDF statements obtained'), 'error');
+
+            if ($exitcode === 0) {
+                $exitcode = 5;
+            }
         }
     }
 
@@ -387,7 +393,12 @@ if (!$certValid) {
         }
     } else {
         if (\is_array($xmlStatements)) {
-            $engine->addStatusMessage(_('No XML statements obtained'), 'info');
+            // XML is required for the Pohoda import: without it no bank movements are imported.
+            $engine->addStatusMessage(_('No XML statements obtained'), 'error');
+
+            if ($exitcode === 0) {
+                $exitcode = 6;
+            }
         } else {
             $engine->addStatusMessage(_('Error Obtaining XML statements'), 'error');
 
