@@ -550,6 +550,22 @@
       "severity": "error",
       "retry": true
     },
+    "5": {
+      "description": {
+        "en": "No PDF statements obtained from the bank",
+        "cs": "Banka nevydala žádné PDF výpisy"
+      },
+      "severity": "error",
+      "retry": true
+    },
+    "6": {
+      "description": {
+        "en": "No XML statements obtained from the bank (nothing to import into Pohoda)",
+        "cs": "Banka nevydala žádné XML výpisy (není co importovat do Pohody)"
+      },
+      "severity": "error",
+      "retry": true
+    },
     "144": {
       "description": {
         "en": "Bad request to Raiffeisen Bank API (HTTP 400).",
