@@ -30,6 +30,8 @@ node() {
         stage('SCM Checkout') {
             sh 'sudo chown -R jenkins:jenkins . 2>/dev/null || true'
             checkout scm
+            // Checked out once here; every parallel branch below unstashes this.
+            stash name: 'src', useDefaultExcludes: false
         }
     }
 }
@@ -47,11 +49,20 @@ distributions.each { distro ->
         def artifacts = []
         def buildVer = ''
 
+        // /var/lib/jenkins is shared over NFS by the nodes (Jenkins, boys) that lock a workspace
+        // separately: two branches of one build could get the same directory and clobber each
+        // other's files. Own directory per branch.
         node {
+            ws('branches/' + env.JOB_NAME.replace('/', '_') + '_' + distroCode + '_' + env.BUILD_NUMBER) {
+            try {
             ansiColor('xterm') {
                 stage('Checkout ' + distroName) {
                     sh 'sudo chown -R jenkins:jenkins . 2>/dev/null || true'
-                    checkout scm
+                    // The first branch shares the SCM Checkout workspace and its read-only
+                    // .git packs cannot be overwritten by unstash. Empty the directory in
+                    // place (deleteDir() races with delayed unlink on NFS workspaces).
+                    sh 'find . -mindepth 1 -delete 2>/dev/null || true'
+                    unstash 'src'
                     def imageName = vendor + '/' + distro
                     buildImage = docker.image(imageName)
                     sh 'git checkout debian/changelog'
@@ -72,7 +83,7 @@ distributions.each { distro ->
                         '''
                         sh 'dch -b -v ' + buildVer  + ' "' + env.BUILD_TAG  + '"'
                         sh 'sudo apt-get update --allow-releaseinfo-change'
-                        sh 'sudo chown jenkins:jenkins ..'
+                        sh 'sudo chown jenkins:jenkins .. || true'
                         sh 'sudo rm -rf debian/$(dpkg-parsechangelog --show-field Source)/ debian/.debhelper/ debian/tmp/'
                         sh '''
                             export DH_INTERNAL_BUILDDIR="/tmp/debhelper-build-''' + uniqueBuildId + '''"
@@ -160,6 +171,11 @@ distributions.each { distro ->
                 }
             }
         }
+            } finally {
+                // leave no checkout behind, even on failure (root-owned files from the container too)
+                sh 'sudo rm -rf "$WORKSPACE"/* "$WORKSPACE"/.[!.]* 2>/dev/null || true'
+            }
+            }
     }
 }
 }
