@@ -125,18 +125,20 @@ if (!$certValid) {
             } catch (\Office365\Runtime\Http\RequestException|GraphApiException $exc) {
                 $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'SharePoint file listing');
                 $engine->addStatusMessage($errorMessage, 'error');
-                $report['mesage'] = $errorMessage;
+                $report['message'] = $errorMessage;
                 $exitcode = 1;
             }
         }
     } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
-        $report['mesage'] = $exc->getMessage();
-        $engine->addStatusMessage($report['mesage'], 'error');
+        $report['message'] = $exc->getMessage();
+        $engine->addStatusMessage($report['message'], 'error');
         $exitcode = $exc->getCode();
 
         if (!$exitcode) {
-            if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {
+            if (preg_match('/cURL error ([0-9]*):/', $report['message'], $codeRaw)) {
                 $exitcode = (int) $codeRaw[1];
+            } else {
+                $exitcode = 1; // Generic error if no specific code available
             }
         }
 
@@ -145,6 +147,10 @@ if (!$certValid) {
         }
     }
 }
+
+// Process exit status is 0-255; report exactly what the process returns
+$exitcode %= 256;
+$report['exitcode'] = $exitcode;
 
 $written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
 $engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');

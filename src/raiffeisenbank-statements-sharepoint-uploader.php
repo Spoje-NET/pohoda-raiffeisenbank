@@ -209,13 +209,15 @@ if (!$certValid) {
 
                             $report['missing'][] = $pdfStatement;
                         } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
-                            $report['mesage'] = $exc->getMessage();
+                            $report['message'] = $exc->getMessage();
 
                             $exitcode = $exc->getCode();
 
                             if (!$exitcode) {
-                                if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {
+                                if (preg_match('/cURL error ([0-9]*):/', $report['message'], $codeRaw)) {
                                     $exitcode = (int) $codeRaw[1];
+                                } else {
+                                    $exitcode = 1; // Generic error if no specific code available
                                 }
                             }
 
@@ -229,27 +231,31 @@ if (!$certValid) {
                 $errorMessage = PohodaBankClientOffice::describeRequestException($exc, 'SharePoint file listing');
                 $report['message'] = $errorMessage;
                 $engine->addStatusMessage($errorMessage, 'error');
-                $exitcode = $exc->getCode();
+                $exitcode = $exc->getCode() ?: 1;
             }
         }
     } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
-        $report['mesage'] = $exc->getMessage();
-        $engine->addStatusMessage($report['mesage'], 'error');
+        $report['message'] = $exc->getMessage();
+        $engine->addStatusMessage($report['message'], 'error');
         $exitcode = $exc->getCode();
 
         if (!$exitcode) {
             if (preg_match('/cURL error ([0-9]*):/', $report['message'], $codeRaw)) {
                 $exitcode = (int) $codeRaw[1];
+            } else {
+                $exitcode = 1; // Generic error if no specific code available
             }
         }
 
         if ($exitcode === 429) {
             $exitcode = 174; // "Too many requests. Rate limit exceeded." per the .multiflexi.app.json manifest
         }
-
-        $report['exitcode'] = $exitcode;
     }
 }
+
+// Process exit status is 0-255; report exactly what the process returns
+$exitcode %= 256;
+$report['exitcode'] = $exitcode;
 
 $written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
 $engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');

@@ -81,16 +81,19 @@ try {
 } catch (\VitexSoftware\Raiffeisenbank\ApiException $exc) {
     $engine->addStatusMessage($exc->getMessage(), 'error');
     $report = PohodaBankClient::applyRaiffeisenbankApiException($report, $exc);
-    $report['mesage'] = $exc->getMessage();
 
     $exitcode = $exc->getCode();
 
     if (!$exitcode) {
-        if (preg_match('/cURL error ([0-9]*):/', $report['mesage'], $codeRaw)) {
+        if (preg_match('/cURL error ([0-9]*):/', $report['message'], $codeRaw)) {
             $exitcode = (int) $codeRaw[1];
         } else {
             $exitcode = 1; // Generic error if no specific code available
         }
+    }
+
+    if ($exitcode === 401) {
+        $exitcode = PohodaBankClient::EXIT_AUTH; // 145 "Authentication or certificate error (HTTP 401)" per the .multiflexi.app.json manifest
     }
 
     if ($exitcode === 429) {
@@ -108,28 +111,27 @@ try {
 if ($mServerOnline) {
     $report['inserted'] = $engine->import();
     $report['messages'] = $engine->getMessages();
-    $report['exitcode'] = $engine->getExitCode();
 } else {
     $engine->addStatusMessage('Error accesing mServer '.$engine->lastCurlResponse, 'error');
-    $report['exitcode'] = 3;
+    $exitcode = $exitcode ?: 3;
 }
 
 if ($engine->getExitCode()) {
     $exitcode = $engine->getExitCode();
 }
 
+// Detect authentication related errors in collected messages and adjust exit code accordingly
+if (PohodaBankClient::detectAuthError($report['messages'] ?? [])) {
+    $exitcode = PohodaBankClient::EXIT_AUTH;
+}
+
+// Process exit status is 0-255; report exactly what the process returns
+$exitcode %= 256;
+
+// Final exit code is decided before the report is written so both always match
+$report['exitcode'] = $exitcode;
+
 $written = file_put_contents($destination, json_encode($report, Shared::cfg('DEBUG') ? \JSON_PRETTY_PRINT : 0));
 $engine->addStatusMessage(sprintf(_('Saving result to %s'), $destination), $written ? 'success' : 'error');
-
-// Detect authentication related errors in collected messages and adjust exit code accordingly
-if (\Pohoda\RaiffeisenBank\PohodaBankClient::detectAuthError($report['messages'] ?? [])) {
-    $exitcode = PohodaBankClient::EXIT_AUTH;
-    $report['exitcode'] = $exitcode;
-}
-
-// Ensure report exitcode reflects final chosen exit code
-if (!isset($report['exitcode']) || $report['exitcode'] !== $exitcode) {
-    $report['exitcode'] = $exitcode;
-}
 
 exit($exitcode);
